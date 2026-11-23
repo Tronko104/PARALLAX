@@ -6,7 +6,7 @@
   <title>PARALLAX — A Universe Beyond Observation</title>
   <meta
     name="description"
-    content="PARALLAX is a procedural, infinite, persistent multi-scale universe simulator with WebGL2 volumetric raymarching — from cosmic web filaments down to planetary biospheres and civilizations."
+    content="PARALLAX is a procedural, infinite, persistent multi-scale universe & real-time N-body physics simulator with WebGL2 volumetric raymarching."
   />
   <meta name="theme-color" content="#05070b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -24,30 +24,34 @@
     <canvas id="overlay-canvas"></canvas>
   </main>
 
-  <!-- Cinematic Welcome Curtain (Live Universe Renders Behind) -->
+  <!-- Cinematic Welcome Curtain -->
   <section id="intro-overlay" class="intro-overlay" aria-label="PARALLAX Welcome">
     <div class="intro-card">
-      <div class="intro-eyebrow">PROCEDURAL COSMOLOGICAL OBSERVATORY • v2.0</div>
+      <div class="intro-eyebrow">N-BODY GRAVITY SANDBOX & COSMOLOGICAL OBSERVATORY • v3.0</div>
       <div class="intro-logo-row">
         <span class="intro-reticle" aria-hidden="true"></span>
         <span class="intro-title">PARALLAX</span>
       </div>
       <p class="intro-tagline">A Universe Beyond Observation</p>
       <p class="intro-desc">
-        Traverse 26 continuous orders of magnitude — from dark-matter cosmic filaments and active galactic nuclei to black hole event horizons, exoplanet climates, evolving biospheres, and Kardashev civilizations.
+        Explore 26 continuous orders of magnitude with live symplectic N-body gravity, planetary collisions, thermal lasers, real-time climate & biosphere editing, and full 6-DOF space flight.
       </p>
       <div class="intro-actions">
         <button id="btn-intro-enter" class="intro-btn-primary">Enter Universe</button>
         <button id="btn-intro-tour" class="intro-btn-secondary">✦ Start Cinematic Tour</button>
       </div>
       <div class="intro-hints">
-        <span>Drag: Orbit / Look</span>
+        <span>Left-Drag: Orbit</span>
         <span>•</span>
-        <span>Scroll / Pinch: Zoom 26 Orders</span>
+        <span>Right-Drag: Pan</span>
         <span>•</span>
-        <span>WASD: Fly</span>
+        <span>WASD/RF/QE: 6-DOF Fly & Roll</span>
         <span>•</span>
-        <span>H: Pure View</span>
+        <span>C: Land</span>
+        <span>•</span>
+        <span>, / . : Speed</span>
+        <span>•</span>
+        <span>O/T/G/H/L: Overlays</span>
       </div>
     </div>
   </section>
@@ -58,7 +62,7 @@
       <div class="modal-header">
         <div>
           <div class="entity-category-overline">OBSERVATORY DISCOVERY GUIDE</div>
-          <h2 class="modal-title">Cosmic Wonders & Infinite Sector Jump</h2>
+          <h2 class="modal-title">Cosmic Wonders, Infinite Sectors & Controls</h2>
         </div>
         <button id="btn-close-wonders" class="icon-btn" aria-label="Close Discovery Guide">✕</button>
       </div>
@@ -69,12 +73,12 @@
         <div class="sector-jump-bar">
           <span class="panel-title">Cosmic Web Sector:</span>
           <span id="sector-coords-badge" class="panel-badge">[0, 0, 0]</span>
-          <button id="btn-sector-prev" class="icon-btn" title="Jump to neighboring cosmic sector (-X)">◀ Prev Sector</button>
-          <button id="btn-sector-next" class="icon-btn" title="Jump to neighboring cosmic sector (+X)">Next Sector ▶</button>
-          <button id="btn-sector-random" class="icon-btn" title="Jump to deep uncharted cosmic coordinates">⟐ Deep Space Jump</button>
+          <button id="btn-sector-prev" class="icon-btn">◀ Prev</button>
+          <button id="btn-sector-next" class="icon-btn">Next ▶</button>
+          <button id="btn-sector-random" class="icon-btn">⟐ Deep Jump</button>
         </div>
         <div class="snapshot-bar">
-          <button id="btn-export-snapshot" class="icon-btn">↓ Export Universe JSON</button>
+          <button id="btn-export-snapshot" class="icon-btn">↓ Export JSON</button>
           <label class="icon-btn" style="cursor:pointer">
             ↑ Import JSON
             <input id="input-import-snapshot" type="file" accept=".json,application/json" style="display:none" />
@@ -84,7 +88,7 @@
     </div>
   </div>
 
-  <!-- Scientific Observatory Telemetry HUD -->
+  <!-- Scientific Observatory & Universe Sandbox Telemetry HUD -->
   <div id="hud-layer">
     <!-- 1. Top Telemetry & Cosmic Breadcrumb Header -->
     <header id="top-telemetry-bar" class="hud-panel">
@@ -94,7 +98,6 @@
           <span class="brand-reticle" aria-hidden="true"></span>
           <h1 class="brand-title">PARALLAX</h1>
         </div>
-        <span class="brand-subtitle">Beyond Observation</span>
       </div>
 
       <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Cosmic Hierarchy"></nav>
@@ -103,33 +106,34 @@
         <button id="btn-open-wonders" class="action-btn accent-amber" title="Open Cosmic Wonders & Infinite Sector Guide">
           ✦ WONDERS
         </button>
-        <button id="btn-autopilot" class="icon-btn" title="Toggle Cinematic Autopilot Tour (Key T)">
-          TOUR: OFF
+        <button id="btn-seti-scanner" class="action-btn accent-emerald" title="Jump to next Bio/Civ Exoplanet">
+          ◉ BIO/SETI
         </button>
-        <button
-          id="btn-seti-scanner"
-          class="action-btn accent-emerald"
-          title="Scan sector and jump to the next exoplanet with an active Biosphere or Civilization"
-        >
-          ◉ BIO / SETI
+        <button id="btn-lighting-mode" class="icon-btn" title="Cycle Lighting: Realistic / Studio / Flashlight">
+          ☀ REALISTIC
         </button>
-        <button id="btn-audio" class="icon-btn" title="Toggle WebAudio Deep Space Soundscape (Key M)">
-          AUDIO: OFF
+        <button id="btn-quality-mode" class="icon-btn" title="Cycle Graphics Quality: Auto DRS / Fast / Balanced / Ultra">
+          ⚙ AUTO DRS
         </button>
-        <button id="btn-zen" class="icon-btn" title="Pure Observation Mode (Key H)">
-          ZEN
+        <button id="btn-photo-capture" class="icon-btn" title="Capture Screenshot (Key F10)">
+          📷
         </button>
-        <button id="btn-toggle-right" class="icon-btn drawer-toggle-btn" title="Toggle Scientific Dossier Drawer">☷</button>
+        <button id="btn-audio" class="icon-btn" title="Toggle Deep Space Soundscape (Key M)">
+          AUDIO
+        </button>
+        <button id="btn-zen" class="icon-btn" title="Toggle Pure View (Key U)">
+          UI
+        </button>
+        <button id="btn-toggle-right" class="icon-btn drawer-toggle-btn" title="Toggle Scientific Dossier & Live Editor">☷</button>
       </div>
     </header>
 
-    <!-- 2. Middle Workspace: Collapsible Left Scale/Catalog + Open 3D Cosmos + Collapsible Right Scientific Dossier -->
+    <!-- 2. Middle Workspace: Left Drawer + Open 3D Viewport + Right Scientific Dossier -->
     <div id="middle-workspace">
-      <!-- Left Panel: Continuous Logarithmic Scale & Spatial Object Catalog -->
       <aside id="left-navigator-panel" class="hud-panel side-drawer left-drawer" aria-label="Spatial Scale and Catalog">
         <div class="panel-header">
-          <span class="panel-title">Continuous Spatial Scale</span>
-          <span id="scale-exponent-tag" class="scale-exponent-tag">10^7.40 m</span>
+          <span class="panel-title">Continuous Scale</span>
+          <span id="scale-exponent-tag" class="scale-exponent-tag">10^7.40 m • 60 FPS</span>
         </div>
 
         <div class="scale-ladder-section">
@@ -158,6 +162,15 @@
           <button id="btn-bookmark" class="icon-btn" title="Save bookmark">★</button>
         </div>
 
+        <!-- Universe Sandbox Display Toggle Bar (O / T / G / H / L) -->
+        <div class="display-toggles-row">
+          <button class="toggle-chip active" data-flag="orbits" title="Toggle Orbits (Key O)">O: Orbits</button>
+          <button class="toggle-chip active" data-flag="trails" title="Toggle Trails (Key T)">T: Trails</button>
+          <button class="toggle-chip" data-flag="grid" title="Toggle 3D Grid (Key G)">G: Grid</button>
+          <button class="toggle-chip active" data-flag="hz" title="Toggle Habitable Zone (Key H)">H: HZ</button>
+          <button class="toggle-chip active" data-flag="labels" title="Toggle Labels (Key L)">L: Labels</button>
+        </div>
+
         <div class="panel-header">
           <span id="catalog-header-title" class="panel-title">Orbital Bodies</span>
           <span id="catalog-count-badge" class="panel-badge">7 planets</span>
@@ -166,8 +179,7 @@
         <div id="catalog-list-container" class="catalog-list-container"></div>
       </aside>
 
-      <!-- Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector -->
-      <aside id="right-dossier-panel" class="hud-panel side-drawer right-drawer" aria-label="Scientific Dossier and Spectrometry">
+      <aside id="right-dossier-panel" class="hud-panel side-drawer right-drawer" aria-label="Scientific Dossier and Live Editor">
         <div class="dossier-entity-hero">
           <div id="entity-category-overline" class="entity-category-overline">TEMPERATE TERRESTRIAL WORLD</div>
           <div class="entity-title-row">
@@ -177,60 +189,55 @@
         </div>
 
         <div class="dossier-tabs" role="tablist">
-          <button class="dossier-tab-btn active" data-tab="physics" role="tab">1. Physics</button>
-          <button class="dossier-tab-btn" data-tab="climate" role="tab">2. Climate</button>
-          <button class="dossier-tab-btn" data-tab="life" role="tab">3. Life</button>
-          <button class="dossier-tab-btn" data-tab="civ" role="tab">4. Civ</button>
+          <button class="dossier-tab-btn active" data-tab="physics" role="tab">Physics</button>
+          <button class="dossier-tab-btn" data-tab="climate" role="tab">Climate</button>
+          <button class="dossier-tab-btn" data-tab="life" role="tab">Life</button>
+          <button class="dossier-tab-btn" data-tab="civ" role="tab">Civ</button>
         </div>
 
         <div id="dossier-content-scroll" class="dossier-content-scroll"></div>
       </aside>
     </div>
 
-    <!-- 3. Bottom Temporal Simulation & Causal Phenomena Dock -->
-    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Time Dilation and Cosmic Events">
+    <!-- Floating Universe Sandbox Add/Launch Palette (Shown when Add tool active) -->
+    <div id="add-tool-palette" class="hud-panel add-tool-palette hidden" aria-label="Add Body Palette">
+      <div class="add-palette-row">
+        <span class="panel-title">Placement Mode:</span>
+        <div id="add-mode-pills" class="time-speed-pills">
+          <button class="time-pill-btn active" data-add-mode="orbit">Orbit</button>
+          <button class="time-pill-btn" data-add-mode="binary">Binary</button>
+          <button class="time-pill-btn" data-add-mode="launch">Launch</button>
+          <button class="time-pill-btn" data-add-mode="still">Still</button>
+        </div>
+        <span class="panel-title" style="margin-left:8px">Click anywhere in Star System to spawn!</span>
+      </div>
+      <div id="add-presets-bar" class="add-presets-bar"></div>
+    </div>
+
+    <!-- 3. Bottom Universe Sandbox Interactive Tools & Temporal Control Dock -->
+    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Sandbox Tools and Time Dilation">
       <div class="time-controls-cluster">
         <div class="epoch-clock-box">
-          <span class="epoch-overline">Universal Cosmic Epoch</span>
-          <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr (+0.0 h)</span>
+          <span class="epoch-overline">Universal Epoch</span>
+          <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr</span>
         </div>
+        <button id="btn-reverse-time" class="time-pill-btn" title="Reverse Time Direction">⏪</button>
         <div id="time-speed-pills" class="time-speed-pills" role="group" aria-label="Time Multiplier"></div>
       </div>
 
-      <div class="live-event-ticker" title="Autonomous real-time log of cosmic events across the universe">
-        <span class="ticker-pulse-dot" aria-hidden="true"></span>
-        <span id="live-ticker-text" class="ticker-text">Tuning PARALLAX telemetry...</span>
+      <!-- Universe Sandbox Interactive Action Tools -->
+      <div class="sandbox-tools-cluster" role="group" aria-label="Universe Sandbox Tools">
+        <button class="action-btn sandbox-tool-btn active" data-tool="select" title="Select, Orbit & Inspect Bodies">⌖ Select</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="add" title="Add or Launch Stars, Planets, Moons & Black Holes">+ Add / Launch</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="laser" title="Hold click to fire Heating Laser & melt crust">⚡ Laser</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="explode" title="Detonate Planet or Trigger Star Supernova">💥 Explode</button>
+        <button id="btn-land-toggle" class="action-btn" title="Land on selected planet surface or liftoff (Key C)">↓ Land (C)</button>
+        <button id="btn-reset-nbody" class="icon-btn" title="Reset N-Body orbits & clear debris">↺ Reset</button>
       </div>
 
-      <div class="phenomena-actions-cluster">
-        <button
-          id="btn-phenom-star"
-          class="action-btn"
-          title="Advance host star astrophysical evolution along the H-R diagram (+Gyr)"
-        >
-          ✦ Star Evo
-        </button>
-        <button
-          id="btn-phenom-impact"
-          class="action-btn"
-          title="Simulate an asteroid bolide impact on the active planet"
-        >
-          ☄ Impact
-        </button>
-        <button
-          id="btn-phenom-bio"
-          class="action-btn accent-emerald"
-          title="Catalyze abiogenesis or accelerate evolutionary radiation"
-        >
-          ❋ Bio Surge
-        </button>
-        <button
-          id="btn-phenom-civ"
-          class="action-btn accent-amber"
-          title="Trigger a Kardashev technological breakthrough"
-        >
-          ⬡ Kardashev
-        </button>
+      <div class="live-event-ticker" title="Real-time physics and cosmic event feed">
+        <span class="ticker-pulse-dot" aria-hidden="true"></span>
+        <span id="live-ticker-text" class="ticker-text">PARALLAX v3.0 N-Body Physics Active</span>
       </div>
     </footer>
   </div>

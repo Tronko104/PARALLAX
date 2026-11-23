@@ -1080,11 +1080,104 @@ body {
   text-overflow: ellipsis;
 }
 
-.phenomena-actions-cluster {
+.phenomena-actions-cluster,
+.sandbox-tools-cluster {
   display: flex;
   align-items: center;
   gap: 5px;
   flex-wrap: wrap;
+}
+
+.sandbox-tool-btn.active {
+  color: #090d16;
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
+  font-weight: 700;
+}
+
+.display-toggles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.toggle-chip {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-chip.active {
+  color: var(--accent-cyan);
+  border-color: rgba(56, 189, 248, 0.42);
+  background: var(--accent-cyan-soft);
+}
+
+.add-tool-palette {
+  position: fixed;
+  left: 50%;
+  bottom: 66px;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 9px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(94vw, 760px);
+  background: var(--surface-glass-strong);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+.add-palette-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.add-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.preset-chip:hover {
+  background: var(--surface-card-hover);
+}
+
+.preset-chip.active {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border-color: var(--border-active);
+  font-weight: 600;
+}
+
+.live-editor-slider {
+  width: 100%;
+  accent-color: var(--accent-cyan);
+  height: 4px;
+  cursor: pointer;
 }
 
 /* Custom Scrollbar */

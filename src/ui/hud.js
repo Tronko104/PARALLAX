@@ -9,7 +9,7 @@
  */
 
 import { SCALE_LEVELS } from '../universe/generator.js';
-import { TIME_SCALES, COSMIC_WONDERS } from '../simulation/engine.js';
+import { TIME_SCALES, COSMIC_WONDERS, SANDBOX_PRESETS } from '../simulation/engine.js';
 import { formatLogScale } from '../math/prng.js';
 
 export class ObservatoryHUD {
@@ -30,14 +30,17 @@ export class ObservatoryHUD {
     this.renderScalePresets();
     this.renderTimeControls();
     this.renderWondersGrid();
+    this.renderAddPresets();
     this.syncDrawerStates();
     this.refreshAll();
 
     this.engine.onChange((_eng, reason) => {
       if (reason === 'select_planet' || reason === 'scanner_lock' || reason === 'wonder_jump') {
         this.soundscape.playTelemetryPing(660, 0.14);
-      } else if (reason === 'phenomenon') {
-        this.soundscape.playTelemetryPing(440, 0.22);
+      } else if (reason === 'phenomenon' || reason === 'explode' || reason === 'nbody_event') {
+        this.soundscape.playTelemetryPing(360, 0.24);
+      } else if (reason === 'spawn_body') {
+        this.soundscape.playTelemetryPing(740, 0.12);
       }
       this.refreshAll();
     });
@@ -68,8 +71,10 @@ export class ObservatoryHUD {
     this.breadcrumbContainer = document.getElementById('cosmic-breadcrumb');
     this.seedInput = document.getElementById('seed-input');
     this.btnApplySeed = document.getElementById('btn-apply-seed');
-    this.btnAutopilot = document.getElementById('btn-autopilot');
     this.btnSetiScanner = document.getElementById('btn-seti-scanner');
+    this.btnLightingMode = document.getElementById('btn-lighting-mode');
+    this.btnQualityMode = document.getElementById('btn-quality-mode');
+    this.btnPhotoCapture = document.getElementById('btn-photo-capture');
     this.btnBookmark = document.getElementById('btn-bookmark');
     this.btnAudio = document.getElementById('btn-audio');
     this.btnZen = document.getElementById('btn-zen');
@@ -78,6 +83,7 @@ export class ObservatoryHUD {
     this.scaleExponentTag = document.getElementById('scale-exponent-tag');
     this.scaleSlider = document.getElementById('scale-slider');
     this.scalePresetsContainer = document.getElementById('scale-presets-grid');
+    this.displayToggleBtns = document.querySelectorAll('.toggle-chip');
     this.catalogHeaderTitle = document.getElementById('catalog-header-title');
     this.catalogCountBadge = document.getElementById('catalog-count-badge');
     this.catalogListContainer = document.getElementById('catalog-list-container');
@@ -88,13 +94,17 @@ export class ObservatoryHUD {
     this.dossierTabBtns = document.querySelectorAll('.dossier-tab-btn');
     this.dossierContent = document.getElementById('dossier-content-scroll');
 
+    this.addToolPalette = document.getElementById('add-tool-palette');
+    this.addModeBtns = document.querySelectorAll('[data-add-mode]');
+    this.addPresetsBar = document.getElementById('add-presets-bar');
+    this.sandboxToolBtns = document.querySelectorAll('.sandbox-tool-btn');
+    this.btnReverseTime = document.getElementById('btn-reverse-time');
+    this.btnLandToggle = document.getElementById('btn-land-toggle');
+    this.btnResetNBody = document.getElementById('btn-reset-nbody');
+
     this.epochTimeVal = document.getElementById('epoch-time-val');
     this.timePillsContainer = document.getElementById('time-speed-pills');
     this.liveTickerText = document.getElementById('live-ticker-text');
-    this.btnPhenomStar = document.getElementById('btn-phenom-star');
-    this.btnPhenomImpact = document.getElementById('btn-phenom-impact');
-    this.btnPhenomBio = document.getElementById('btn-phenom-bio');
-    this.btnPhenomCiv = document.getElementById('btn-phenom-civ');
   }
 
   syncDrawerStates() {
@@ -127,9 +137,7 @@ export class ObservatoryHUD {
     if (this.btnToggleLeft) {
       this.btnToggleLeft.addEventListener('click', () => {
         this.leftDrawerCollapsed = !this.leftDrawerCollapsed;
-        if (window.innerWidth <= 820 && !this.leftDrawerCollapsed) {
-          this.rightDrawerCollapsed = true;
-        }
+        if (window.innerWidth <= 820 && !this.leftDrawerCollapsed) this.rightDrawerCollapsed = true;
         this.syncDrawerStates();
       });
     }
@@ -137,22 +145,16 @@ export class ObservatoryHUD {
     if (this.btnToggleRight) {
       this.btnToggleRight.addEventListener('click', () => {
         this.rightDrawerCollapsed = !this.rightDrawerCollapsed;
-        if (window.innerWidth <= 820 && !this.rightDrawerCollapsed) {
-          this.leftDrawerCollapsed = true;
-        }
+        if (window.innerWidth <= 820 && !this.rightDrawerCollapsed) this.leftDrawerCollapsed = true;
         this.syncDrawerStates();
       });
     }
 
     if (this.btnOpenWonders) {
-      this.btnOpenWonders.addEventListener('click', () => {
-        this.wondersModal.classList.remove('hidden');
-      });
+      this.btnOpenWonders.addEventListener('click', () => this.wondersModal.classList.remove('hidden'));
     }
     if (this.btnCloseWonders) {
-      this.btnCloseWonders.addEventListener('click', () => {
-        this.wondersModal.classList.add('hidden');
-      });
+      this.btnCloseWonders.addEventListener('click', () => this.wondersModal.classList.add('hidden'));
     }
     if (this.wondersModal) {
       this.wondersModal.addEventListener('click', (e) => {
@@ -204,12 +206,91 @@ export class ObservatoryHUD {
           try {
             this.engine.importUniverseSnapshot(String(reader.result));
             this.wondersModal.classList.add('hidden');
-            this.liveTickerText.textContent = `[IMPORTED] Universe seed ${this.engine.universeSeed} restored.`;
           } catch (err) {
-            this.liveTickerText.textContent = `[ERROR] Invalid universe snapshot file.`;
+            this.liveTickerText.textContent = '[ERROR] Invalid universe snapshot JSON.';
           }
         };
         reader.readAsText(file);
+      });
+    }
+
+    // Lighting Mode (Realistic -> Studio -> Flashlight)
+    if (this.btnLightingMode) {
+      this.btnLightingMode.addEventListener('click', () => {
+        const m = this.engine.cycleLightingMode();
+        const labels = ['☀ REALISTIC', '☀ STUDIO', '☀ FLASHLIGHT'];
+        this.btnLightingMode.textContent = labels[m];
+      });
+    }
+
+    // Adaptive Graphics Quality Mode (Auto DRS -> Fast -> Balanced -> Ultra)
+    if (this.btnQualityMode) {
+      const modes = ['auto', 'low', 'medium', 'ultra'];
+      const labels = { auto: '⚙ AUTO DRS', low: '⚙ FAST', medium: '⚙ BALANCED', ultra: '⚙ ULTRA' };
+      this.btnQualityMode.addEventListener('click', () => {
+        const next = modes[(modes.indexOf(this.engine.qualityMode) + 1) % modes.length];
+        this.renderer.setQualityMode(next);
+        this.btnQualityMode.textContent = labels[next];
+      });
+    }
+
+    // F10 Photo Tool
+    if (this.btnPhotoCapture) {
+      this.btnPhotoCapture.addEventListener('click', () => {
+        this.renderer.captureScreenshot();
+        this.liveTickerText.textContent = '[PHOTO CAPTURED] High-resolution PNG saved.';
+      });
+    }
+
+    // Universe Sandbox Display Toggles (O / T / G / H / L)
+    this.displayToggleBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.engine.toggleDisplayFlag(btn.dataset.flag);
+      });
+    });
+
+    // Universe Sandbox Interactive Tool Selector (Select / Add / Laser / Explode)
+    this.sandboxToolBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tool = btn.dataset.tool;
+        this.engine.setSandboxTool(tool);
+        if (tool === 'add' && this.engine.getActiveScaleLevel().index !== 3) {
+          this.engine.flyToScale(3); // Fly to Star System so user sees live N-Body placement!
+        }
+        if (tool === 'laser' && this.engine.getActiveScaleLevel().index !== 4) {
+          this.engine.flyToScale(4); // Fly to Planet Globe to watch crust melt & oceans boil!
+        }
+      });
+    });
+
+    // Add Placement Modes (Orbit / Binary / Launch / Still)
+    this.addModeBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.engine.addMode = btn.dataset.addMode;
+        this.addModeBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    // Reverse Time & Reset N-Body & Land Toggle
+    if (this.btnReverseTime) {
+      this.btnReverseTime.addEventListener('click', () => {
+        this.engine.nbody.timeReversed = !this.engine.nbody.timeReversed;
+        this.btnReverseTime.classList.toggle('active', this.engine.nbody.timeReversed);
+      });
+    }
+
+    if (this.btnLandToggle) {
+      this.btnLandToggle.addEventListener('click', () => {
+        const lvl = this.engine.getActiveScaleLevel();
+        this.engine.flyToScale(lvl.index >= 5 ? 4 : 5);
+      });
+    }
+
+    if (this.btnResetNBody) {
+      this.btnResetNBody.addEventListener('click', () => {
+        this.engine.refreshPlanetarySystem();
+        this.renderer.resetCameraFocus();
+        this.liveTickerText.textContent = '[N-BODY RESET] Restored orbital elements & cleared collision debris.';
       });
     }
 
@@ -220,16 +301,8 @@ export class ObservatoryHUD {
     });
 
     this.seedInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.engine.resetUniverse(this.seedInput.value);
-      }
+      if (e.key === 'Enter') this.engine.resetUniverse(this.seedInput.value);
     });
-
-    if (this.btnAutopilot) {
-      this.btnAutopilot.addEventListener('click', () => {
-        this.engine.toggleAutopilot();
-      });
-    }
 
     this.btnSetiScanner.addEventListener('click', () => {
       this.engine.toggleAutopilot(false);
@@ -244,28 +317,55 @@ export class ObservatoryHUD {
 
     this.btnAudio.addEventListener('click', () => {
       const on = this.soundscape.toggle();
-      this.btnAudio.textContent = on ? 'AUDIO: ON' : 'AUDIO: OFF';
+      this.btnAudio.textContent = on ? 'AUDIO: ON' : 'AUDIO';
       this.btnAudio.classList.toggle('accent-emerald', on);
       if (on) this.soundscape.playTelemetryPing(520, 0.18);
     });
 
-    this.btnZen.addEventListener('click', () => {
-      this.toggleZenMode();
-    });
+    this.btnZen.addEventListener('click', () => this.toggleZenMode());
 
+    // Exact Universe Sandbox 2 Keyboard Shortcuts!
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT') return;
-      if (e.key === 'h' || e.key === 'H') {
-        this.toggleZenMode();
-      } else if (e.key === 't' || e.key === 'T') {
-        this.engine.toggleAutopilot();
-      } else if (e.key === 'm' || e.key === 'M') {
-        this.btnAudio.click();
-      } else if (e.key === 'Escape' && this.wondersModal) {
-        this.wondersModal.classList.add('hidden');
-      } else if (e.key === ' ') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const key = e.key.toLowerCase();
+
+      if (key === ' ') {
         e.preventDefault();
         this.engine.setTimeScale(this.engine.timeScaleIndex === 0 ? 4 : 0);
+      } else if (e.key === ',') {
+        this.engine.setTimeScale(this.engine.timeScaleIndex - 1);
+      } else if (e.key === '.') {
+        this.engine.setTimeScale(this.engine.timeScaleIndex + 1);
+      } else if (key === 'c') {
+        const lvl = this.engine.getActiveScaleLevel();
+        this.engine.flyToScale(lvl.index >= 5 ? 4 : 5);
+      } else if (key === 'o') {
+        this.engine.toggleDisplayFlag('orbits');
+      } else if (key === 't') {
+        this.engine.toggleDisplayFlag('trails');
+      } else if (key === 'g') {
+        this.engine.toggleDisplayFlag('grid');
+      } else if (key === 'h') {
+        this.engine.toggleDisplayFlag('hz');
+      } else if (key === 'l') {
+        this.engine.toggleDisplayFlag('labels');
+      } else if (key === 'u') {
+        this.toggleZenMode();
+      } else if (key === 'm') {
+        this.btnAudio.click();
+      } else if (key === 'v') {
+        this.renderer.resetCameraFocus();
+      } else if (e.key === 'F10') {
+        e.preventDefault();
+        this.renderer.captureScreenshot();
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = this.engine.getActiveNBodyTarget();
+        if (target && this.engine.nbody.deleteBody(target.id)) {
+          this.liveTickerText.textContent = `[DELETED] Removed ${target.name} from live simulation.`;
+        }
+      } else if (e.key === 'Escape') {
+        if (this.wondersModal) this.wondersModal.classList.add('hidden');
+        this.engine.setSandboxTool('select');
       } else if (e.key >= '1' && e.key <= '7') {
         this.engine.toggleAutopilot(false);
         this.engine.flyToScale(parseInt(e.key, 10) - 1);
@@ -274,8 +374,7 @@ export class ObservatoryHUD {
 
     this.scaleSlider.addEventListener('input', (e) => {
       this.engine.toggleAutopilot(false);
-      const val = parseFloat(e.target.value);
-      this.engine.setTargetLogScale(val);
+      this.engine.setTargetLogScale(parseFloat(e.target.value));
     });
 
     this.dossierTabBtns.forEach((btn) => {
@@ -285,18 +384,23 @@ export class ObservatoryHUD {
         this.renderDossierContent();
       });
     });
+  }
 
-    this.btnPhenomStar.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('stellar_evolution_step');
-    });
-    this.btnPhenomImpact.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('asteroid_impact');
-    });
-    this.btnPhenomBio.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('abiogenesis_surge');
-    });
-    this.btnPhenomCiv.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('kardashev_breakthrough');
+  renderAddPresets() {
+    if (!this.addPresetsBar) return;
+    this.addPresetsBar.innerHTML = '';
+    SANDBOX_PRESETS.forEach((preset) => {
+      const btn = document.createElement('button');
+      btn.className = `preset-chip ${preset.id === this.engine.addPresetId ? 'active' : ''}`;
+      btn.dataset.presetId = preset.id;
+      btn.textContent = preset.name;
+      btn.addEventListener('click', () => {
+        this.engine.addPresetId = preset.id;
+        this.addPresetsBar.querySelectorAll('.preset-chip').forEach((c) => {
+          c.classList.toggle('active', c.dataset.presetId === preset.id);
+        });
+      });
+      this.addPresetsBar.appendChild(btn);
     });
   }
 
@@ -313,6 +417,7 @@ export class ObservatoryHUD {
       `;
       card.addEventListener('click', () => {
         this.engine.toggleAutopilot(false);
+        this.renderer.resetCameraFocus();
         this.engine.jumpToWonder(wonder);
         this.wondersModal.classList.add('hidden');
       });
@@ -323,7 +428,7 @@ export class ObservatoryHUD {
   toggleZenMode() {
     this.zenMode = !this.zenMode;
     this.hudLayer.classList.toggle('zen-mode', this.zenMode);
-    this.btnZen.textContent = this.zenMode ? 'EXIT ZEN' : 'ZEN';
+    this.btnZen.textContent = this.zenMode ? 'SHOW UI' : 'UI';
     this.btnZen.classList.toggle('accent-amber', this.zenMode);
   }
 
@@ -391,12 +496,24 @@ export class ObservatoryHUD {
     this.seedInput.value = this.engine.universeSeed;
     const activeLvl = this.engine.getActiveScaleLevel();
 
-    if (this.btnAutopilot) {
-      this.btnAutopilot.textContent = this.engine.autopilotActive ? 'TOUR: ON' : 'TOUR: OFF';
-      this.btnAutopilot.classList.toggle('accent-amber', this.engine.autopilotActive);
-    }
     if (this.sectorCoordsBadge) {
       this.sectorCoordsBadge.textContent = `[${this.engine.sectorCoords.join(', ')}]`;
+    }
+
+    this.sandboxToolBtns.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.tool === this.engine.sandboxTool);
+    });
+
+    if (this.addToolPalette) {
+      this.addToolPalette.classList.toggle('hidden', this.engine.sandboxTool !== 'add');
+    }
+
+    this.displayToggleBtns.forEach((btn) => {
+      btn.classList.toggle('active', Boolean(this.engine.displayFlags[btn.dataset.flag]));
+    });
+
+    if (this.btnLandToggle) {
+      this.btnLandToggle.textContent = activeLvl.index >= 5 ? '↑ Liftoff (C)' : '↓ Land (C)';
     }
 
     this.scalePresetsContainer.querySelectorAll('.scale-preset-btn').forEach((btn) => {
@@ -933,6 +1050,48 @@ export class ObservatoryHUD {
 
       <div class="instrument-box">
         <div class="instrument-header">
+          <span class="instrument-title">Live Sandbox Property Editor (Real-Time Physics)</span>
+          <span class="panel-badge">INTERACTIVE</span>
+        </div>
+        <div class="comp-bar-list">
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Surface Temperature</span>
+              <span style="color:var(--accent-amber)">${pl.surfaceTempC.toFixed(0)} °C</span>
+            </div>
+            <input id="edit-temp" class="live-editor-slider" type="range" min="-220" max="2200" step="10" value="${Math.round(pl.surfaceTempC)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Liquid Ocean / Water Level</span>
+              <span style="color:var(--accent-cyan)">${Math.round(pl.oceanCoverage * 100)}%</span>
+            </div>
+            <input id="edit-ocean" class="live-editor-slider" type="range" min="0" max="100" step="2" value="${Math.round(pl.oceanCoverage * 100)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Atmospheric Pressure</span>
+              <span style="color:var(--accent-emerald)">${pl.pressureAtm.toFixed(2)} atm</span>
+            </div>
+            <input id="edit-pressure" class="live-editor-slider" type="range" min="0" max="25" step="0.2" value="${Math.min(25, pl.pressureAtm).toFixed(1)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Host Star Mass (Changes All Orbits!)</span>
+              <span style="color:var(--accent-amber)">${pSys.star.currentMassSolar.toFixed(2)} M☉</span>
+            </div>
+            <input id="edit-starmass" class="live-editor-slider" type="range" min="0.1" max="12" step="0.1" value="${Math.min(12, pSys.star.currentMassSolar).toFixed(1)}" />
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
+            <button id="btn-vel-down" class="icon-btn">-10% Orbit Vel</button>
+            <button id="btn-vel-up" class="icon-btn">+10% Orbit Vel</button>
+            <button id="btn-star-evo-inline" class="action-btn">✦ Age Star +Gyr</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="instrument-box">
+        <div class="instrument-header">
           <span class="instrument-title">Tectonic & Geophysical Regime</span>
         </div>
         <div style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono)">
@@ -973,6 +1132,26 @@ export class ObservatoryHUD {
     `;
 
     this.drawAbsorptionSpectrumCanvas(pl);
+
+    const bindSlider = (id, prop, transform = (v) => v) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', (e) => {
+          this.engine.editActivePlanetProperty(prop, transform(parseFloat(e.target.value)));
+        });
+      }
+    };
+    bindSlider('edit-temp', 'surfaceTempC');
+    bindSlider('edit-ocean', 'oceanCoverage', (v) => v / 100);
+    bindSlider('edit-pressure', 'pressureAtm');
+    bindSlider('edit-starmass', 'starMassSolar');
+
+    const btnDown = document.getElementById('btn-vel-down');
+    if (btnDown) btnDown.addEventListener('click', () => this.engine.nbody.scaleAllVelocities(0.9));
+    const btnUp = document.getElementById('btn-vel-up');
+    if (btnUp) btnUp.addEventListener('click', () => this.engine.nbody.scaleAllVelocities(1.1));
+    const btnEvo = document.getElementById('btn-star-evo-inline');
+    if (btnEvo) btnEvo.addEventListener('click', () => this.engine.triggerPhenomenon('stellar_evolution_step'));
   }
 
   drawAbsorptionSpectrumCanvas(pl) {

@@ -49,17 +49,28 @@ Download pre-built, ready-to-install packages directly from **[GitHub Releases](
 
 ---
 
-## Controls & Instruments
+## Universe Sandbox-Inspired Controls & Tools (v3.0)
 
-- **Orbit / Look:** Drag with mouse or 1 finger
-- **Continuous Scale Zoom (26 Orders):** Mouse wheel, 2-finger pinch-to-zoom, scale slider, or keys `1`–`7` / `Q` & `E`
-- **Surface & Orbital Flight:** `W / A / S / D` or Arrow keys
-- **Cosmic Wonders & Infinite Sector Jump:** Click `✦ WONDERS` to visit Black Holes, Pulsars, Eyeball Worlds, Red Giants, or jump into deep uncharted `[sx, sy, sz]` sectors
-- **Cinematic Autopilot Tour:** Press `T` or click `TOUR`
-- **Pure Observation (Zen) Mode:** Press `H` or click `ZEN`
-- **Pause / Resume Time:** Press `Space`
-- **Procedural WebAudio Soundscape:** Press `M` or click `AUDIO`
-- **Universe Snapshots:** Export and import your evolved universe state as JSON
+### 6-DOF Space Camera & Movement
+- **Left-Drag:** Orbit smoothly around locked object
+- **Right-Drag / Middle-Drag:** Pan camera freely in 3D space
+- **Scroll Wheel / Up & Down Arrows / 2-Finger Pinch:** Continuous logarithmic zoom across 26 orders of magnitude
+- **Left / Right Arrows:** Rotate camera azimuth around target
+- **`W` / `S`:** Fly forward / backward (or fly across planetary surfaces)
+- **`A` / `D`:** Strafe camera left / right
+- **`R` / `F`:** Move camera vertically up / down
+- **`Q` / `E`:** True 6-DOF space roll counterclockwise / clockwise
+- **`C`:** Land directly onto the selected planet's surface (press again to liftoff)
+- **`V` / Double-Click:** Refocus & lock onto object
+
+### Real-Time N-Body Sandbox Tools & Overlays
+- **`+ Add / Launch`:** Spawn Asteroids, Comets, Moons, Earth-Like Worlds, Gas Giants, Red Dwarfs, Stars, or Black Holes in `Orbit`, `Binary`, `Launch`, or `Still` modes with live orbital preview
+- **`⚡ Laser`:** Hold click on a planet to fire a plasma heating laser — watch oceans boil, ice sheets melt, and crust turn molten in real time
+- **`💥 Explode`:** Detonate planets into incandescent orbital debris rings or trigger a core-collapse Star Supernova shockwave
+- **Live Property Editor:** Adjust Temperature, Ocean Water Level, Atmospheric Pressure, Host Star Mass, and Orbital Velocity (`±10%`) in real time
+- **Display Toggles:** `O` (Orbits), `T` (Motion Trails), `G` (3D Simulation Grid), `H` (Habitable Zone), `L` (Labels), `U` (Toggle UI)
+- **Time & Photo Controls:** `Space` (Pause/Resume), `,` / `.` (Slower / Faster), `⏪` (Reverse Time), `Delete` (Remove Body), `F10` (Capture PNG Screenshot)
+- **Adaptive Performance:** Built-in **Dynamic Resolution Scaling (Auto DRS)** plus `Fast`, `Balanced`, and `Ultra` GPU profiles, and `Realistic`, `Studio`, and `Flashlight` lighting modes.
 
 ---
 

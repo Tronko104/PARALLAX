@@ -17,6 +17,9 @@ import {
   computeStellarEvolutionState
 } from '../universe/generator.js';
 import { solveKeplerOrbit, PRNG, hashHierarchy } from '../math/prng.js';
+import { NBodySystem, SANDBOX_PRESETS } from './nbody.js';
+
+export { SANDBOX_PRESETS };
 
 export const TIME_SCALES = [
   { id: 'pause', label: 'PAUSE', short: '0x', yearsPerSec: 0, visualSpeed: 0.0, desc: 'Simulation paused' },
@@ -114,6 +117,23 @@ export class SimulationEngine {
     this.autopilotActive = false;
     this._autopilotTimer = 0;
     this._autopilotWonderIndex = 0;
+
+    // Universe Sandbox 2 Interactive Physics & Controls State
+    this.nbody = new NBodySystem();
+    this.sandboxTool = 'select';       // 'select' | 'add' | 'laser' | 'explode'
+    this.addPresetId = 'earth';
+    this.addMode = 'orbit';            // 'orbit' | 'binary' | 'launch' | 'still'
+    this.launchSpeedKmS = 28;
+    this.laserActive = false;
+    this.lightingMode = 0;             // 0: Realistic, 1: Studio, 2: Flashlight
+    this.qualityMode = 'auto';         // 'auto' | 'low' | 'medium' | 'ultra'
+    this.displayFlags = {
+      orbits: true,
+      trails: true,
+      grid: false,
+      hz: true,
+      labels: true
+    };
 
     this.deltas = {};
     this.bookmarks = [];
@@ -250,6 +270,9 @@ export class SimulationEngine {
     if (this.activePlanetIndex >= this.planetarySystem.planets.length) {
       this.activePlanetIndex = Math.max(0, this.planetarySystem.planets.length - 1);
     }
+
+    // Synchronize real-time Symplectic N-Body Physics Engine with the active star system
+    this.nbody.loadFromPlanetarySystem(this.planetarySystem, this.elapsedYears);
   }
 
   applyPlanetCausalityAndDeltas(planet, star, extraAgeGyr) {
@@ -449,8 +472,19 @@ export class SimulationEngine {
 
     if (timeScale.yearsPerSec > 0) {
       const prevGyr = Math.floor((this.elapsedYears / 1e9) * 20);
-      this.elapsedYears += timeScale.yearsPerSec * clampedDt;
-      this.visualTime += clampedDt * timeScale.visualSpeed;
+      const dir = this.nbody.timeReversed ? -1 : 1;
+      const dtYears = timeScale.yearsPerSec * clampedDt;
+      this.elapsedYears += dtYears * dir;
+      this.visualTime += clampedDt * timeScale.visualSpeed * dir;
+
+      // Step real-time N-Body Newtonian gravity, collisions & debris!
+      // Keep orbital visual cadence responsive even at slower time steps
+      const nbodyDtYears = Math.max(0.0002, Math.min(0.04, dtYears > 0.05 ? 0.025 : dtYears * 4.0 + clampedDt * 0.02));
+      this.nbody.step(nbodyDtYears, clampedDt, (cat, title, detail) => {
+        this.transientEffects.impactFlashIntensity = 1.0;
+        this.logEvent(cat, title, detail);
+        this.emitChange('nbody_event');
+      });
 
       const newGyr = Math.floor((this.elapsedYears / 1e9) * 20);
       if (newGyr !== prevGyr) {
@@ -463,7 +497,16 @@ export class SimulationEngine {
         this.simulateAutonomousBackgroundUniverse();
       }
     } else {
-      this.visualTime += clampedDt * 0.08;
+      this.visualTime += clampedDt * 0.04;
+      this.nbody.stepFragmentsAndShockwaves(0.0002, clampedDt);
+    }
+
+    // Apply live Heating Laser if held on the active planet
+    if (this.laserActive) {
+      const targetBody = this.getActiveNBodyTarget();
+      if (targetBody) {
+        this.nbody.applyThermalLaser(targetBody, clampedDt, 1.4);
+      }
     }
   }
 
@@ -942,5 +985,87 @@ export class SimulationEngine {
     this.rebuildHierarchy();
     this.savePersistence();
     this.emitChange('import');
+  }
+
+  getActiveNBodyTarget() {
+    if (!this.nbody || !this.nbody.bodies.length) return null;
+    const pl = this.getActivePlanet();
+    if (pl) {
+      const match = this.nbody.bodies.find((b) => b.alive && b.id === pl.id);
+      if (match) return match;
+    }
+    return this.nbody.bodies[0];
+  }
+
+  toggleDisplayFlag(flag) {
+    if (flag in this.displayFlags) {
+      this.displayFlags[flag] = !this.displayFlags[flag];
+      this.emitChange('display_flag');
+    }
+  }
+
+  cycleLightingMode() {
+    this.lightingMode = (this.lightingMode + 1) % 3;
+    this.emitChange('lighting');
+    return this.lightingMode;
+  }
+
+  setSandboxTool(tool) {
+    this.sandboxTool = tool;
+    this.laserActive = false;
+    this.emitChange('sandbox_tool');
+  }
+
+  /**
+   * Universe Sandbox Live Property Editor: mutates planet/star physics in real time!
+   */
+  editActivePlanetProperty(prop, value) {
+    const pl = this.getActivePlanet();
+    const nb = this.getActiveNBodyTarget();
+    if (!pl) return;
+
+    if (prop === 'massEarths') {
+      pl.massEarths = Math.max(0.01, value);
+      pl.gravityG = pl.massEarths / Math.max(0.05, pl.radiusEarths * pl.radiusEarths);
+      if (nb) nb.massSolar = pl.massEarths * 3.0034896e-6;
+    } else if (prop === 'surfaceTempC') {
+      pl.surfaceTempC = value;
+      pl.surfaceTempK = value + 273.15;
+      if (nb) {
+        nb.tempK = pl.surfaceTempK;
+        nb.moltenHeat = pl.surfaceTempC > 750 ? Math.min(1.0, (pl.surfaceTempC - 750) / 1400) : 0;
+      }
+      if (pl.surfaceTempC > 100) pl.oceanCoverage = Math.max(0, pl.oceanCoverage * 0.6);
+      if (pl.surfaceTempC < -10) pl.iceCoverage = Math.min(0.98, Math.max(pl.iceCoverage, (-pl.surfaceTempC) / 90));
+      else if (pl.surfaceTempC > 45) pl.iceCoverage = 0;
+    } else if (prop === 'oceanCoverage') {
+      pl.oceanCoverage = Math.max(0, Math.min(1, value));
+    } else if (prop === 'pressureAtm') {
+      pl.pressureAtm = Math.max(0.0001, value);
+      pl.cloudCoverage = Math.min(0.96, Math.pow(pl.pressureAtm, 0.35) * 0.55);
+    } else if (prop === 'starMassSolar') {
+      const star = this.planetarySystem.star;
+      star.currentMassSolar = Math.max(0.08, value);
+      star.luminositySolar = Math.pow(star.currentMassSolar, 3.5);
+      star.radiusSolar = Math.pow(star.currentMassSolar, 0.8);
+      star.tempK = Math.min(42000, 5778 * Math.pow(star.luminositySolar / (star.radiusSolar * star.radiusSolar), 0.25));
+      if (this.nbody.bodies[0]) {
+        this.nbody.bodies[0].massSolar = star.currentMassSolar;
+        this.nbody.bodies[0].luminositySolar = star.luminositySolar;
+      }
+    }
+
+    this.emitChange('property_edit');
+  }
+
+  explodeTargetBody(body) {
+    const target = body || this.getActiveNBodyTarget();
+    if (!target || !target.alive) return;
+    this.nbody.shatterBody(target, this.nbody.bodies[0], (cat, title, detail) => {
+      this.transientEffects.impactFlashIntensity = 1.0;
+      this.transientEffects.superflareIntensity = target.kind === 'star' ? 1.0 : 0.4;
+      this.logEvent(cat, title, detail);
+    });
+    this.emitChange('explode');
   }
 }

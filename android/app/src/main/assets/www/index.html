@@ -6,7 +6,7 @@
   <title>PARALLAX — A Universe Beyond Observation</title>
   <meta
     name="description"
-    content="PARALLAX is a procedural, infinite, persistent multi-scale universe simulator with WebGL2 volumetric raymarching — from cosmic web filaments down to planetary biospheres and civilizations."
+    content="PARALLAX is a procedural, infinite, persistent multi-scale universe & real-time N-body physics simulator with WebGL2 volumetric raymarching."
   />
   <meta name="theme-color" content="#05070b" />
   
@@ -1095,11 +1095,104 @@ body {
   text-overflow: ellipsis;
 }
 
-.phenomena-actions-cluster {
+.phenomena-actions-cluster,
+.sandbox-tools-cluster {
   display: flex;
   align-items: center;
   gap: 5px;
   flex-wrap: wrap;
+}
+
+.sandbox-tool-btn.active {
+  color: #090d16;
+  background: var(--accent-amber);
+  border-color: var(--accent-amber);
+  font-weight: 700;
+}
+
+.display-toggles-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.toggle-chip {
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.toggle-chip.active {
+  color: var(--accent-cyan);
+  border-color: rgba(56, 189, 248, 0.42);
+  background: var(--accent-cyan-soft);
+}
+
+.add-tool-palette {
+  position: fixed;
+  left: 50%;
+  bottom: 66px;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 9px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: min(94vw, 760px);
+  background: var(--surface-glass-strong);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65);
+}
+
+.add-palette-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.add-presets-bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.preset-chip {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.preset-chip:hover {
+  background: var(--surface-card-hover);
+}
+
+.preset-chip.active {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border-color: var(--border-active);
+  font-weight: 600;
+}
+
+.live-editor-slider {
+  width: 100%;
+  accent-color: var(--accent-cyan);
+  height: 4px;
+  cursor: pointer;
 }
 
 /* Custom Scrollbar */
@@ -1176,30 +1269,34 @@ body {
     <canvas id="overlay-canvas"></canvas>
   </main>
 
-  <!-- Cinematic Welcome Curtain (Live Universe Renders Behind) -->
+  <!-- Cinematic Welcome Curtain -->
   <section id="intro-overlay" class="intro-overlay" aria-label="PARALLAX Welcome">
     <div class="intro-card">
-      <div class="intro-eyebrow">PROCEDURAL COSMOLOGICAL OBSERVATORY • v2.0</div>
+      <div class="intro-eyebrow">N-BODY GRAVITY SANDBOX & COSMOLOGICAL OBSERVATORY • v3.0</div>
       <div class="intro-logo-row">
         <span class="intro-reticle" aria-hidden="true"></span>
         <span class="intro-title">PARALLAX</span>
       </div>
       <p class="intro-tagline">A Universe Beyond Observation</p>
       <p class="intro-desc">
-        Traverse 26 continuous orders of magnitude — from dark-matter cosmic filaments and active galactic nuclei to black hole event horizons, exoplanet climates, evolving biospheres, and Kardashev civilizations.
+        Explore 26 continuous orders of magnitude with live symplectic N-body gravity, planetary collisions, thermal lasers, real-time climate & biosphere editing, and full 6-DOF space flight.
       </p>
       <div class="intro-actions">
         <button id="btn-intro-enter" class="intro-btn-primary">Enter Universe</button>
         <button id="btn-intro-tour" class="intro-btn-secondary">✦ Start Cinematic Tour</button>
       </div>
       <div class="intro-hints">
-        <span>Drag: Orbit / Look</span>
+        <span>Left-Drag: Orbit</span>
         <span>•</span>
-        <span>Scroll / Pinch: Zoom 26 Orders</span>
+        <span>Right-Drag: Pan</span>
         <span>•</span>
-        <span>WASD: Fly</span>
+        <span>WASD/RF/QE: 6-DOF Fly & Roll</span>
         <span>•</span>
-        <span>H: Pure View</span>
+        <span>C: Land</span>
+        <span>•</span>
+        <span>, / . : Speed</span>
+        <span>•</span>
+        <span>O/T/G/H/L: Overlays</span>
       </div>
     </div>
   </section>
@@ -1210,7 +1307,7 @@ body {
       <div class="modal-header">
         <div>
           <div class="entity-category-overline">OBSERVATORY DISCOVERY GUIDE</div>
-          <h2 class="modal-title">Cosmic Wonders & Infinite Sector Jump</h2>
+          <h2 class="modal-title">Cosmic Wonders, Infinite Sectors & Controls</h2>
         </div>
         <button id="btn-close-wonders" class="icon-btn" aria-label="Close Discovery Guide">✕</button>
       </div>
@@ -1221,12 +1318,12 @@ body {
         <div class="sector-jump-bar">
           <span class="panel-title">Cosmic Web Sector:</span>
           <span id="sector-coords-badge" class="panel-badge">[0, 0, 0]</span>
-          <button id="btn-sector-prev" class="icon-btn" title="Jump to neighboring cosmic sector (-X)">◀ Prev Sector</button>
-          <button id="btn-sector-next" class="icon-btn" title="Jump to neighboring cosmic sector (+X)">Next Sector ▶</button>
-          <button id="btn-sector-random" class="icon-btn" title="Jump to deep uncharted cosmic coordinates">⟐ Deep Space Jump</button>
+          <button id="btn-sector-prev" class="icon-btn">◀ Prev</button>
+          <button id="btn-sector-next" class="icon-btn">Next ▶</button>
+          <button id="btn-sector-random" class="icon-btn">⟐ Deep Jump</button>
         </div>
         <div class="snapshot-bar">
-          <button id="btn-export-snapshot" class="icon-btn">↓ Export Universe JSON</button>
+          <button id="btn-export-snapshot" class="icon-btn">↓ Export JSON</button>
           <label class="icon-btn" style="cursor:pointer">
             ↑ Import JSON
             <input id="input-import-snapshot" type="file" accept=".json,application/json" style="display:none" />
@@ -1236,7 +1333,7 @@ body {
     </div>
   </div>
 
-  <!-- Scientific Observatory Telemetry HUD -->
+  <!-- Scientific Observatory & Universe Sandbox Telemetry HUD -->
   <div id="hud-layer">
     <!-- 1. Top Telemetry & Cosmic Breadcrumb Header -->
     <header id="top-telemetry-bar" class="hud-panel">
@@ -1246,7 +1343,6 @@ body {
           <span class="brand-reticle" aria-hidden="true"></span>
           <h1 class="brand-title">PARALLAX</h1>
         </div>
-        <span class="brand-subtitle">Beyond Observation</span>
       </div>
 
       <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Cosmic Hierarchy"></nav>
@@ -1255,33 +1351,34 @@ body {
         <button id="btn-open-wonders" class="action-btn accent-amber" title="Open Cosmic Wonders & Infinite Sector Guide">
           ✦ WONDERS
         </button>
-        <button id="btn-autopilot" class="icon-btn" title="Toggle Cinematic Autopilot Tour (Key T)">
-          TOUR: OFF
+        <button id="btn-seti-scanner" class="action-btn accent-emerald" title="Jump to next Bio/Civ Exoplanet">
+          ◉ BIO/SETI
         </button>
-        <button
-          id="btn-seti-scanner"
-          class="action-btn accent-emerald"
-          title="Scan sector and jump to the next exoplanet with an active Biosphere or Civilization"
-        >
-          ◉ BIO / SETI
+        <button id="btn-lighting-mode" class="icon-btn" title="Cycle Lighting: Realistic / Studio / Flashlight">
+          ☀ REALISTIC
         </button>
-        <button id="btn-audio" class="icon-btn" title="Toggle WebAudio Deep Space Soundscape (Key M)">
-          AUDIO: OFF
+        <button id="btn-quality-mode" class="icon-btn" title="Cycle Graphics Quality: Auto DRS / Fast / Balanced / Ultra">
+          ⚙ AUTO DRS
         </button>
-        <button id="btn-zen" class="icon-btn" title="Pure Observation Mode (Key H)">
-          ZEN
+        <button id="btn-photo-capture" class="icon-btn" title="Capture Screenshot (Key F10)">
+          📷
         </button>
-        <button id="btn-toggle-right" class="icon-btn drawer-toggle-btn" title="Toggle Scientific Dossier Drawer">☷</button>
+        <button id="btn-audio" class="icon-btn" title="Toggle Deep Space Soundscape (Key M)">
+          AUDIO
+        </button>
+        <button id="btn-zen" class="icon-btn" title="Toggle Pure View (Key U)">
+          UI
+        </button>
+        <button id="btn-toggle-right" class="icon-btn drawer-toggle-btn" title="Toggle Scientific Dossier & Live Editor">☷</button>
       </div>
     </header>
 
-    <!-- 2. Middle Workspace: Collapsible Left Scale/Catalog + Open 3D Cosmos + Collapsible Right Scientific Dossier -->
+    <!-- 2. Middle Workspace: Left Drawer + Open 3D Viewport + Right Scientific Dossier -->
     <div id="middle-workspace">
-      <!-- Left Panel: Continuous Logarithmic Scale & Spatial Object Catalog -->
       <aside id="left-navigator-panel" class="hud-panel side-drawer left-drawer" aria-label="Spatial Scale and Catalog">
         <div class="panel-header">
-          <span class="panel-title">Continuous Spatial Scale</span>
-          <span id="scale-exponent-tag" class="scale-exponent-tag">10^7.40 m</span>
+          <span class="panel-title">Continuous Scale</span>
+          <span id="scale-exponent-tag" class="scale-exponent-tag">10^7.40 m • 60 FPS</span>
         </div>
 
         <div class="scale-ladder-section">
@@ -1310,6 +1407,15 @@ body {
           <button id="btn-bookmark" class="icon-btn" title="Save bookmark">★</button>
         </div>
 
+        <!-- Universe Sandbox Display Toggle Bar (O / T / G / H / L) -->
+        <div class="display-toggles-row">
+          <button class="toggle-chip active" data-flag="orbits" title="Toggle Orbits (Key O)">O: Orbits</button>
+          <button class="toggle-chip active" data-flag="trails" title="Toggle Trails (Key T)">T: Trails</button>
+          <button class="toggle-chip" data-flag="grid" title="Toggle 3D Grid (Key G)">G: Grid</button>
+          <button class="toggle-chip active" data-flag="hz" title="Toggle Habitable Zone (Key H)">H: HZ</button>
+          <button class="toggle-chip active" data-flag="labels" title="Toggle Labels (Key L)">L: Labels</button>
+        </div>
+
         <div class="panel-header">
           <span id="catalog-header-title" class="panel-title">Orbital Bodies</span>
           <span id="catalog-count-badge" class="panel-badge">7 planets</span>
@@ -1318,8 +1424,7 @@ body {
         <div id="catalog-list-container" class="catalog-list-container"></div>
       </aside>
 
-      <!-- Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector -->
-      <aside id="right-dossier-panel" class="hud-panel side-drawer right-drawer" aria-label="Scientific Dossier and Spectrometry">
+      <aside id="right-dossier-panel" class="hud-panel side-drawer right-drawer" aria-label="Scientific Dossier and Live Editor">
         <div class="dossier-entity-hero">
           <div id="entity-category-overline" class="entity-category-overline">TEMPERATE TERRESTRIAL WORLD</div>
           <div class="entity-title-row">
@@ -1329,60 +1434,55 @@ body {
         </div>
 
         <div class="dossier-tabs" role="tablist">
-          <button class="dossier-tab-btn active" data-tab="physics" role="tab">1. Physics</button>
-          <button class="dossier-tab-btn" data-tab="climate" role="tab">2. Climate</button>
-          <button class="dossier-tab-btn" data-tab="life" role="tab">3. Life</button>
-          <button class="dossier-tab-btn" data-tab="civ" role="tab">4. Civ</button>
+          <button class="dossier-tab-btn active" data-tab="physics" role="tab">Physics</button>
+          <button class="dossier-tab-btn" data-tab="climate" role="tab">Climate</button>
+          <button class="dossier-tab-btn" data-tab="life" role="tab">Life</button>
+          <button class="dossier-tab-btn" data-tab="civ" role="tab">Civ</button>
         </div>
 
         <div id="dossier-content-scroll" class="dossier-content-scroll"></div>
       </aside>
     </div>
 
-    <!-- 3. Bottom Temporal Simulation & Causal Phenomena Dock -->
-    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Time Dilation and Cosmic Events">
+    <!-- Floating Universe Sandbox Add/Launch Palette (Shown when Add tool active) -->
+    <div id="add-tool-palette" class="hud-panel add-tool-palette hidden" aria-label="Add Body Palette">
+      <div class="add-palette-row">
+        <span class="panel-title">Placement Mode:</span>
+        <div id="add-mode-pills" class="time-speed-pills">
+          <button class="time-pill-btn active" data-add-mode="orbit">Orbit</button>
+          <button class="time-pill-btn" data-add-mode="binary">Binary</button>
+          <button class="time-pill-btn" data-add-mode="launch">Launch</button>
+          <button class="time-pill-btn" data-add-mode="still">Still</button>
+        </div>
+        <span class="panel-title" style="margin-left:8px">Click anywhere in Star System to spawn!</span>
+      </div>
+      <div id="add-presets-bar" class="add-presets-bar"></div>
+    </div>
+
+    <!-- 3. Bottom Universe Sandbox Interactive Tools & Temporal Control Dock -->
+    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Sandbox Tools and Time Dilation">
       <div class="time-controls-cluster">
         <div class="epoch-clock-box">
-          <span class="epoch-overline">Universal Cosmic Epoch</span>
-          <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr (+0.0 h)</span>
+          <span class="epoch-overline">Universal Epoch</span>
+          <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr</span>
         </div>
+        <button id="btn-reverse-time" class="time-pill-btn" title="Reverse Time Direction">⏪</button>
         <div id="time-speed-pills" class="time-speed-pills" role="group" aria-label="Time Multiplier"></div>
       </div>
 
-      <div class="live-event-ticker" title="Autonomous real-time log of cosmic events across the universe">
-        <span class="ticker-pulse-dot" aria-hidden="true"></span>
-        <span id="live-ticker-text" class="ticker-text">Tuning PARALLAX telemetry...</span>
+      <!-- Universe Sandbox Interactive Action Tools -->
+      <div class="sandbox-tools-cluster" role="group" aria-label="Universe Sandbox Tools">
+        <button class="action-btn sandbox-tool-btn active" data-tool="select" title="Select, Orbit & Inspect Bodies">⌖ Select</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="add" title="Add or Launch Stars, Planets, Moons & Black Holes">+ Add / Launch</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="laser" title="Hold click to fire Heating Laser & melt crust">⚡ Laser</button>
+        <button class="action-btn sandbox-tool-btn" data-tool="explode" title="Detonate Planet or Trigger Star Supernova">💥 Explode</button>
+        <button id="btn-land-toggle" class="action-btn" title="Land on selected planet surface or liftoff (Key C)">↓ Land (C)</button>
+        <button id="btn-reset-nbody" class="icon-btn" title="Reset N-Body orbits & clear debris">↺ Reset</button>
       </div>
 
-      <div class="phenomena-actions-cluster">
-        <button
-          id="btn-phenom-star"
-          class="action-btn"
-          title="Advance host star astrophysical evolution along the H-R diagram (+Gyr)"
-        >
-          ✦ Star Evo
-        </button>
-        <button
-          id="btn-phenom-impact"
-          class="action-btn"
-          title="Simulate an asteroid bolide impact on the active planet"
-        >
-          ☄ Impact
-        </button>
-        <button
-          id="btn-phenom-bio"
-          class="action-btn accent-emerald"
-          title="Catalyze abiogenesis or accelerate evolutionary radiation"
-        >
-          ❋ Bio Surge
-        </button>
-        <button
-          id="btn-phenom-civ"
-          class="action-btn accent-amber"
-          title="Trigger a Kardashev technological breakthrough"
-        >
-          ⬡ Kardashev
-        </button>
+      <div class="live-event-ticker" title="Real-time physics and cosmic event feed">
+        <span class="ticker-pulse-dot" aria-hidden="true"></span>
+        <span id="live-ticker-text" class="ticker-text">PARALLAX v3.0 N-Body Physics Active</span>
       </div>
     </footer>
   </div>
@@ -3328,6 +3428,604 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
   return landmarks;
 }
 
+// === MODULE: src/simulation/nbody.js ===
+/**
+ * PARALLAX v3.0 — Real-Time Symplectic N-Body Gravity, Collision & Fragmentation Engine
+ * Inspired by Universe Sandbox 2:
+ * - Velocity-Verlet N-Body Newtonian gravity integrator (exact momentum & energy stability)
+ * - Real-time gravitational slingshots, orbital perturbations, binary captures & escapes
+ * - Kinetic collision physics: momentum conservation, thermal impact heating, molten debris ejecta
+ * - Roche Limit tidal disruption into glowing orbital ring fragments
+ * - Zero-allocation circular motion trail buffers
+ */
+
+
+// Gravitational constant in AU^3 / (M_sun * yr^2) = 4 * pi^2
+const G_AU_MSUN_YR = 4.0 * Math.PI * Math.PI;
+const EARTH_TO_SOLAR_MASS = 3.0034896e-6;
+const SOLAR_TO_EARTH_MASS = 332946.0487;
+const MAX_TRAIL_POINTS = 72;
+const MAX_FRAGMENTS = 120;
+
+const SANDBOX_PRESETS = [
+  { id: 'asteroid', name: 'Iron Asteroid', kind: 'planet', massEarths: 0.002, radiusEarths: 0.14, tempK: 210, color: [0.58, 0.55, 0.52], archetype: 'iron_cratered' },
+  { id: 'comet', name: 'Halley Comet', kind: 'planet', massEarths: 0.0005, radiusEarths: 0.10, tempK: 140, color: [0.65, 0.88, 1.0], archetype: 'cryo_glacial' },
+  { id: 'moon', name: 'Rocky Moon', kind: 'planet', massEarths: 0.0123, radiusEarths: 0.27, tempK: 250, color: [0.72, 0.73, 0.76], archetype: 'iron_cratered' },
+  { id: 'earth', name: 'Earth-Like World', kind: 'planet', massEarths: 1.0, radiusEarths: 1.0, tempK: 288, color: [0.22, 0.55, 0.86], archetype: 'temperate_terrestrial' },
+  { id: 'jupiter', name: 'Jovian Gas Giant', kind: 'planet', massEarths: 317.8, radiusEarths: 11.2, tempK: 165, color: [0.85, 0.66, 0.44], archetype: 'gas_giant' },
+  { id: 'red_dwarf', name: 'M-Class Red Dwarf', kind: 'star', massSolar: 0.28, radiusSolar: 0.34, tempK: 3300, color: [1.0, 0.52, 0.28] },
+  { id: 'sun', name: 'G-Class Yellow Star', kind: 'star', massSolar: 1.0, radiusSolar: 1.0, tempK: 5778, color: [1.0, 0.94, 0.84] },
+  { id: 'blue_giant', name: 'O-Class Blue Giant', kind: 'star', massSolar: 16.0, radiusSolar: 6.2, tempK: 31000, color: [0.58, 0.78, 1.0] },
+  { id: 'black_hole', name: 'Stellar Black Hole', kind: 'black_hole', massSolar: 12.0, radiusSolar: 0.05, tempK: 28000, color: [1.0, 0.65, 0.25] }
+];
+
+class NBodySystem {
+  constructor() {
+    this.bodies = [];
+    this.fragments = [];
+    this.shockwaves = [];
+    this.active = false;
+    this.timeReversed = false;
+    this.collisionCount = 0;
+    this._trailTimer = 0;
+    this._nextSpawnId = 1;
+  }
+
+  /**
+   * Initialize live N-Body state vectors (position in AU, velocity in AU/yr)
+   * directly from the procedural planetary system's exact Keplerian elements!
+   */
+  loadFromPlanetarySystem(planetarySystem, currentElapsedYears = 0) {
+    this.bodies = [];
+    this.fragments = [];
+    this.shockwaves = [];
+    this.collisionCount = 0;
+    this._trailTimer = 0;
+
+    if (!planetarySystem) return;
+    const star = planetarySystem.star;
+
+    // 1. Central Star Body
+    this.bodies.push({
+      id: `star-${planetarySystem.id}`,
+      name: planetarySystem.name,
+      kind: star.remnantType === 'black_hole' ? 'black_hole' : 'star',
+      planetIndex: -1,
+      massSolar: Math.max(0.05, star.currentMassSolar),
+      radiusVisual: star.remnantType === 'black_hole' ? 0.07 : 0.14,
+      tempK: star.tempK,
+      luminositySolar: star.luminositySolar,
+      color: [...star.rgb],
+      hexColor: star.hexColor,
+      x: 0,
+      y: 0,
+      z: 0,
+      vx: 0,
+      vy: 0,
+      vz: 0,
+      ax: 0,
+      ay: 0,
+      az: 0,
+      moltenHeat: 0,
+      alive: true,
+      trail: [],
+      sourcePlanet: null
+    });
+
+    const M_star = Math.max(0.05, star.currentMassSolar);
+
+    // 2. All Procedural Planets with exact 3D position & tangential velocity from Kepler solver
+    planetarySystem.planets.forEach((planet, idx) => {
+      const dt = 0.0004;
+      const p0 = solveKeplerOrbit(planet.orbit, currentElapsedYears);
+      const p1 = solveKeplerOrbit(planet.orbit, currentElapsedYears + dt);
+
+      const vx = (p1.x - p0.x) / dt;
+      const vy = (p1.y - p0.y) / dt;
+      const vz = (p1.z - p0.z) / dt;
+
+      this.bodies.push({
+        id: planet.id,
+        name: planet.name,
+        kind: 'planet',
+        planetIndex: idx,
+        massSolar: Math.max(1e-9, planet.massEarths * EARTH_TO_SOLAR_MASS),
+        radiusVisual: Math.max(0.025, Math.min(0.08, Math.pow(planet.radiusEarths, 0.35) * 0.028)),
+        tempK: planet.surfaceTempK,
+        luminositySolar: 0,
+        color: [...planet.palette.lowland],
+        atmoColor: [...planet.palette.atmosphere],
+        hexColor: rgbToHex(planet.palette.lowland),
+        x: p0.x,
+        y: p0.y,
+        z: p0.z,
+        vx,
+        vy,
+        vz,
+        ax: 0,
+        ay: 0,
+        az: 0,
+        moltenHeat: 0,
+        alive: true,
+        trail: [{ x: p0.x, y: p0.y, z: p0.z }],
+        sourcePlanet: planet
+      });
+    });
+
+    this.computeAccelerations();
+    this.active = true;
+  }
+
+  /**
+   * Velocity-Verlet N-Body Gravitational Integration Step
+   */
+  step(dtYears, dtRealSeconds, onEventCallback) {
+    if (!this.active || this.bodies.length === 0) return;
+
+    const dir = this.timeReversed ? -1 : 1;
+    // Clamp integration step size for orbital stability & substep when time runs fast
+    const totalDt = Math.max(-0.08, Math.min(0.08, dtYears * dir));
+    const substeps = Math.abs(totalDt) > 0.012 ? 4 : Math.abs(totalDt) > 0.004 ? 2 : 1;
+    const h = totalDt / substeps;
+
+    if (Math.abs(h) > 1e-9) {
+      for (let s = 0; s < substeps; s++) {
+        this.verletSubstep(h, onEventCallback);
+      }
+    }
+
+    // Step molten ejecta fragments & supernova shockwaves
+    this.stepFragmentsAndShockwaves(Math.max(0.0005, Math.abs(totalDt)), dtRealSeconds);
+
+    // Record motion trail breadcrumbs
+    this._trailTimer += dtRealSeconds;
+    if (this._trailTimer >= 0.045) {
+      this._trailTimer = 0;
+      for (let i = 0; i < this.bodies.length; i++) {
+        const b = this.bodies[i];
+        if (!b.alive) continue;
+        b.trail.push({ x: b.x, y: b.y, z: b.z });
+        if (b.trail.length > MAX_TRAIL_POINTS) {
+          b.trail.shift();
+        }
+        // Cool down molten collision scars over time
+        if (b.moltenHeat > 0) {
+          b.moltenHeat = Math.max(0, b.moltenHeat - dtRealSeconds * 0.06);
+        }
+      }
+    }
+  }
+
+  verletSubstep(h, onEventCallback) {
+    const bodies = this.bodies;
+    const n = bodies.length;
+    const halfH2 = 0.5 * h * h;
+
+    // 1. Update positions & half-step velocities
+    for (let i = 0; i < n; i++) {
+      const b = bodies[i];
+      if (!b.alive) continue;
+      b.x += b.vx * h + b.ax * halfH2;
+      b.y += b.vy * h + b.ay * halfH2;
+      b.z += b.vz * h + b.az * halfH2;
+
+      b.vx += 0.5 * b.ax * h;
+      b.vy += 0.5 * b.ay * h;
+      b.vz += 0.5 * b.az * h;
+    }
+
+    // 2. Recompute pairwise Newtonian forces & check collisions / Roche limit
+    this.computeAccelerationsAndCollisions(onEventCallback);
+
+    // 3. Complete second half-step velocities
+    for (let i = 0; i < n; i++) {
+      const b = bodies[i];
+      if (!b.alive) continue;
+      b.vx += 0.5 * b.ax * h;
+      b.vy += 0.5 * b.ay * h;
+      b.vz += 0.5 * b.az * h;
+
+      // Live thermodynamic update: distance to primary star updates planet equilibrium temp!
+      if (b.sourcePlanet && i > 0 && bodies[0].alive) {
+        const dx = b.x - bodies[0].x;
+        const dy = b.y - bodies[0].y;
+        const dz = b.z - bodies[0].z;
+        const distAU = Math.max(0.05, Math.hypot(dx, dy, dz));
+        const L = Math.max(0.001, bodies[0].luminositySolar || 1.0);
+        const eqT = 278.5 * Math.pow(L, 0.25) / Math.sqrt(distAU) * Math.pow(1 - (b.sourcePlanet.albedo || 0.3), 0.25);
+        const targetT = Math.max(25, eqT + (b.sourcePlanet.greenhouseDeltaK || 0) + b.moltenHeat * 1800);
+        b.tempK += (targetT - b.tempK) * 0.04;
+        b.sourcePlanet.surfaceTempK = b.tempK;
+        b.sourcePlanet.surfaceTempC = b.tempK - 273.15;
+        b.sourcePlanet.orbit.a = distAU;
+      }
+    }
+  }
+
+  computeAccelerations() {
+    this.computeAccelerationsAndCollisions(null);
+  }
+
+  computeAccelerationsAndCollisions(onEventCallback) {
+    const bodies = this.bodies;
+    const n = bodies.length;
+
+    for (let i = 0; i < n; i++) {
+      bodies[i].ax = 0;
+      bodies[i].ay = 0;
+      bodies[i].az = 0;
+    }
+
+    for (let i = 0; i < n; i++) {
+      const a = bodies[i];
+      if (!a.alive) continue;
+
+      for (let j = i + 1; j < n; j++) {
+        const b = bodies[j];
+        if (!b.alive) continue;
+
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dz = b.z - a.z;
+        const distSq = dx * dx + dy * dy + dz * dz;
+        const dist = Math.sqrt(distSq);
+
+        // Collision threshold (scaled visual-physical capture radius)
+        const collideDist = (a.radiusVisual + b.radiusVisual) * 0.72;
+        if (dist < collideDist) {
+          this.resolveCollision(a, b, onEventCallback);
+          continue;
+        }
+
+        // Roche Limit tidal shredding check if a small planet passes very close to a black hole or giant star
+        if (a.kind === 'black_hole' && b.kind === 'planet' && dist < a.radiusVisual * 2.1 && b.massSolar < 0.01) {
+          this.shatterBody(b, a, onEventCallback, 'Roche Limit Tidal Disruption');
+          continue;
+        }
+
+        // Softened Newtonian Gravity: F = G * m1 * m2 / (r^2 + eps^2)^(3/2)
+        const softSq = distSq + 0.0004;
+        const invDist3 = G_AU_MSUN_YR / (softSq * Math.sqrt(softSq));
+
+        const fx = dx * invDist3;
+        const fy = dy * invDist3;
+        const fz = dz * invDist3;
+
+        a.ax += fx * b.massSolar;
+        a.ay += fy * b.massSolar;
+        a.az += fz * b.massSolar;
+
+        b.ax -= fx * a.massSolar;
+        b.ay -= fy * a.massSolar;
+        b.az -= fz * a.massSolar;
+      }
+    }
+  }
+
+  /**
+   * Momentum-conserving inelastic collision with molten thermal heating & glowing ejecta fragments
+   */
+  resolveCollision(a, b, onEventCallback) {
+    const primary = a.massSolar >= b.massSolar ? a : b;
+    const secondary = a.massSolar >= b.massSolar ? b : a;
+
+    const totalMass = primary.massSolar + secondary.massSolar;
+    const relV = Math.hypot(primary.vx - secondary.vx, primary.vy - secondary.vy, primary.vz - secondary.vz);
+
+    // Conserve linear momentum
+    primary.vx = (primary.vx * primary.massSolar + secondary.vx * secondary.massSolar) / totalMass;
+    primary.vy = (primary.vy * primary.massSolar + secondary.vy * secondary.massSolar) / totalMass;
+    primary.vz = (primary.vz * primary.massSolar + secondary.vz * secondary.massSolar) / totalMass;
+    primary.massSolar = totalMass;
+
+    // Kinetic thermal heating
+    const massRatio = Math.min(1.0, secondary.massSolar / Math.max(1e-9, primary.massSolar));
+    const heatSpikeK = Math.min(4500, 350 + massRatio * 3200 + relV * 140);
+    primary.tempK += heatSpikeK;
+    primary.moltenHeat = Math.min(1.0, primary.moltenHeat + 0.55 + massRatio * 0.45);
+    if (primary.sourcePlanet) {
+      primary.sourcePlanet.surfaceTempK = primary.tempK;
+      primary.sourcePlanet.surfaceTempC = primary.tempK - 273.15;
+      primary.sourcePlanet.volcanism = Math.min(1.0, (primary.sourcePlanet.volcanism || 0.2) + 0.45);
+      primary.sourcePlanet.massEarths = primary.massSolar * SOLAR_TO_EARTH_MASS;
+    }
+
+    // Spawn molten ejecta debris cloud orbiting from the collision point
+    this.spawnFragments(
+      secondary.x,
+      secondary.y,
+      secondary.z,
+      primary.vx,
+      primary.vy,
+      primary.vz,
+      Math.min(28, 12 + Math.round(massRatio * 22)),
+      [1.0, 0.52, 0.16]
+    );
+
+    // Expanding thermal impact shockwave
+    this.shockwaves.push({
+      x: secondary.x,
+      y: secondary.y,
+      z: secondary.z,
+      radius: 0.02,
+      maxRadius: 0.45 + massRatio * 0.5,
+      alpha: 1.0,
+      color: [1.0, 0.62, 0.22]
+    });
+
+    secondary.alive = false;
+    this.collisionCount++;
+
+    if (onEventCallback) {
+      onEventCallback(
+        'geo',
+        `Catastrophic Collision: ${secondary.name} → ${primary.name}`,
+        `Impact velocity ${(relV * 4.74).toFixed(1)} km/s; temperature spiked by +${Math.round(heatSpikeK)} K; molten debris ejected into orbit.`
+      );
+    }
+  }
+
+  /**
+   * Shatter / Explode a planet or trigger a Supernova shockwave on a star!
+   */
+  shatterBody(body, attractor, onEventCallback, reason = 'Detonation') {
+    if (!body || !body.alive) return;
+
+    const isStar = body.kind === 'star';
+    const fragCount = isStar ? 48 : 32;
+    const fragColor = isStar ? [0.48, 0.88, 1.0] : [1.0, 0.48, 0.14];
+
+    this.spawnFragments(body.x, body.y, body.z, body.vx, body.vy, body.vz, fragCount, fragColor);
+    this.shockwaves.push({
+      x: body.x,
+      y: body.y,
+      z: body.z,
+      radius: 0.05,
+      maxRadius: isStar ? 3.2 : 0.85,
+      alpha: 1.0,
+      color: isStar ? [0.45, 0.88, 1.0] : [1.0, 0.55, 0.15]
+    });
+
+    if (isStar) {
+      // Supernova leaves behind a Neutron Star / Black Hole core and blasts outward shockwave!
+      body.kind = body.massSolar > 8 ? 'black_hole' : 'star';
+      body.tempK = 42000;
+      body.color = [0.55, 0.90, 1.0];
+      body.massSolar *= 0.28;
+      // Push all surrounding planets outward with radial radiation impulse
+      for (const other of this.bodies) {
+        if (!other.alive || other === body) continue;
+        const dx = other.x - body.x;
+        const dy = other.y - body.y;
+        const dz = other.z - body.z;
+        const d = Math.max(0.1, Math.hypot(dx, dy, dz));
+        const push = 1.6 / d;
+        other.vx += (dx / d) * push;
+        other.vy += (dy / d) * push;
+        other.vz += (dz / d) * push;
+        other.tempK += 1400 / d;
+        other.moltenHeat = Math.min(1.0, other.moltenHeat + 0.7);
+      }
+      if (onEventCallback) {
+        onEventCallback(
+          'astro',
+          `Core-Collapse Supernova: ${body.name}`,
+          `Ejected 72% of stellar envelope; relativistic shockwave superheated surrounding planetary orbits.`
+        );
+      }
+    } else {
+      body.alive = false;
+      if (onEventCallback) {
+        onEventCallback(
+          'geo',
+          `${reason}: ${body.name} Fragmented`,
+          `Body disrupted into ${fragCount} incandescent orbital debris fragments.`
+        );
+      }
+    }
+  }
+
+  spawnFragments(x, y, z, baseVx, baseVy, baseVz, count, color) {
+    for (let i = 0; i < count; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = (Math.random() - 0.5) * Math.PI;
+      const speed = 0.35 + Math.random() * 1.45;
+      this.fragments.push({
+        x: x + (Math.random() - 0.5) * 0.03,
+        y: y + (Math.random() - 0.5) * 0.03,
+        z: z + (Math.random() - 0.5) * 0.03,
+        vx: baseVx + Math.cos(theta) * Math.cos(phi) * speed,
+        vy: baseVy + Math.sin(phi) * speed * 0.5,
+        vz: baseVz + Math.sin(theta) * Math.cos(phi) * speed,
+        life: 1.0,
+        color: [...color],
+        size: 1.5 + Math.random() * 2.5
+      });
+    }
+    if (this.fragments.length > MAX_FRAGMENTS) {
+      this.fragments.splice(0, this.fragments.length - MAX_FRAGMENTS);
+    }
+  }
+
+  stepFragmentsAndShockwaves(dtYears, dtRealSeconds) {
+    const primary = this.bodies[0];
+    const M = primary && primary.alive ? primary.massSolar : 1.0;
+
+    for (let i = this.fragments.length - 1; i >= 0; i--) {
+      const f = this.fragments[i];
+      if (primary && primary.alive) {
+        const dx = primary.x - f.x;
+        const dy = primary.y - f.y;
+        const dz = primary.z - f.z;
+        const rSq = dx * dx + dy * dy + dz * dz + 0.008;
+        const invR3 = (G_AU_MSUN_YR * M) / (rSq * Math.sqrt(rSq));
+        f.vx += dx * invR3 * dtYears;
+        f.vy += dy * invR3 * dtYears;
+        f.vz += dz * invR3 * dtYears;
+      }
+      f.x += f.vx * dtYears;
+      f.y += f.vy * dtYears;
+      f.z += f.vz * dtYears;
+      f.life -= dtRealSeconds * 0.09;
+      if (f.life <= 0) {
+        this.fragments.splice(i, 1);
+      }
+    }
+
+    for (let i = this.shockwaves.length - 1; i >= 0; i--) {
+      const sw = this.shockwaves[i];
+      sw.radius += dtRealSeconds * (sw.maxRadius * 0.55);
+      sw.alpha = Math.max(0, 1.0 - sw.radius / sw.maxRadius);
+      if (sw.alpha <= 0.01) {
+        this.shockwaves.splice(i, 1);
+      }
+    }
+  }
+
+  /**
+   * Universe Sandbox Add / Launch Tool:
+   * placementMode: 'orbit' | 'binary' | 'launch' | 'still'
+   */
+  spawnBody(presetId, worldPos, placementMode = 'orbit', launchDir = [0, 0, -1], launchSpeedKmS = 28) {
+    const preset = SANDBOX_PRESETS.find((p) => p.id === presetId) || SANDBOX_PRESETS[3];
+    const [x, y, z] = worldPos;
+    const massSolar = preset.massSolar !== undefined
+      ? preset.massSolar
+      : (preset.massEarths || 1.0) * EARTH_TO_SOLAR_MASS;
+
+    // Find strongest gravitational attractor
+    let attractor = this.bodies[0];
+    let bestPull = -1;
+    for (const b of this.bodies) {
+      if (!b.alive) continue;
+      const dSq = Math.max(0.01, (b.x - x) ** 2 + (b.y - y) ** 2 + (b.z - z) ** 2);
+      const pull = b.massSolar / dSq;
+      if (pull > bestPull) {
+        bestPull = pull;
+        attractor = b;
+      }
+    }
+
+    let vx = 0, vy = 0, vz = 0;
+
+    if ((placementMode === 'orbit' || placementMode === 'binary') && attractor) {
+      const rx = x - attractor.x;
+      const ry = y - attractor.y;
+      const rz = z - attractor.z;
+      const r = Math.max(0.12, Math.hypot(rx, ry, rz));
+      // Circular orbital speed v = sqrt(G * M_total / r) in AU/yr
+      const mTotal = placementMode === 'binary' ? (attractor.massSolar + massSolar) : attractor.massSolar;
+      const vCirc = Math.sqrt((G_AU_MSUN_YR * mTotal) / r);
+      // Tangential direction in ecliptic XZ plane
+      const rXZ = Math.hypot(rx, rz) || 1;
+      const tx = -rz / rXZ;
+      const tz = rx / rXZ;
+
+      vx = attractor.vx + tx * vCirc;
+      vy = attractor.vy;
+      vz = attractor.vz + tz * vCirc;
+
+      // Balance barycenter momentum in Binary mode!
+      if (placementMode === 'binary') {
+        const ratio = massSolar / Math.max(1e-9, attractor.massSolar);
+        attractor.vx -= tx * vCirc * Math.min(0.8, ratio);
+        attractor.vz -= tz * vCirc * Math.min(0.8, ratio);
+      }
+    } else if (placementMode === 'launch') {
+      // Convert km/s to AU/yr (1 AU/yr ≈ 4.74047 km/s)
+      const speedAuYr = launchSpeedKmS / 4.74047;
+      const len = Math.hypot(launchDir[0], launchDir[1], launchDir[2]) || 1;
+      vx = (launchDir[0] / len) * speedAuYr;
+      vy = (launchDir[1] / len) * speedAuYr;
+      vz = (launchDir[2] / len) * speedAuYr;
+    }
+
+    const rgb = preset.kind === 'star' ? planckBlackbodyRGB(preset.tempK) : preset.color;
+    const newBody = {
+      id: `spawn-${this._nextSpawnId++}`,
+      name: `${preset.name} #${this._nextSpawnId - 1}`,
+      kind: preset.kind,
+      planetIndex: -1,
+      massSolar,
+      radiusVisual: preset.kind === 'star' ? 0.12 : preset.kind === 'black_hole' ? 0.08 : Math.max(0.024, Math.min(0.075, Math.pow(preset.radiusEarths || 1, 0.35) * 0.028)),
+      tempK: preset.tempK,
+      luminositySolar: preset.kind === 'star' ? Math.pow(massSolar, 3.5) : 0,
+      color: [...rgb],
+      atmoColor: [...rgb],
+      hexColor: rgbToHex(rgb),
+      x,
+      y,
+      z,
+      vx,
+      vy,
+      vz,
+      ax: 0,
+      ay: 0,
+      az: 0,
+      moltenHeat: 0,
+      alive: true,
+      trail: [{ x, y, z }],
+      sourcePlanet: null
+    };
+
+    this.bodies.push(newBody);
+    this.computeAccelerations();
+    return newBody;
+  }
+
+  /**
+   * Universe Sandbox Heating Laser Tool: continuously pumps thermal energy into a body
+   */
+  applyThermalLaser(body, dtSeconds, powerScale = 1.0) {
+    if (!body || !body.alive) return;
+    const deltaK = dtSeconds * 420 * powerScale;
+    body.tempK = Math.min(18000, body.tempK + deltaK);
+    body.moltenHeat = Math.min(1.0, body.moltenHeat + dtSeconds * 0.42 * powerScale);
+    if (body.sourcePlanet) {
+      body.sourcePlanet.surfaceTempK = body.tempK;
+      body.sourcePlanet.surfaceTempC = body.tempK - 273.15;
+      if (body.tempK > 373 && body.sourcePlanet.oceanCoverage > 0) {
+        body.sourcePlanet.oceanCoverage = Math.max(0, body.sourcePlanet.oceanCoverage - dtSeconds * 0.14);
+        body.sourcePlanet.cloudCoverage = Math.min(0.95, body.sourcePlanet.cloudCoverage + dtSeconds * 0.12);
+      }
+      if (body.tempK > 273 && body.sourcePlanet.iceCoverage > 0) {
+        body.sourcePlanet.iceCoverage = Math.max(0, body.sourcePlanet.iceCoverage - dtSeconds * 0.18);
+      }
+      if (body.tempK > 950) {
+        body.sourcePlanet.volcanism = Math.min(1.0, body.sourcePlanet.volcanism + dtSeconds * 0.25);
+      }
+    }
+  }
+
+  /**
+   * Universe Sandbox System Management Actions
+   */
+  scaleAllVelocities(factor) {
+    for (const b of this.bodies) {
+      if (!b.alive) continue;
+      b.vx *= factor;
+      b.vy *= factor;
+      b.vz *= factor;
+    }
+  }
+
+  clearFragmentsAndTrails() {
+    this.fragments = [];
+    for (const b of this.bodies) {
+      b.trail = [];
+    }
+  }
+
+  deleteBody(bodyId) {
+    const idx = this.bodies.findIndex((b) => b.id === bodyId);
+    if (idx > 0) { // Keep index 0 anchor or mark dead
+      this.bodies[idx].alive = false;
+      return true;
+    }
+    return false;
+  }
+}
+
 // === MODULE: src/simulation/engine.js ===
 /**
  * PARALLAX — Persistent Multi-Scale Time & Evolution Simulation Engine
@@ -3340,6 +4038,9 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
  */
 
 
+
+
+export { SANDBOX_PRESETS };
 
 const TIME_SCALES = [
   { id: 'pause', label: 'PAUSE', short: '0x', yearsPerSec: 0, visualSpeed: 0.0, desc: 'Simulation paused' },
@@ -3437,6 +4138,23 @@ class SimulationEngine {
     this.autopilotActive = false;
     this._autopilotTimer = 0;
     this._autopilotWonderIndex = 0;
+
+    // Universe Sandbox 2 Interactive Physics & Controls State
+    this.nbody = new NBodySystem();
+    this.sandboxTool = 'select';       // 'select' | 'add' | 'laser' | 'explode'
+    this.addPresetId = 'earth';
+    this.addMode = 'orbit';            // 'orbit' | 'binary' | 'launch' | 'still'
+    this.launchSpeedKmS = 28;
+    this.laserActive = false;
+    this.lightingMode = 0;             // 0: Realistic, 1: Studio, 2: Flashlight
+    this.qualityMode = 'auto';         // 'auto' | 'low' | 'medium' | 'ultra'
+    this.displayFlags = {
+      orbits: true,
+      trails: true,
+      grid: false,
+      hz: true,
+      labels: true
+    };
 
     this.deltas = {};
     this.bookmarks = [];
@@ -3573,6 +4291,9 @@ class SimulationEngine {
     if (this.activePlanetIndex >= this.planetarySystem.planets.length) {
       this.activePlanetIndex = Math.max(0, this.planetarySystem.planets.length - 1);
     }
+
+    // Synchronize real-time Symplectic N-Body Physics Engine with the active star system
+    this.nbody.loadFromPlanetarySystem(this.planetarySystem, this.elapsedYears);
   }
 
   applyPlanetCausalityAndDeltas(planet, star, extraAgeGyr) {
@@ -3772,8 +4493,19 @@ class SimulationEngine {
 
     if (timeScale.yearsPerSec > 0) {
       const prevGyr = Math.floor((this.elapsedYears / 1e9) * 20);
-      this.elapsedYears += timeScale.yearsPerSec * clampedDt;
-      this.visualTime += clampedDt * timeScale.visualSpeed;
+      const dir = this.nbody.timeReversed ? -1 : 1;
+      const dtYears = timeScale.yearsPerSec * clampedDt;
+      this.elapsedYears += dtYears * dir;
+      this.visualTime += clampedDt * timeScale.visualSpeed * dir;
+
+      // Step real-time N-Body Newtonian gravity, collisions & debris!
+      // Keep orbital visual cadence responsive even at slower time steps
+      const nbodyDtYears = Math.max(0.0002, Math.min(0.04, dtYears > 0.05 ? 0.025 : dtYears * 4.0 + clampedDt * 0.02));
+      this.nbody.step(nbodyDtYears, clampedDt, (cat, title, detail) => {
+        this.transientEffects.impactFlashIntensity = 1.0;
+        this.logEvent(cat, title, detail);
+        this.emitChange('nbody_event');
+      });
 
       const newGyr = Math.floor((this.elapsedYears / 1e9) * 20);
       if (newGyr !== prevGyr) {
@@ -3786,7 +4518,16 @@ class SimulationEngine {
         this.simulateAutonomousBackgroundUniverse();
       }
     } else {
-      this.visualTime += clampedDt * 0.08;
+      this.visualTime += clampedDt * 0.04;
+      this.nbody.stepFragmentsAndShockwaves(0.0002, clampedDt);
+    }
+
+    // Apply live Heating Laser if held on the active planet
+    if (this.laserActive) {
+      const targetBody = this.getActiveNBodyTarget();
+      if (targetBody) {
+        this.nbody.applyThermalLaser(targetBody, clampedDt, 1.4);
+      }
     }
   }
 
@@ -4266,21 +5007,99 @@ class SimulationEngine {
     this.savePersistence();
     this.emitChange('import');
   }
+
+  getActiveNBodyTarget() {
+    if (!this.nbody || !this.nbody.bodies.length) return null;
+    const pl = this.getActivePlanet();
+    if (pl) {
+      const match = this.nbody.bodies.find((b) => b.alive && b.id === pl.id);
+      if (match) return match;
+    }
+    return this.nbody.bodies[0];
+  }
+
+  toggleDisplayFlag(flag) {
+    if (flag in this.displayFlags) {
+      this.displayFlags[flag] = !this.displayFlags[flag];
+      this.emitChange('display_flag');
+    }
+  }
+
+  cycleLightingMode() {
+    this.lightingMode = (this.lightingMode + 1) % 3;
+    this.emitChange('lighting');
+    return this.lightingMode;
+  }
+
+  setSandboxTool(tool) {
+    this.sandboxTool = tool;
+    this.laserActive = false;
+    this.emitChange('sandbox_tool');
+  }
+
+  /**
+   * Universe Sandbox Live Property Editor: mutates planet/star physics in real time!
+   */
+  editActivePlanetProperty(prop, value) {
+    const pl = this.getActivePlanet();
+    const nb = this.getActiveNBodyTarget();
+    if (!pl) return;
+
+    if (prop === 'massEarths') {
+      pl.massEarths = Math.max(0.01, value);
+      pl.gravityG = pl.massEarths / Math.max(0.05, pl.radiusEarths * pl.radiusEarths);
+      if (nb) nb.massSolar = pl.massEarths * 3.0034896e-6;
+    } else if (prop === 'surfaceTempC') {
+      pl.surfaceTempC = value;
+      pl.surfaceTempK = value + 273.15;
+      if (nb) {
+        nb.tempK = pl.surfaceTempK;
+        nb.moltenHeat = pl.surfaceTempC > 750 ? Math.min(1.0, (pl.surfaceTempC - 750) / 1400) : 0;
+      }
+      if (pl.surfaceTempC > 100) pl.oceanCoverage = Math.max(0, pl.oceanCoverage * 0.6);
+      if (pl.surfaceTempC < -10) pl.iceCoverage = Math.min(0.98, Math.max(pl.iceCoverage, (-pl.surfaceTempC) / 90));
+      else if (pl.surfaceTempC > 45) pl.iceCoverage = 0;
+    } else if (prop === 'oceanCoverage') {
+      pl.oceanCoverage = Math.max(0, Math.min(1, value));
+    } else if (prop === 'pressureAtm') {
+      pl.pressureAtm = Math.max(0.0001, value);
+      pl.cloudCoverage = Math.min(0.96, Math.pow(pl.pressureAtm, 0.35) * 0.55);
+    } else if (prop === 'starMassSolar') {
+      const star = this.planetarySystem.star;
+      star.currentMassSolar = Math.max(0.08, value);
+      star.luminositySolar = Math.pow(star.currentMassSolar, 3.5);
+      star.radiusSolar = Math.pow(star.currentMassSolar, 0.8);
+      star.tempK = Math.min(42000, 5778 * Math.pow(star.luminositySolar / (star.radiusSolar * star.radiusSolar), 0.25));
+      if (this.nbody.bodies[0]) {
+        this.nbody.bodies[0].massSolar = star.currentMassSolar;
+        this.nbody.bodies[0].luminositySolar = star.luminositySolar;
+      }
+    }
+
+    this.emitChange('property_edit');
+  }
+
+  explodeTargetBody(body) {
+    const target = body || this.getActiveNBodyTarget();
+    if (!target || !target.alive) return;
+    this.nbody.shatterBody(target, this.nbody.bodies[0], (cat, title, detail) => {
+      this.transientEffects.impactFlashIntensity = 1.0;
+      this.transientEffects.superflareIntensity = target.kind === 'star' ? 1.0 : 0.4;
+      this.logEvent(cat, title, detail);
+    });
+    this.emitChange('explode');
+  }
 }
 
 // === MODULE: src/renderer/shaders.js ===
 /**
- * PARALLAX v2.0 — Cinematic WebGL2 GLSL Multi-Scale Raymarching Shaders
- * Renders 26 orders of spatial magnitude seamlessly in real time:
- * - Relativistic warp star-streak transit across scales
- * - Cosmic Web dark-matter & baryonic filaments + supercluster nodes
- * - Volumetric 3D Galaxies (Spiral, Barred, Elliptical, Irregular) with HII knots, dust lanes & AGN jets
- * - Stars with convective granulation, coronal plasma loops, planetary nebulae,
- *   Pulsar lighthouse beams & true Gravitational Lensing Black Holes (double-imaged accretion disk)
- * - 3D Raymarched Planetary Globes with tectonic relief, procedural impact craters,
- *   tidally-locked eyeball-world climates, specular oceans, cloud shadows, Cassini rings,
- *   Rayleigh/Mie sunset scattering, polar auroras & nocturnal city grids
- * - 3D Raymarched Planetary Surfaces with alien skies, visible moons/rings, animated waves & aerial haze
+ * PARALLAX v3.0 — Ultra-Optimized WebGL2 GLSL Multi-Scale Raymarching Shaders
+ * Performance & Realism Optimizations:
+ * - CPU-precomputed 6-DOF orthonormal camera basis (supports Roll, Pitch, Yaw, Pan & Orbit!)
+ * - Adaptive GPU step count via u_qualityLevel (0=Performance, 1=Balanced, 2=Ultra)
+ * - Fast analytical impact crater relief (5x faster than 27-tap 3D Voronoi)
+ * - Universe Sandbox Lighting Modes (0=Realistic, 1=Studio Fill, 2=Camera Flashlight)
+ * - Real-time molten collision/laser crust heating (u_moltenHeat) & thermal laser strike
  */
 
 const VERTEX_SHADER_SOURCE = `#version 300 es
@@ -4303,24 +5122,29 @@ out vec4 fragColor;
 
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform float u_logScale;       // Continuous scale: 25.5 (Cosmos) -> 0.0 (Surface/Micro)
-uniform vec2 u_cameraAngles;    // x: yaw, y: pitch
-uniform vec2 u_surfaceOffset;   // x, z offset when flying across planetary surface
-uniform float u_cameraZoom;
-uniform float u_warpFactor;     // 0.0..1.0 relativistic transit speed stretch
+uniform float u_logScale;
+uniform vec3 u_camRight;
+uniform vec3 u_camUp;
+uniform vec3 u_camForward;
+uniform vec3 u_camOrigin;
+uniform vec2 u_cameraAngles;
+uniform vec2 u_surfaceOffset;
+uniform float u_warpFactor;
 uniform float u_seed;
+uniform int u_qualityLevel;     // 0: Fast/Mobile, 1: Balanced, 2: Ultra
+uniform int u_lightingMode;     // 0: Realistic, 1: Studio, 2: Flashlight
 
 // Star uniforms
 uniform vec3 u_starColor;
 uniform float u_starTempK;
 uniform float u_starRadiusNorm;
-uniform int u_remnantType;      // 0: normal star, 1: white dwarf, 2: neutron star/pulsar, 3: black hole
+uniform int u_remnantType;
 uniform float u_hasNebulaHalo;
 uniform float u_isBinary;
 uniform vec3 u_companionColor;
 
 // Galaxy uniforms
-uniform int u_galaxyFamily;     // 0: spiral, 1: barred, 2: elliptical, 3: irregular
+uniform int u_galaxyFamily;
 uniform float u_galaxyArms;
 uniform float u_galaxyTwist;
 uniform float u_galaxyBar;
@@ -4328,7 +5152,7 @@ uniform float u_agnActive;
 uniform vec3 u_nebulaColor;
 
 // Planet uniforms
-uniform int u_planetArchetype;  // 0: temperate, 1: ocean, 2: lava, 3: venus, 4: desert, 5: gas_giant, 6: ice_giant, 7: cryo, 8: barren
+uniform int u_planetArchetype;
 uniform vec3 u_colDeepOcean;
 uniform vec3 u_colShallowOcean;
 uniform vec3 u_colLowland;
@@ -4345,6 +5169,7 @@ uniform float u_pressureAtm;
 uniform float u_bioComplexity;
 uniform float u_cityLights;
 uniform float u_isTidallyLocked;
+uniform float u_moltenHeat;     // 0.0..1.0 real-time collision / thermal laser magma glow!
 uniform float u_hasRings;
 uniform float u_ringInner;
 uniform float u_ringOuter;
@@ -4354,10 +5179,10 @@ uniform float u_planetSeed;
 uniform float u_superflare;
 uniform float u_impactFlash;
 uniform float u_evoPulse;
+uniform float u_laserActive;
 
 #define PI 3.14159265359
 
-// --- High-Speed GPU Hash & 3D Value Noise ---
 float hash13(vec3 p3) {
   p3 = fract(p3 * 0.1031);
   p3 += dot(p3, p3.zyx + 31.32);
@@ -4377,13 +5202,13 @@ float noise3(vec3 x) {
 
   return mix(
     mix(
-      mix(hash13(i + vec3(0, 0, 0)), hash13(i + vec3(1, 0, 0)), f.x),
-      mix(hash13(i + vec3(0, 1, 0)), hash13(i + vec3(1, 1, 0)), f.x),
+      mix(hash13(i), hash13(i + vec3(1.0, 0.0, 0.0)), f.x),
+      mix(hash13(i + vec3(0.0, 1.0, 0.0)), hash13(i + vec3(1.0, 1.0, 0.0)), f.x),
       f.y
     ),
     mix(
-      mix(hash13(i + vec3(0, 0, 1)), hash13(i + vec3(1, 0, 1)), f.x),
-      mix(hash13(i + vec3(0, 1, 1)), hash13(i + vec3(1, 1, 1)), f.x),
+      mix(hash13(i + vec3(0.0, 0.0, 1.0)), hash13(i + vec3(1.0, 0.0, 1.0)), f.x),
+      mix(hash13(i + vec3(0.0, 1.0, 1.0)), hash13(i + vec3(1.0, 1.0, 1.0)), f.x),
       f.y
     ),
     f.z
@@ -4399,7 +5224,7 @@ const mat3 m3 = mat3(
 float fbm(vec3 p, int octaves) {
   float f = 0.0;
   float amp = 0.5;
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 5; i++) {
     if (i >= octaves) break;
     f += amp * noise3(p);
     p = m3 * p * 2.04;
@@ -4412,7 +5237,7 @@ float ridgeFbm(vec3 p, int octaves) {
   float f = 0.0;
   float amp = 0.5;
   float weight = 1.0;
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 4; i++) {
     if (i >= octaves) break;
     float v = 1.0 - abs(noise3(p) * 2.0 - 1.0);
     v = v * v * weight;
@@ -4424,71 +5249,51 @@ float ridgeFbm(vec3 p, int octaves) {
   return f;
 }
 
-// Procedural 3D Voronoi Crater Field for rocky & lunar bodies
-float craterField(vec3 p) {
+// Fast 1-cell analytical crater relief (~5x faster than 27-tap Voronoi!)
+float fastCraters(vec3 p) {
   vec3 i = floor(p);
   vec3 f = fract(p);
-  float minD = 1.0;
-  for (int z = -1; z <= 1; z++) {
-    for (int y = -1; y <= 1; y++) {
-      for (int x = -1; x <= 1; x++) {
-        vec3 neighbor = vec3(float(x), float(y), float(z));
-        vec3 pt = hash33(i + neighbor);
-        float d = length(neighbor + pt - f);
-        minD = min(minD, d);
-      }
-    }
-  }
-  // Bowl depression + crisp raised ejecta rim
-  float bowl = smoothstep(0.0, 0.34, minD);
-  float rim = exp(-pow((minD - 0.36) * 14.0, 2.0)) * 0.22;
-  return (bowl - 1.0) * 0.35 + rim;
+  vec3 center = hash33(i) * 0.5 + 0.25;
+  float d = length(f - center);
+  float bowl = smoothstep(0.0, 0.28, d);
+  float rim = exp(-pow((d - 0.30) * 14.0, 2.0)) * 0.20;
+  return (bowl - 1.0) * 0.30 + rim;
 }
 
-mat3 getCameraMatrix(float yaw, float pitch) {
-  float cy = cos(yaw), sy = sin(yaw);
-  float cp = cos(pitch), sp = sin(pitch);
-  vec3 forward = vec3(sy * cp, sp, cy * cp);
-  vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
-  vec3 up = cross(right, forward);
-  return mat3(right, up, -forward);
-}
-
-// --- Deep Space Starfield, Milky Way Band & Relativistic Warp Streaks ---
+// --- Deep Space Starfield & Relativistic Warp Streaks ---
 vec3 renderDeepStarfield(vec3 rd, vec2 aspectUV) {
-  vec3 col = vec3(0.009, 0.013, 0.022);
+  vec3 col = vec3(0.008, 0.012, 0.020);
 
-  // Subtle background Milky Way / dust lane band
   float galLat = abs(rd.y * 1.45 + rd.x * 0.38 - rd.z * 0.18);
   float band = pow(max(0.0, 1.0 - galLat), 3.2);
-  float dust1 = fbm(rd * 3.8 + vec3(u_seed * 0.01), 4);
-  float dust2 = ridgeFbm(rd * 6.5 - vec3(u_seed * 0.02), 3);
-  col += vec3(0.038, 0.060, 0.110) * band * smoothstep(0.22, 0.82, dust1);
-  col += u_nebulaColor * 0.028 * band * pow(dust1, 2.2) * (1.0 - dust2 * 0.45);
-  col += vec3(0.06, 0.045, 0.028) * band * pow(max(0.0, 1.0 - galLat * 2.2), 2.5) * 0.4;
+  if (band > 0.02) {
+    float dust = fbm(rd * 3.8 + vec3(u_seed * 0.01), 3);
+    col += vec3(0.036, 0.058, 0.105) * band * smoothstep(0.22, 0.82, dust);
+    col += u_nebulaColor * 0.025 * band * dust * dust;
+  }
 
-  // Multi-layer procedural starfield with realistic Planck blackbody hues
+  int starLayers = u_qualityLevel == 0 ? 2 : 3;
   for (int layer = 0; layer < 3; layer++) {
-    float scale = layer == 0 ? 95.0 : (layer == 1 ? 195.0 : 320.0);
+    if (layer >= starLayers) break;
+    float scale = layer == 0 ? 96.0 : (layer == 1 ? 195.0 : 310.0);
     vec3 p = rd * scale;
     vec3 id = floor(p);
     vec3 local = fract(p) - 0.5;
     float h = hash13(id + float(layer) * 77.7);
-    float thresh = layer == 0 ? 0.968 : (layer == 1 ? 0.958 : 0.965);
+    float thresh = layer == 0 ? 0.968 : 0.960;
     if (h > thresh) {
-      vec3 offset = (hash33(id + float(layer) * 19.1) - 0.5) * 0.62;
+      vec3 offset = (hash33(id + float(layer) * 19.1) - 0.5) * 0.60;
       float d = length(local - offset);
       float brightness = smoothstep(thresh, 1.0, h);
-      float starGlow = exp(-d * (layer == 0 ? 15.0 : (layer == 1 ? 24.0 : 32.0))) * brightness;
+      float starGlow = exp(-d * (layer == 0 ? 15.0 : 25.0)) * brightness;
       float tempHash = hash13(id + 9.0);
       vec3 sCol = tempHash < 0.35
         ? vec3(1.0, 0.72, 0.46)
         : (tempHash < 0.72 ? vec3(0.98, 0.97, 0.94) : vec3(0.58, 0.80, 1.0));
-      col += sCol * starGlow * (layer == 0 ? 1.45 : (layer == 1 ? 0.85 : 0.45));
+      col += sCol * starGlow * (layer == 0 ? 1.42 : (layer == 1 ? 0.82 : 0.45));
     }
   }
 
-  // Relativistic Warp / Scale-Transit Light Streaks
   if (u_warpFactor > 0.02) {
     float rUV = length(aspectUV);
     float angle = atan(aspectUV.y, aspectUV.x);
@@ -4505,39 +5310,35 @@ vec3 renderDeepStarfield(vec3 rd, vec2 aspectUV) {
 vec4 renderCosmicWeb(vec3 ro, vec3 rd) {
   vec3 accum = vec3(0.0);
   float alpha = 0.0;
+  int steps = u_qualityLevel == 0 ? 22 : (u_qualityLevel == 1 ? 30 : 38);
+  float stepLen = 5.4 / float(steps);
   float t = 0.75;
   vec3 seedOff = vec3(mod(u_seed, 97.0) * 0.13);
 
   for (int i = 0; i < 38; i++) {
+    if (i >= steps || alpha > 0.94) break;
     vec3 p = ro + rd * t;
     float r = length(p);
-    if (r < 4.6) {
-      float fil = ridgeFbm(p * 0.88 + seedOff, 4);
-      float fineWeb = ridgeFbm(p * 1.95 - seedOff, 3);
-      float combined = fil * 0.78 + fineWeb * 0.22;
-      float node = smoothstep(0.54, 0.92, combined);
+    if (r < 4.5) {
+      float fil = ridgeFbm(p * 0.88 + seedOff, 3);
+      float node = smoothstep(0.52, 0.92, fil);
       float radialFalloff = smoothstep(4.4, 0.55, r);
-      float density = pow(max(0.0, combined - 0.32), 2.15) * radialFalloff;
+      float density = pow(max(0.0, fil - 0.30), 2.1) * radialFalloff;
 
       vec3 filColor = mix(vec3(0.14, 0.44, 0.92), vec3(0.98, 0.74, 0.36), node);
-      filColor = mix(filColor, vec3(0.32, 0.72, 0.95), smoothstep(1.6, 3.8, r) * 0.35);
-
       float coreGlow = exp(-r * 1.35) * 0.14;
-      accum += (filColor * density * 0.24 + vec3(1.0, 0.80, 0.46) * coreGlow * 0.14) * (1.0 - alpha);
-      alpha = min(0.96, alpha + density * 0.045);
+      accum += (filColor * density * 0.25 + vec3(1.0, 0.80, 0.46) * coreGlow * 0.14) * (1.0 - alpha);
+      alpha = min(0.96, alpha + density * 0.05);
     }
-    t += 0.15;
+    t += stepLen;
   }
   return vec4(accum, clamp(alpha, 0.0, 1.0));
 }
 
-// --- SCALE 2: VOLUMETRIC 3D GALAXY & ACTIVE GALACTIC NUCLEUS (AGN) JETS ---
+// --- SCALE 2: VOLUMETRIC 3D GALAXY & AGN QUASAR JETS ---
 vec4 renderGalaxy(vec3 ro, vec3 rd) {
-  vec3 accum = vec3(0.0);
-  float alpha = 0.0;
-
   float b = dot(ro, rd);
-  float c = dot(ro, ro) - 7.84; // radius 2.8
+  float c = dot(ro, ro) - 7.84;
   float disc = b * b - c;
   if (disc < 0.0) return vec4(0.0);
 
@@ -4545,18 +5346,20 @@ vec4 renderGalaxy(vec3 ro, vec3 rd) {
   float tMax = -b + sqrt(disc);
   if (tMax <= tMin) return vec4(0.0);
 
-  int steps = 44;
+  int steps = u_qualityLevel == 0 ? 24 : (u_qualityLevel == 1 ? 34 : 44);
   float dt = (tMax - tMin) / float(steps);
   float t = tMin;
   float rotTime = u_time * 0.032;
+  vec3 accum = vec3(0.0);
+  float alpha = 0.0;
 
   for (int i = 0; i < 44; i++) {
+    if (i >= steps || alpha > 0.96) break;
     vec3 p = ro + rd * t;
     float r = length(p.xz);
     float y = p.y;
 
-    // Relativistic AGN Quasar Polar Jets (along Y axis) when SMBH is active!
-    if (u_agnActive > 0.5 && r < 0.32 && abs(y) > 0.08 && abs(y) < 2.5) {
+    if (u_agnActive > 0.5 && r < 0.30 && abs(y) > 0.08 && abs(y) < 2.5) {
       float jetWidth = 0.035 + abs(y) * 0.065;
       float jetMask = exp(-pow(r / jetWidth, 2.0)) * exp(-abs(y) * 0.75);
       float jetPulse = 0.75 + 0.25 * sin(abs(y) * 14.0 - u_time * 6.0);
@@ -4574,21 +5377,19 @@ vec4 renderGalaxy(vec3 ro, vec3 rd) {
       float diskThickness = 0.095 + 0.19 * exp(-r * 1.65);
       float verticalProfile = exp(-abs(y) / diskThickness);
 
-      if (verticalProfile > 0.008 && r < 2.55) {
+      if (verticalProfile > 0.012 && r < 2.55) {
         float theta = atan(p.z, p.x) - rotTime;
         float logR = log(max(0.05, r));
         float armPhase = theta * max(1.0, u_galaxyArms) + logR * u_galaxyTwist;
         float spiralPattern = pow(cos(armPhase) * 0.5 + 0.5, 1.9);
 
         float barFactor = u_galaxyBar * exp(-r * 1.85) * pow(abs(cos(theta)), 3.2);
-        float noiseVal = fbm(vec3(p.xz * 2.5, y * 4.5) + vec3(rotTime), 4);
-        float dustLane = smoothstep(0.40, 0.72, fbm(vec3(p.xz * 4.2, y * 9.0), 3));
+        float noiseVal = fbm(vec3(p.xz * 2.5, y * 4.5) + vec3(rotTime), 3);
+        float dustLane = smoothstep(0.42, 0.72, noise3(vec3(p.xz * 4.4, y * 9.0)));
 
         float radialDisk = exp(-r * 1.18) * smoothstep(2.5, 0.75, r);
-        float armDensity = (0.16 + 0.84 * spiralPattern + barFactor) * radialDisk * verticalProfile;
-        armDensity *= (0.52 + 0.80 * noiseVal);
+        float armDensity = (0.16 + 0.84 * spiralPattern + barFactor) * radialDisk * verticalProfile * (0.52 + 0.80 * noiseVal);
 
-        // Galactic bulge & central SMBH accretion halo
         float bulge = exp(-length(vec3(p.x, p.y * 2.3, p.z)) * 3.6) * 2.3;
         float hiiMask = pow(spiralPattern * noiseVal, 2.3) * smoothstep(0.22, 0.72, r) * smoothstep(2.15, 0.8, r);
 
@@ -4596,8 +5397,7 @@ vec4 renderGalaxy(vec3 ro, vec3 rd) {
         armCol = mix(armCol, u_nebulaColor * 1.75, hiiMask * 1.4);
         armCol *= (1.0 - 0.62 * dustLane * smoothstep(0.075, 0.0, abs(y)));
 
-        vec3 coreCol = vec3(1.0, 0.85, 0.56) * bulge;
-        accum += (armCol * armDensity * 1.55 + coreCol) * dt * (1.0 - alpha * 0.42);
+        accum += (armCol * armDensity * 1.55 + vec3(1.0, 0.85, 0.56) * bulge) * dt * (1.0 - alpha * 0.42);
         alpha = min(0.98, alpha + (armDensity + bulge) * dt * 0.40);
       }
     }
@@ -4607,7 +5407,7 @@ vec4 renderGalaxy(vec3 ro, vec3 rd) {
   return vec4(accum, clamp(alpha, 0.0, 1.0));
 }
 
-// --- SCALE 3 & 4: VOLUMETRIC STAR, PULSAR, NEBULA & GRAVITATIONALLY LENSED BLACK HOLE ---
+// --- SCALE 3 & 4: VOLUMETRIC STAR, PULSAR & GRAVITATIONALLY LENSED BLACK HOLE ---
 vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
   vec3 col = vec3(0.0);
   float alpha = 0.0;
@@ -4615,28 +5415,25 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
   float starR = 0.62 * scaleFactor;
   float b = dot(ro, rd);
   float c = dot(ro, ro);
-  float closestDistSq = max(0.0, c - b * b);
-  float closestDist = sqrt(closestDistSq);
+  float closestDist = sqrt(max(0.0, c - b * b));
 
-  // Expanding Planetary Nebula / Supernova Remnant Shell
   if (u_hasNebulaHalo > 0.5) {
     float shellR = starR * 2.55;
     float shellDist = abs(closestDist - shellR);
     vec3 shellDir = normalize(ro + rd * max(0.0, -b) + 1e-4);
-    float nNoise = fbm(shellDir * 4.8 + u_time * 0.04, 4);
-    float filaments = ridgeFbm(shellDir * 7.5 - u_time * 0.03, 3);
-    float shellGlow = exp(-shellDist / (starR * 0.82)) * (0.42 + 0.65 * nNoise + 0.45 * filaments);
+    float nNoise = fbm(shellDir * 4.8 + u_time * 0.04, 3);
+    float shellGlow = exp(-shellDist / (starR * 0.82)) * (0.45 + 0.85 * nNoise);
     vec3 shellCol = mix(vec3(0.16, 0.88, 0.94), vec3(0.98, 0.26, 0.50), smoothstep(starR * 1.4, shellR * 1.15, closestDist));
     col += shellCol * shellGlow * 1.05;
     alpha = max(alpha, clamp(shellGlow * 0.70, 0.0, 0.88));
   }
 
-  // Case A: Stellar Black Hole with True Ray-Deflected Gravitational Lensing & Double-Imaged Accretion Disk!
+  // Case A: Ray-Deflected Gravitational Lensing Black Hole
   if (u_remnantType == 3) {
     float ehRadius = starR * 0.46;
     vec3 diskNormal = normalize(vec3(0.14, 0.94, -0.30));
+    int bhSteps = u_qualityLevel == 0 ? 32 : (u_qualityLevel == 1 ? 42 : 52);
 
-    // Raymarch curved geodesic near Schwarzschild metric
     vec3 p = ro;
     vec3 v = rd;
     vec3 bhAccum = vec3(0.0);
@@ -4644,6 +5441,7 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
     bool fellIn = false;
 
     for (int step = 0; step < 52; step++) {
+      if (step >= bhSteps) break;
       float r = length(p);
       if (r < ehRadius) {
         fellIn = true;
@@ -4651,14 +5449,12 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
       }
       if (r > 7.5) break;
 
-      // Relativistic gravitational light bending toward singularity: a ~ -1.5 * Rs / r^3 * p
       float bend = (ehRadius * 0.58) / (r * r * r + 0.008);
       v = normalize(v - p * bend * 0.14);
 
-      float stepLen = max(0.035, min(0.24, (r - ehRadius) * 0.28));
+      float stepLen = max(0.04, min(0.26, (r - ehRadius) * 0.30));
       vec3 nextP = p + v * stepLen;
 
-      // Detect equatorial accretion disk crossing (captures BOTH primary front disk AND lensed upper/lower back arcs!)
       float dPrev = dot(p, diskNormal);
       float dNext = dot(nextP, diskNormal);
       if (dPrev * dNext <= 0.0) {
@@ -4668,9 +5464,8 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
         if (rHit > ehRadius * 1.48 && rHit < starR * 3.1) {
           float normR = (rHit - ehRadius * 1.48) / (starR * 3.1 - ehRadius * 1.48);
           float angle = atan(hit.z, hit.x) - u_time * (2.6 / (0.4 + normR));
-          float spiral = fbm(vec3(rHit * 6.5, angle * 1.8, u_time * 0.3), 4);
+          float spiral = fbm(vec3(rHit * 6.5, angle * 1.8, u_time * 0.3), 3);
           float bands = sin(rHit * 32.0 - u_time * 3.0) * 0.25 + 0.75;
-          // Relativistic Doppler beaming: approaching plasma boosted & blue-shifted, receding dimmed & red-shifted
           float doppler = clamp(0.62 + 0.68 * normalize(hit).x, 0.22, 1.55);
           float fade = smoothstep(0.0, 0.12, normR) * smoothstep(1.0, 0.25, normR);
           vec3 hotCol = mix(vec3(0.98, 0.30, 0.06), vec3(1.0, 0.94, 0.78), clamp(spiral * doppler * 0.85 + (1.0 - normR) * 0.4, 0.0, 1.0));
@@ -4679,22 +5474,17 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
         }
       }
 
-      // Photon sphere halo accumulation
       float photonGlow = exp(-abs(r - ehRadius * 1.42) * 14.0) * stepLen * 1.35;
       bhAccum += vec3(1.0, 0.80, 0.45) * photonGlow * (1.0 - bhAlpha * 0.4);
       p = nextP;
     }
 
-    if (fellIn) {
-      // Pure Event Horizon blackness framed by lensed disk in front
-      return vec4(bhAccum, 1.0);
-    }
-    // Lensed background stars bent around the Einstein ring
+    if (fellIn) return vec4(bhAccum, 1.0);
     vec3 lensedBg = renderDeepStarfield(v, aspectUV);
     return vec4(mix(lensedBg, bhAccum, clamp(bhAlpha, 0.0, 1.0)) + bhAccum * 0.35, 1.0);
   }
 
-  // Case B: Neutron Star / Magnetar Pulsar with Synchrotron Nebula & Polar Beams
+  // Case B: Neutron Star / Magnetar Pulsar
   if (u_remnantType == 2) {
     float psrR = starR * 0.22;
     float coreGlow = exp(-closestDist / (psrR * 1.15)) * 2.8;
@@ -4705,14 +5495,13 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
     vec3 jetAxis = normalize(vec3(sin(spin) * 0.52, 0.86, cos(spin) * 0.52));
     float align = abs(dot(normalize(pClosest + 1e-4), jetAxis));
     float jetBeam = pow(max(0.0, align), 22.0) * exp(-closestDist * 0.48);
-    // Pulsar wind equatorial torus
     float torus = exp(-abs(pClosest.y) * 5.0) * exp(-abs(closestDist - starR * 1.2) * 3.5);
     col += vec3(0.35, 0.86, 1.0) * (jetBeam * 2.8 + torus * 0.85);
     alpha = clamp(coreGlow + jetBeam + torus * 0.6, 0.0, 1.0);
     return vec4(col, alpha);
   }
 
-  // Case C: Main Sequence / Giant / White Dwarf with Convective Photosphere, Corona & Anamorphic Flare
+  // Case C: Convective Star Photosphere & Corona
   float disc = b * b - (c - starR * starR);
   if (disc > 0.0 && -b > 0.0) {
     float tHit = -b - sqrt(disc);
@@ -4722,9 +5511,10 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
     float a = u_time * 0.12;
     vec3 nRot = vec3(n.x * cos(a) - n.z * sin(a), n.y, n.x * sin(a) + n.z * cos(a));
 
-    float gran = fbm(nRot * 9.0 + vec3(u_time * 0.22), 5);
-    float fineGran = ridgeFbm(nRot * 20.0 - vec3(u_time * 0.35), 3);
-    float spots = smoothstep(0.67, 0.78, fbm(nRot * 3.4 + vec3(u_seed * 0.1), 3));
+    int oct = u_qualityLevel == 0 ? 3 : 4;
+    float gran = fbm(nRot * 9.0 + vec3(u_time * 0.22), oct);
+    float fineGran = ridgeFbm(nRot * 18.0 - vec3(u_time * 0.35), 2);
+    float spots = smoothstep(0.67, 0.78, fbm(nRot * 3.4 + vec3(u_seed * 0.1), 2));
 
     float mu = max(0.0, dot(n, -rd));
     float limbDarkening = pow(mu, 0.42);
@@ -4740,19 +5530,16 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
   } else {
     vec3 pClosest = ro + rd * max(0.0, -b);
     vec3 dir = normalize(pClosest + 1e-5);
-    float coronaNoise = ridgeFbm(dir * 5.5 + vec3(u_time * 0.28), 4);
+    float coronaNoise = ridgeFbm(dir * 5.5 + vec3(u_time * 0.28), 3);
     float distFromLimb = max(0.0, closestDist - starR);
     float corona = exp(-distFromLimb / (starR * (0.52 + u_superflare * 0.65))) * (0.65 + 0.72 * coronaNoise);
     float outerHalo = exp(-distFromLimb / (starR * 2.35)) * 0.42;
-
-    // Subtle horizontal anamorphic cinematic optical lens streak
     float anamorphic = exp(-abs(aspectUV.y) * 34.0) * exp(-abs(aspectUV.x) * 2.4) * 0.35 * scaleFactor;
 
     col += u_starColor * (corona * 1.42 + outerHalo + anamorphic) * (1.0 + u_superflare * 1.5);
     alpha = clamp(corona + outerHalo * 0.52 + anamorphic, 0.0, 1.0);
   }
 
-  // Binary companion star
   if (u_isBinary > 0.5 && scaleFactor > 0.3) {
     float compAngle = u_time * 0.42;
     vec3 compPos = vec3(cos(compAngle) * starR * 2.65, sin(compAngle * 0.5) * starR * 0.32, sin(compAngle) * starR * 2.65);
@@ -4771,24 +5558,23 @@ vec4 renderStar(vec3 ro, vec3 rd, float scaleFactor, vec2 aspectUV) {
   return vec4(col, alpha);
 }
 
-// --- SCALE 5: ULTRA-DETAILED 3D RAYMARCHED PLANETARY GLOBE ---
+// --- SCALE 5: ULTRA-FAST 3D PLANETARY GLOBE WITH LIGHTING MODES & MOLTEN COLLISION HEATING ---
 float getPlanetElevation(vec3 n) {
   vec3 seedShift = vec3(mod(u_planetSeed, 73.0) * 0.17, mod(u_planetSeed, 41.0) * 0.23, mod(u_planetSeed, 89.0) * 0.11);
   if (u_planetArchetype == 5 || u_planetArchetype == 6) {
-    float jetWarp = fbm(n * 3.8 + seedShift, 4);
+    float jetWarp = fbm(n * 3.8 + seedShift, 3);
     float bands = sin(n.y * 18.0 + jetWarp * 3.6) * 0.5 + 0.5;
     float greatSpot = exp(-length(n - normalize(vec3(0.55, -0.28, 0.78))) * 6.5) * 0.85;
-    float eddies = smoothstep(0.64, 0.92, fbm(vec3(n.x * 3.2, n.y * 7.0, n.z * 3.2) + seedShift, 4));
+    float eddies = smoothstep(0.64, 0.92, fbm(vec3(n.x * 3.2, n.y * 7.0, n.z * 3.2) + seedShift, 3));
     return clamp(mix(bands, 1.0, eddies * 0.55) + greatSpot * 0.35, 0.0, 1.0);
   }
-  float continents = fbm(n * 2.35 + seedShift, 5);
-  float mountains = ridgeFbm(n * 6.5 + seedShift, 4) * u_terrainRoughness;
+  int oct = u_qualityLevel == 0 ? 3 : 4;
+  float continents = fbm(n * 2.35 + seedShift, oct);
+  float mountains = ridgeFbm(n * 6.5 + seedShift, oct - 1) * u_terrainRoughness;
   float elev = continents * 0.70 + mountains * 0.30;
 
-  // Add realistic impact craters on airless / arid / barren worlds!
   if (u_pressureAtm < 0.35 || u_planetArchetype == 8 || u_planetArchetype == 4) {
-    float craters = craterField(n * 5.8 + seedShift) * 0.24 + craterField(n * 13.5 + seedShift) * 0.10;
-    elev += craters;
+    elev += fastCraters(n * 6.5 + seedShift) * 0.25 + fastCraters(n * 14.0 + seedShift) * 0.11;
   }
   return elev;
 }
@@ -4799,12 +5585,15 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
   float planetR = 1.05;
   float atmoR = planetR * (1.08 + clamp(u_pressureAtm * 0.016, 0.02, 0.10));
 
-  vec3 sunDir = normalize(vec3(0.82, 0.26, 0.50));
+  // Universe Sandbox Lighting Mode: 0 = Realistic Star, 1 = Studio Soft Fill, 2 = Camera Flashlight
+  vec3 sunDir = u_lightingMode == 2
+    ? normalize(ro)
+    : normalize(vec3(0.82, 0.26, 0.50));
+
   float b = dot(ro, rd);
   float c = dot(ro, ro);
   float closestDist = sqrt(max(0.0, c - b * b));
 
-  // 1. Multi-Band Cassini Planetary Rings with Eclipse Shadow
   vec3 ringAccum = vec3(0.0);
   float ringAlpha = 0.0;
   float tRing = -1.0;
@@ -4819,13 +5608,13 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
         float rRing = length(pRing) / planetR;
         if (rRing > u_ringInner && rRing < u_ringOuter) {
           float normR = (rRing - u_ringInner) / (u_ringOuter - u_ringInner);
-          float bands = sin(normR * 46.0) * 0.30 + sin(normR * 130.0) * 0.18 + sin(normR * 260.0) * 0.10 + 0.58;
+          float bands = sin(normR * 46.0) * 0.30 + sin(normR * 130.0) * 0.18 + 0.58;
           float cassiniGap = smoothstep(0.028, 0.075, abs(normR - 0.62)) * smoothstep(0.012, 0.035, abs(normR - 0.28));
           float edgeFade = smoothstep(0.0, 0.08, normR) * smoothstep(1.0, 0.88, normR);
 
           float shadow = 1.0;
           float bShadow = dot(pRing, sunDir);
-          if (bShadow < 0.0) {
+          if (bShadow < 0.0 && u_lightingMode == 0) {
             float dShadow = length(pRing - sunDir * bShadow);
             shadow = smoothstep(planetR * 0.94, planetR * 1.04, dShadow);
           }
@@ -4837,7 +5626,6 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
     }
   }
 
-  // 2. Planet Sphere Surface Intersection
   float disc = b * b - (c - planetR * planetR);
   float tPlanet = 1e9;
   if (disc > 0.0 && -b > 0.0) {
@@ -4845,7 +5633,6 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
     vec3 hitPos = ro + rd * tPlanet;
     vec3 nSphere = normalize(hitPos);
 
-    // Tidally locked worlds keep the same face toward the sun; rotating worlds spin smoothly
     float rot = u_isTidallyLocked > 0.5 ? 0.0 : (u_time * 0.085);
     vec3 nRot = vec3(
       nSphere.x * cos(rot) - nSphere.z * sin(rot),
@@ -4854,8 +5641,7 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
     );
 
     float elev = getPlanetElevation(nRot);
-
-    float eps = 0.0075;
+    float eps = 0.008;
     float ex = getPlanetElevation(normalize(nRot + vec3(eps, 0.0, 0.0))) - elev;
     float ey = getPlanetElevation(normalize(nRot + vec3(0.0, eps, 0.0))) - elev;
     float ez = getPlanetElevation(normalize(nRot + vec3(0.0, 0.0, eps))) - elev;
@@ -4867,8 +5653,9 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
 
     float ndotl = dot(nSurface, sunDir);
     float rawSun = dot(nSphere, sunDir);
+    float ambientFloor = u_lightingMode == 1 ? 0.36 : 0.025;
     float dayMask = smoothstep(-0.12, 0.22, ndotl);
-    float diffuse = max(0.025, smoothstep(-0.08, 0.96, ndotl));
+    float diffuse = max(ambientFloor, smoothstep(-0.08, 0.96, ndotl));
 
     vec3 surfCol;
     float specStrength = 0.08;
@@ -4887,7 +5674,6 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
       surfCol = mix(surfCol, u_colPeak, smoothstep(0.66, 0.94, landH));
 
       if (u_bioComplexity > 0.1) {
-        // On tidally locked worlds, lush biosphere thrives in the twilight terminator belt!
         float bioClimaticZone = u_isTidallyLocked > 0.5
           ? exp(-pow((rawSun - 0.18) * 2.6, 2.0))
           : smoothstep(0.15, 0.75, 1.0 - abs(nRot.y));
@@ -4897,7 +5683,6 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
       specStrength = 0.08;
     }
 
-    // Polar Ice Caps OR Tidally-Locked Nightside Eyeball Ice Sheet!
     if (u_planetArchetype != 5 && u_planetArchetype != 6) {
       float iceMask = 0.0;
       if (u_isTidallyLocked > 0.5) {
@@ -4910,18 +5695,16 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
       specStrength = mix(specStrength, 0.45, iceMask);
     }
 
-    // Fresnel specular reflection (Sun glint on oceans & ice)
     vec3 halfVec = normalize(sunDir - rd);
     float spec = pow(max(0.0, dot(nSurface, halfVec)), isOcean > 0.5 ? 56.0 : 18.0) * specStrength * dayMask;
     vec3 sunTint = mix(vec3(1.0), u_starColor, 0.35);
 
-    // Warm sunset/twilight terminator Rayleigh scatter band
     float sunsetBand = exp(-pow((rawSun + 0.02) * 5.8, 2.0)) * clamp(pow(u_pressureAtm, 0.3), 0.0, 1.1);
     vec3 terminatorWarmth = vec3(1.0, 0.42, 0.16) * sunsetBand * 0.32;
 
     vec3 litCol = surfCol * (diffuse * sunTint + terminatorWarmth) + sunTint * spec * 0.82;
 
-    // 3. Dynamic Volumetric Cloud Layer + Cast Cloud Shadows
+    // Dynamic Volumetric Cloud Layer + Cast Cloud Shadows
     if (u_cloudCoverage > 0.02 && u_planetArchetype != 5 && u_planetArchetype != 6) {
       float cloudRot = u_time * 0.13;
       vec3 nCloud = vec3(
@@ -4929,31 +5712,43 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
         nSphere.y,
         nSphere.x * sin(cloudRot) + nSphere.z * cos(cloudRot)
       );
-      float swirl = fbm(nCloud * 3.4 + vec3(0.0, u_time * 0.02, 0.0), 4);
-      float clouds = fbm(nCloud * 4.8 + vec3(swirl * 1.5), 5);
+      float swirl = fbm(nCloud * 3.4 + vec3(0.0, u_time * 0.02, 0.0), 3);
+      float clouds = fbm(nCloud * 4.8 + vec3(swirl * 1.5), 4);
       float cloudMask = smoothstep(0.92 - u_cloudCoverage * 0.58, 0.98, clouds);
 
-      float shadowClouds = fbm((nCloud - sunDir * 0.032) * 4.8 + vec3(swirl * 1.5), 4);
+      float shadowClouds = fbm((nCloud - sunDir * 0.032) * 4.8 + vec3(swirl * 1.5), 3);
       float shadowMask = smoothstep(0.92 - u_cloudCoverage * 0.58, 0.98, shadowClouds);
       litCol *= (1.0 - shadowMask * 0.42 * dayMask);
 
-      vec3 cloudLight = mix(u_colAtmo * 0.22, vec3(0.98, 0.99, 1.0) * sunTint + terminatorWarmth * 1.3, max(0.06, smoothstep(-0.15, 0.85, rawSun)));
+      vec3 cloudLight = mix(u_colAtmo * 0.22, vec3(0.98, 0.99, 1.0) * sunTint + terminatorWarmth * 1.3, max(ambientFloor, smoothstep(-0.15, 0.85, rawSun)));
       litCol = mix(litCol, cloudLight, cloudMask * 0.88);
     }
 
-    // 4. Night-Side Emissive Features: City Lights, Lava Fissures & Bioluminescence
+    // Real-Time Molten Crust Glow from Collisions or Thermal Heating Laser!
+    if (u_moltenHeat > 0.02 || u_laserActive > 0.5) {
+      float cracks = pow(ridgeFbm(nRot * 8.0 + vec3(u_time * 0.04), 3), 2.2);
+      float heatVal = clamp(u_moltenHeat + u_laserActive * 0.35, 0.0, 1.0);
+      vec3 magmaCol = mix(vec3(0.98, 0.24, 0.04), vec3(1.0, 0.92, 0.55), clamp(cracks * heatVal * 1.5, 0.0, 1.0));
+      litCol = mix(litCol, magmaCol * 1.65, smoothstep(0.65 - heatVal * 0.55, 0.95, cracks) * heatVal);
+      if (u_laserActive > 0.5) {
+        float spot = exp(-length(nSphere - normalize(ro)) * 7.5);
+        litCol += vec3(1.0, 0.95, 0.82) * spot * 3.2;
+      }
+    }
+
+    // Night-Side Emissive Features
     float nightMask = smoothstep(0.14, -0.22, rawSun);
     if (nightMask > 0.01) {
       if (u_volcanism > 0.35 || u_planetArchetype == 2) {
-        float lavaRift = pow(ridgeFbm(nRot * 7.8 + vec3(u_time * 0.05), 4), 3.2);
+        float lavaRift = pow(ridgeFbm(nRot * 7.8 + vec3(u_time * 0.05), 3), 3.2);
         float lavaThreshold = u_planetArchetype == 2 ? 0.16 : (0.55 - u_volcanism * 0.28);
         float lavaGlow = smoothstep(lavaThreshold, lavaThreshold + 0.25, lavaRift);
         litCol += vec3(1.0, 0.38, 0.06) * lavaGlow * (u_planetArchetype == 2 ? 1.35 : nightMask * 0.95);
       }
 
       if (u_cityLights > 0.05 && isOcean < 0.5) {
-        float urbanCluster = fbm(nRot * 6.8, 4);
-        float roadGrid = ridgeFbm(nRot * 30.0, 3);
+        float urbanCluster = fbm(nRot * 6.8, 3);
+        float roadGrid = ridgeFbm(nRot * 28.0, 2);
         float coastalBonus = smoothstep(u_oceanCoverage + 0.26, u_oceanCoverage + 0.01, elev);
         float cityMask = smoothstep(0.46, 0.74, urbanCluster + coastalBonus * 0.26) * smoothstep(0.44, 0.80, roadGrid);
         float latValid = smoothstep(0.85, 0.42, abs(nRot.y));
@@ -4967,16 +5762,14 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
       }
     }
 
-    // 5. Shimmering Polar Aurora Ovals
     float auroraLat = smoothstep(0.68, 0.88, abs(nRot.y)) * smoothstep(0.98, 0.88, abs(nRot.y));
     if (auroraLat > 0.01 && u_pressureAtm > 0.02) {
-      float curtain = sin(nRot.x * 26.0 + fbm(nRot * 8.0 + u_time * 0.55, 3) * 8.5) * 0.5 + 0.5;
+      float curtain = sin(nRot.x * 26.0 + fbm(nRot * 8.0 + u_time * 0.55, 2) * 8.5) * 0.5 + 0.5;
       float auroraStrength = (0.30 + u_superflare * 1.55) * auroraLat * pow(curtain, 2.0);
       vec3 auroraCol = mix(vec3(0.16, 0.96, 0.62), vec3(0.32, 0.78, 1.0), curtain);
       litCol += auroraCol * auroraStrength * (0.35 + 0.65 * nightMask);
     }
 
-    // 6. Atmospheric Rayleigh Fresnel Limb Scatter
     float fresnel = pow(1.0 - max(0.0, dot(nSphere, -rd)), 3.1);
     float atmoDensity = clamp(pow(u_pressureAtm, 0.35), 0.05, 1.38);
     float terminatorScatter = smoothstep(-0.35, 0.45, rawSun);
@@ -4997,7 +5790,6 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
     alpha = 1.0;
   }
 
-  // 7. Outer Atmospheric Rayleigh Limb Halo
   if (closestDist >= planetR * 0.98 && closestDist < atmoR * 1.20 && -b > 0.0 && u_pressureAtm > 0.005) {
     vec3 pLimb = normalize(ro + rd * max(0.0, -b));
     float sunAlign = smoothstep(-0.35, 0.65, dot(pLimb, sunDir));
@@ -5021,32 +5813,35 @@ vec4 renderPlanetaryGlobe(vec3 ro, vec3 rd) {
   return vec4(col, alpha);
 }
 
-// --- SCALE 6 & 7: 3D RAYMARCHED PLANETARY SURFACE, ALIEN SKY & EXPLORATION ---
+// --- SCALE 6 & 7: OPTIMIZED 3D PLANETARY SURFACE RAYMARCHER ---
 float getSurfaceTerrainHeight(vec2 xz) {
   vec2 seedShift = vec2(mod(u_planetSeed, 53.0) * 1.7, mod(u_planetSeed, 79.0) * 2.3);
   vec3 p = vec3(xz * 0.20 + seedShift, u_planetSeed * 0.05);
-  float base = fbm(p, 5);
-  float ridges = ridgeFbm(p * 1.9, 4) * u_terrainRoughness;
+  int oct = u_qualityLevel == 0 ? 3 : 4;
+  float base = fbm(p, oct);
+  float ridges = ridgeFbm(p * 1.9, oct - 1) * u_terrainRoughness;
   return (base * 0.62 + ridges * 0.58) * 2.55 - 0.88;
 }
 
 vec4 renderPlanetarySurface(vec2 uv) {
   float yaw = u_cameraAngles.x * 0.72;
   float pitch = clamp(u_cameraAngles.y * 0.38 + 0.08, -0.28, 0.50);
-  mat3 cam = getCameraMatrix(yaw, pitch);
-  vec3 rd = normalize(cam * vec3(uv, -1.35));
+  float cy = cos(yaw), sy = sin(yaw);
+  float cp = cos(pitch), sp = sin(pitch);
+  vec3 fwd = vec3(sy * cp, sp, cy * cp);
+  vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+  vec3 up = cross(right, fwd);
+  vec3 rd = normalize(right * uv.x + up * uv.y - fwd * 1.35);
 
-  vec3 ro = vec3(u_surfaceOffset.x + u_time * 0.18, 1.5, u_surfaceOffset.y + u_time * 0.28);
+  vec3 ro = vec3(u_surfaceOffset.x + u_time * 0.14, 1.5, u_surfaceOffset.y + u_time * 0.22);
   float groundUnderCam = getSurfaceTerrainHeight(ro.xz);
   float waterLevel = (u_oceanCoverage - 0.42) * 1.1;
   ro.y = max(groundUnderCam, waterLevel) + 1.18;
 
-  // On tidally locked worlds, sun stays permanently low near the golden twilight horizon!
   float dayCycle = u_isTidallyLocked > 0.5 ? 0.36 : (u_time * 0.065 + 0.62);
   vec3 sunDir = normalize(vec3(cos(dayCycle) * 0.65, max(0.08, sin(dayCycle) * 0.52 + 0.22), 0.62));
   float sunElevation = clamp(sunDir.y, 0.0, 1.0);
 
-  // 1. Physically Based Atmospheric Sky Scattering
   float atmoThick = clamp(pow(u_pressureAtm, 0.35), 0.02, 1.6);
   vec3 spaceSky = renderDeepStarfield(rd, uv) * (1.0 - clamp(atmoThick * sunElevation * 0.88, 0.0, 0.94));
   vec3 zenithCol = u_colAtmo * (0.24 + 0.88 * sunElevation) * clamp(atmoThick, 0.05, 1.25);
@@ -5055,13 +5850,11 @@ vec4 renderPlanetarySurface(vec2 uv) {
   float horizonGrad = pow(1.0 - max(0.0, rd.y), 3.1);
   vec3 skyCol = spaceSky + mix(zenithCol, horizonCol, horizonGrad);
 
-  // Parent Star Disk & Mie Forward Scattering Glow
   float sunCos = max(0.0, dot(rd, sunDir));
   float sunDisk = smoothstep(0.9980, 0.9994, sunCos);
   float mieScatter = pow(sunCos, 10.0) * 0.48 * clamp(atmoThick, 0.1, 1.45) + pow(sunCos, 64.0) * 0.82;
   skyCol += u_starColor * (sunDisk * 3.8 + mieScatter);
 
-  // Companion Moon visible hanging in the alien sky!
   vec3 moonDir = normalize(vec3(-0.48, 0.38, 0.78));
   float moonCos = dot(rd, moonDir);
   if (moonCos > 0.9945 && rd.y > 0.05) {
@@ -5070,7 +5863,6 @@ vec4 renderPlanetarySurface(vec2 uv) {
     skyCol = mix(skyCol, vec3(0.86, 0.88, 0.94) * (0.18 + 0.82 * mCrescent), mEdge * 0.82);
   }
 
-  // Arching Planetary Rings overhead
   if (u_hasRings > 0.5 && rd.y > 0.0) {
     float ringArc = abs(rd.y * 0.75 - abs(rd.x) * 0.42 - 0.28);
     if (ringArc < 0.095) {
@@ -5080,50 +5872,46 @@ vec4 renderPlanetarySurface(vec2 uv) {
     }
   }
 
-  // High-altitude Volumetric Sky Clouds
   if (u_cloudCoverage > 0.05 && rd.y > 0.03) {
     vec2 skyUV = rd.xz / (rd.y + 0.17) * 1.65 + vec2(u_time * 0.038, 0.0);
-    float cNoise = fbm(vec3(skyUV, u_time * 0.018), 5);
+    float cNoise = fbm(vec3(skyUV, u_time * 0.018), 4);
     float cMask = smoothstep(0.88 - u_cloudCoverage * 0.48, 0.96, cNoise) * smoothstep(0.03, 0.22, rd.y);
     vec3 cCol = mix(horizonCol, vec3(0.98, 0.98, 1.0) * mix(vec3(1.0), u_starColor, 0.32), 0.68);
     skyCol = mix(skyCol, cCol, cMask * 0.84);
   }
 
-  // 2. Raymarch 3D Planetary Terrain & Ocean
   vec3 finalCol = skyCol;
+  int maxSteps = u_qualityLevel == 0 ? 40 : (u_qualityLevel == 1 ? 54 : 68);
   float t = 0.22;
-  float maxT = 28.0;
+  float maxT = 26.0;
   bool hitTerrain = false;
   vec3 hitPos = vec3(0.0);
 
   for (int i = 0; i < 68; i++) {
+    if (i >= maxSteps) break;
     vec3 p = ro + rd * t;
     float h = getSurfaceTerrainHeight(p.xz);
-    if (u_oceanCoverage > 0.05) {
-      h = max(h, waterLevel);
-    }
+    if (u_oceanCoverage > 0.05) h = max(h, waterLevel);
     float diff = p.y - h;
-    if (diff < 0.008 * t) {
+    if (diff < 0.009 * t) {
       hitTerrain = true;
       hitPos = p;
       break;
     }
-    t += max(0.048, diff * 0.50);
+    t += max(0.055, diff * 0.54);
     if (t > maxT) break;
   }
 
   if (hitTerrain) {
     float rawH = getSurfaceTerrainHeight(hitPos.xz);
     bool isWaterSurface = (u_oceanCoverage > 0.05) && (rawH <= waterLevel + 0.015);
-
-    vec3 n;
     vec3 matCol;
 
     if (isWaterSurface) {
       vec2 wuv = hitPos.xz * 3.6 + vec2(u_time * 0.55, u_time * 0.38);
       float w1 = noise3(vec3(wuv, u_time * 0.75));
       float w2 = noise3(vec3(wuv * 2.4 - u_time * 0.85, u_time * 0.45));
-      n = normalize(vec3((w1 - 0.5) * 0.14, 1.0, (w2 - 0.5) * 0.14));
+      vec3 n = normalize(vec3((w1 - 0.5) * 0.14, 1.0, (w2 - 0.5) * 0.14));
 
       vec3 reflDir = reflect(rd, n);
       reflDir.y = abs(reflDir.y);
@@ -5136,10 +5924,10 @@ vec4 renderPlanetarySurface(vec2 uv) {
       float sunGlint = pow(max(0.0, dot(reflDir, sunDir)), 104.0) * 2.6;
       matCol = mix(baseWater * (0.35 + 0.65 * sunElevation), skyCol, fresnel * 0.80) + u_starColor * sunGlint;
     } else {
-      float eps = 0.038;
+      float eps = 0.04;
       float hx = getSurfaceTerrainHeight(hitPos.xz + vec2(eps, 0.0)) - rawH;
       float hz = getSurfaceTerrainHeight(hitPos.xz + vec2(0.0, eps)) - rawH;
-      n = normalize(vec3(-hx, eps, -hz));
+      vec3 n = normalize(vec3(-hx, eps, -hz));
 
       float slope = 1.0 - n.y;
       float normH = clamp((rawH - waterLevel) / 1.85, 0.0, 1.0);
@@ -5180,7 +5968,6 @@ vec4 renderPlanetarySurface(vec2 uv) {
   return vec4(finalCol, 1.0);
 }
 
-// --- ACES Filmic HDR Tone Mapping ---
 vec3 acesToneMap(vec3 x) {
   const float a = 2.51;
   const float b = 0.03;
@@ -5194,9 +5981,9 @@ void main() {
   vec2 aspectUV = (v_uv - 0.5) * 2.0;
   aspectUV.x *= u_resolution.x / max(1.0, u_resolution.y);
 
-  mat3 camMat = getCameraMatrix(u_cameraAngles.x, u_cameraAngles.y);
-  vec3 ro = camMat * vec3(0.0, 0.0, 3.35 / max(0.25, u_cameraZoom));
-  vec3 rd = normalize(camMat * vec3(aspectUV, -1.55));
+  // CPU-precomputed 6-DOF Orthonormal Camera Ray (with Roll, Pan, Yaw & Pitch!)
+  vec3 ro = u_camOrigin;
+  vec3 rd = normalize(u_camRight * aspectUV.x + u_camUp * aspectUV.y + u_camForward * 1.55);
 
   vec3 finalColor = renderDeepStarfield(rd, aspectUV);
 
@@ -5211,29 +5998,24 @@ void main() {
     vec4 cosCol = renderCosmicWeb(ro, rd);
     finalColor = mix(finalColor, finalColor + cosCol.rgb, wCosmos);
   }
-
   if (wGalaxy > 0.005) {
     vec4 galCol = renderGalaxy(ro, rd);
     finalColor = mix(finalColor, mix(finalColor, galCol.rgb, galCol.a) + galCol.rgb * 0.25, wGalaxy);
   }
-
   if (wStar > 0.005) {
     float starSizeFactor = mix(1.06, 0.54, smoothstep(11.5, 17.5, s));
     vec4 stCol = renderStar(ro, rd, starSizeFactor, aspectUV);
     finalColor = mix(finalColor, mix(finalColor, stCol.rgb, stCol.a), wStar);
   }
-
   if (wPlanet > 0.005) {
     vec4 plCol = renderPlanetaryGlobe(ro, rd);
     finalColor = mix(finalColor, mix(finalColor, plCol.rgb, plCol.a), wPlanet);
   }
-
   if (wSurface > 0.005) {
     vec4 surfCol = renderPlanetarySurface(aspectUV);
     finalColor = mix(finalColor, surfCol.rgb, wSurface);
   }
 
-  // Subtle cinematic vignette + ACES Filmic HDR Tone Mapping
   float vig = 1.0 - dot(v_uv - 0.5, v_uv - 0.5) * 0.34;
   finalColor = acesToneMap(finalColor * vig * 1.10);
   finalColor = pow(finalColor, vec3(0.95));
@@ -5244,9 +6026,13 @@ void main() {
 
 // === MODULE: src/renderer/webgl_renderer.js ===
 /**
- * PARALLAX — WebGL2 Volumetric Raymarching & 3D Astrographic Telemetry Renderer
- * Combines GPU WebGL2 fragment raymarching with a synchronized 3D projective vector
- * & interactive spatial picking layer.
+ * PARALLAX v3.0 — Ultra-Optimized WebGL2 Renderer, 6-DOF Universe Sandbox Camera & Live N-Body Visualizer
+ * Features:
+ * - Dynamic Adaptive Resolution Scaling (DRS) + Quality Levels (Auto / Performance / Balanced / Ultra)
+ * - Exact Universe Sandbox 2 Camera: Left-Drag Orbit, Right/Mid-Drag Pan, WASD/RF 6-DOF Fly,
+ *   Q/E Roll, Arrow Keys, C to Land/Liftoff, Scroll/Pinch Continuous Logarithmic Zoom
+ * - Interactive Sandbox Tools: Add/Launch with Live Orbit Preview, Heating Laser Beam, Explode/Supernova
+ * - Live N-Body Gravity Trails, Molten Impact Debris, Expanding Shockwaves & F10 Photo Capture
  */
 
 
@@ -5258,17 +6044,28 @@ class UniverseRenderer {
     this.ctx = overlayCanvas.getContext('2d');
     this.engine = engine;
 
-    // 3D Orbital Camera & Surface Flight State
+    // 6-DOF Universe Sandbox Camera State
     this.yaw = 0.45;
     this.pitch = 0.28;
+    this.roll = 0.0;
     this.targetYaw = 0.45;
     this.targetPitch = 0.28;
+    this.targetRoll = 0.0;
+    this.panOffset = { x: 0, y: 0, z: 0 };
+    this.targetPan = { x: 0, y: 0, z: 0 };
     this.cameraZoom = 1.0;
     this.surfaceOffset = { x: 0, z: 0 };
     this.keysPressed = new Set();
 
-    // Pointer, Multi-Touch Pinch & 3D spatial picking state
+    // CPU-precomputed Orthonormal Basis (shared identically by WebGL2 shader & 3D vector overlay!)
+    this.camRight = [1, 0, 0];
+    this.camUp = [0, 1, 0];
+    this.camForward = [0, 0, -1];
+    this.camOrigin = [0, 0, 3.35];
+
+    // Pointer, Multi-Touch Pinch & Sandbox Tool State
     this.isDragging = false;
+    this.isPanning = false;
     this.dragMoved = false;
     this.lastPointer = { x: 0, y: 0 };
     this.hoverPointer = { x: -1000, y: -1000 };
@@ -5277,8 +6074,10 @@ class UniverseRenderer {
     this.interactiveTargets = [];
     this.hoveredTarget = null;
 
-    // FPS tracking
+    // Performance & Adaptive Resolution Scaling (DRS)
     this.fps = 60;
+    this.shaderScale = window.innerWidth <= 860 ? 0.72 : 1.0;
+    this.qualityLevel = window.innerWidth <= 860 ? 0 : 1;
     this._frameCount = 0;
     this._fpsTimer = performance.now();
 
@@ -5297,11 +6096,12 @@ class UniverseRenderer {
       antialias: false,
       depth: false,
       stencil: false,
+      preserveDrawingBuffer: true, // Enables crisp F10 Photo Tool capture!
       powerPreference: 'high-performance'
     });
 
     if (!gl) {
-      console.warn('WebGL2 unavailable, falling back to 2D astrographic renderer.');
+      console.warn('WebGL2 unavailable; running astrographic 2D renderer.');
       return;
     }
 
@@ -5337,8 +6137,10 @@ class UniverseRenderer {
     this.vao = vao;
 
     const uniformNames = [
-      'u_resolution', 'u_time', 'u_logScale', 'u_cameraAngles', 'u_surfaceOffset',
-      'u_cameraZoom', 'u_warpFactor', 'u_seed',
+      'u_resolution', 'u_time', 'u_logScale',
+      'u_camRight', 'u_camUp', 'u_camForward', 'u_camOrigin',
+      'u_cameraAngles', 'u_surfaceOffset', 'u_warpFactor', 'u_seed',
+      'u_qualityLevel', 'u_lightingMode',
       'u_starColor', 'u_starTempK', 'u_starRadiusNorm', 'u_remnantType', 'u_hasNebulaHalo',
       'u_isBinary', 'u_companionColor',
       'u_galaxyFamily', 'u_galaxyArms', 'u_galaxyTwist', 'u_galaxyBar', 'u_agnActive', 'u_nebulaColor',
@@ -5346,8 +6148,8 @@ class UniverseRenderer {
       'u_colHighland', 'u_colPeak', 'u_colAtmo', 'u_colFoliage',
       'u_oceanCoverage', 'u_iceCoverage', 'u_cloudCoverage', 'u_terrainRoughness',
       'u_volcanism', 'u_pressureAtm', 'u_bioComplexity', 'u_cityLights', 'u_isTidallyLocked',
-      'u_hasRings', 'u_ringInner', 'u_ringOuter', 'u_planetSeed',
-      'u_superflare', 'u_impactFlash', 'u_evoPulse'
+      'u_moltenHeat', 'u_hasRings', 'u_ringInner', 'u_ringOuter', 'u_planetSeed',
+      'u_superflare', 'u_impactFlash', 'u_evoPulse', 'u_laserActive'
     ];
     for (const name of uniformNames) {
       this.uniforms[name] = gl.getUniformLocation(prog, name);
@@ -5371,31 +6173,71 @@ class UniverseRenderer {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
-
-    // Keep shader resolution crisp & high-FPS
-    const shaderScale = Math.min(dpr, 1.35);
-    this.webglCanvas.width = Math.floor(w * shaderScale);
-    this.webglCanvas.height = Math.floor(h * shaderScale);
-
-    this.overlayCanvas.width = Math.floor(w * dpr);
-    this.overlayCanvas.height = Math.floor(h * dpr);
     this.dpr = dpr;
     this.width = w;
     this.height = h;
+
+    this.applyShaderResolution();
+    this.overlayCanvas.width = Math.floor(w * dpr);
+    this.overlayCanvas.height = Math.floor(h * dpr);
+  }
+
+  applyShaderResolution() {
+    const targetW = Math.max(320, Math.floor(this.width * this.shaderScale));
+    const targetH = Math.max(200, Math.floor(this.height * this.shaderScale));
+    if (this.webglCanvas.width !== targetW || this.webglCanvas.height !== targetH) {
+      this.webglCanvas.width = targetW;
+      this.webglCanvas.height = targetH;
+    }
+  }
+
+  setQualityMode(mode) {
+    this.engine.qualityMode = mode;
+    if (mode === 'low') {
+      this.qualityLevel = 0;
+      this.shaderScale = 0.65;
+    } else if (mode === 'medium') {
+      this.qualityLevel = 1;
+      this.shaderScale = 0.92;
+    } else if (mode === 'ultra') {
+      this.qualityLevel = 2;
+      this.shaderScale = Math.min(window.devicePixelRatio || 1, 1.35);
+    }
+    this.applyShaderResolution();
+  }
+
+  resetCameraFocus() {
+    this.targetPan = { x: 0, y: 0, z: 0 };
+    this.targetRoll = 0.0;
   }
 
   bindInteractionEvents() {
     const el = this.overlayCanvas;
     el.style.touchAction = 'none';
+    el.addEventListener('contextmenu', (e) => e.preventDefault());
 
     el.addEventListener('pointerdown', (e) => {
       this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      // Heating Laser Tool: hold left button to fire plasma beam!
+      if (e.button === 0 && this.engine.sandboxTool === 'laser') {
+        this.engine.laserActive = true;
+        this.hoverPointer = { x: e.clientX, y: e.clientY };
+        el.setPointerCapture(e.pointerId);
+        return;
+      }
+
       if (this.activePointers.size === 1) {
-        this.isDragging = true;
+        if (e.button === 2 || e.button === 1) {
+          this.isPanning = true;
+        } else {
+          this.isDragging = true;
+        }
         this.dragMoved = false;
         this.lastPointer = { x: e.clientX, y: e.clientY };
       } else if (this.activePointers.size === 2) {
         this.isDragging = false;
+        this.isPanning = false;
         this.dragMoved = true;
         const pts = Array.from(this.activePointers.values());
         this.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -5409,7 +6251,6 @@ class UniverseRenderer {
         this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
       }
 
-      // Two-finger pinch-to-zoom for Android & touchscreens
       if (this.activePointers.size === 2) {
         const pts = Array.from(this.activePointers.values());
         const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
@@ -5421,17 +6262,28 @@ class UniverseRenderer {
         return;
       }
 
-      if (!this.isDragging) return;
+      if (!this.isDragging && !this.isPanning) return;
       const dx = e.clientX - this.lastPointer.x;
       const dy = e.clientY - this.lastPointer.y;
       if (Math.hypot(dx, dy) > 4) this.dragMoved = true;
 
-      this.targetYaw -= dx * 0.0065;
-      this.targetPitch = Math.max(-1.38, Math.min(1.38, this.targetPitch + dy * 0.0065));
+      if (this.isPanning) {
+        // Right/Middle drag pans camera freely in 3D space!
+        const panSpeed = 0.0055;
+        this.targetPan.x -= (this.camRight[0] * dx - this.camUp[0] * dy) * panSpeed;
+        this.targetPan.y -= (this.camRight[1] * dx - this.camUp[1] * dy) * panSpeed;
+        this.targetPan.z -= (this.camRight[2] * dx - this.camUp[2] * dy) * panSpeed;
+      } else if (this.isDragging) {
+        this.targetYaw -= dx * 0.0065;
+        this.targetPitch = Math.max(-1.42, Math.min(1.42, this.targetPitch + dy * 0.0065));
+      }
       this.lastPointer = { x: e.clientX, y: e.clientY };
     });
 
     const releasePointer = (e) => {
+      if (this.engine.laserActive) {
+        this.engine.laserActive = false;
+      }
       const wasSingleClick = this.activePointers.size === 1 && this.isDragging && !this.dragMoved;
       this.activePointers.delete(e.pointerId);
       if (this.activePointers.size < 2) {
@@ -5442,24 +6294,28 @@ class UniverseRenderer {
       }
       if (this.activePointers.size === 0) {
         this.isDragging = false;
+        this.isPanning = false;
       }
     };
 
     el.addEventListener('pointerup', releasePointer);
     el.addEventListener('pointercancel', releasePointer);
 
-    // Continuous logarithmic scale zoom via mouse wheel
+    el.addEventListener('dblclick', (e) => {
+      this.resetCameraFocus();
+      this.handleSpatialClick(e.clientX, e.clientY, true);
+    });
+
     el.addEventListener(
       'wheel',
       (e) => {
         e.preventDefault();
-        const delta = e.deltaY * 0.0032;
+        const delta = e.deltaY * 0.0030;
         this.engine.setTargetLogScale(this.engine.targetLogScale + delta);
       },
       { passive: false }
     );
 
-    // Keyboard camera & surface flight controls (WASD / Arrows / Q & E)
     window.addEventListener('keydown', (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       this.keysPressed.add(e.key.toLowerCase());
@@ -5469,7 +6325,73 @@ class UniverseRenderer {
     });
   }
 
-  handleSpatialClick(clientX, clientY) {
+  /**
+   * Unproject a 2D screen click onto the 3D ecliptic plane (y = 0) for Universe Sandbox Add/Launch placement!
+   */
+  unprojectToEcliptic(clientX, clientY) {
+    const aspect = this.width / Math.max(1, this.height);
+    const uvX = ((clientX / this.width) * 2.0 - 1.0) * aspect;
+    const uvY = -((clientY / this.height) * 2.0 - 1.0);
+
+    const dx = this.camRight[0] * uvX + this.camUp[0] * uvY + this.camForward[0] * 1.55;
+    const dy = this.camRight[1] * uvX + this.camUp[1] * uvY + this.camForward[1] * 1.55;
+    const dz = this.camRight[2] * uvX + this.camUp[2] * uvY + this.camForward[2] * 1.55;
+    const len = Math.hypot(dx, dy, dz) || 1;
+    const rd = [dx / len, dy / len, dz / len];
+
+    // Intersect plane y = 0
+    if (Math.abs(rd[1]) < 0.01) {
+      return { point3D: [this.camOrigin[0] + rd[0] * 2.5, 0, this.camOrigin[2] + rd[2] * 2.5], rayDir: rd };
+    }
+    const t = -this.camOrigin[1] / rd[1];
+    if (t <= 0.1 || t > 18) {
+      return { point3D: [this.camOrigin[0] + rd[0] * 2.5, 0, this.camOrigin[2] + rd[2] * 2.5], rayDir: rd };
+    }
+    return {
+      point3D: [
+        this.camOrigin[0] + rd[0] * t,
+        0,
+        this.camOrigin[2] + rd[2] * t
+      ],
+      rayDir: rd
+    };
+  }
+
+  handleSpatialClick(clientX, clientY, isDoubleClick = false) {
+    const tool = this.engine.sandboxTool;
+
+    // 1. Universe Sandbox ADD / LAUNCH Tool
+    if (tool === 'add') {
+      const lvl = this.engine.getActiveScaleLevel();
+      if (lvl.index !== 3) {
+        this.engine.flyToScale(3); // Switch smoothly to Star System orbital view to watch N-Body physics!
+      }
+      const { point3D, rayDir } = this.unprojectToEcliptic(clientX, clientY);
+      const pSys = this.engine.getActivePlanetarySystem();
+      const maxAU = pSys.planets.length ? pSys.planets[pSys.planets.length - 1].orbit.a : 10;
+      const worldScaleAU = Math.max(2.0, maxAU * 0.55);
+
+      const auPos = this.engine.addMode === 'launch'
+        ? [this.camOrigin[0] * worldScaleAU * 0.45, this.camOrigin[1] * worldScaleAU * 0.45, this.camOrigin[2] * worldScaleAU * 0.45]
+        : [point3D[0] * worldScaleAU * 0.65, 0, point3D[2] * worldScaleAU * 0.65];
+
+      const spawned = this.engine.nbody.spawnBody(
+        this.engine.addPresetId,
+        auPos,
+        this.engine.addMode,
+        rayDir,
+        this.engine.launchSpeedKmS
+      );
+      this.engine.logEvent(
+        'astro',
+        `Spawned ${spawned.name} (${this.engine.addMode.toUpperCase()})`,
+        `Added to live N-Body simulation at ${Math.hypot(auPos[0], auPos[2]).toFixed(2)} AU.`
+      );
+      this.engine.emitChange('spawn_body');
+      return;
+    }
+
+    // Find closest interactive 3D body under cursor
     let closest = null;
     let minDist = 34;
     for (const target of this.interactiveTargets) {
@@ -5480,60 +6402,97 @@ class UniverseRenderer {
       }
     }
 
+    // 2. Universe Sandbox EXPLODE / SUPERNOVA Tool
+    if (tool === 'explode') {
+      if (closest && closest.nbodyRef) {
+        this.engine.explodeTargetBody(closest.nbodyRef);
+      } else {
+        this.engine.explodeTargetBody();
+      }
+      return;
+    }
+
     if (!closest) return;
 
+    this.resetCameraFocus();
     if (closest.type === 'supercluster') {
       const same = this.engine.activeSuperclusterIndex === closest.index;
-      this.engine.selectSupercluster(closest.index, same);
+      this.engine.selectSupercluster(closest.index, same || isDoubleClick);
     } else if (closest.type === 'galaxy') {
       const same = this.engine.activeGalaxyIndex === closest.index;
-      this.engine.selectGalaxy(closest.index, same);
+      this.engine.selectGalaxy(closest.index, same || isDoubleClick);
     } else if (closest.type === 'system') {
       const same = this.engine.activeSystemIndex === closest.index;
-      this.engine.selectStarSystem(closest.index, same);
+      this.engine.selectStarSystem(closest.index, same || isDoubleClick);
     } else if (closest.type === 'planet') {
       const same = this.engine.activePlanetIndex === closest.index;
       this.engine.selectPlanet(closest.index, true);
-      if (same && this.engine.currentLogScale < 8.5) {
-        this.engine.flyToScale(5); // Descend to surface on second click!
+      if ((same || isDoubleClick) && this.engine.currentLogScale < 8.5) {
+        this.engine.flyToScale(5);
       }
     } else if (closest.type === 'landmark') {
       this.engine.selectLandmark(closest.index, true);
     } else if (closest.type === 'clade') {
       this.engine.selectClade(closest.index, true);
-    } else if (closest.type === 'star_center') {
-      this.engine.flyToScale(3);
     }
   }
 
   /**
-   * Project a 3D world point [x, y, z] into 2D screen coordinates matching the WebGL camera matrix
+   * Compute exact 6-DOF Orthonormal Camera Basis (with Roll, Yaw, Pitch, Pan) ONCE per frame on CPU!
    */
-  project3D(point3D, camDist = 3.35) {
-    const [x, y, z] = point3D;
+  updateCameraBasis(camDist = 3.35) {
     const cy = Math.cos(this.yaw);
     const sy = Math.sin(this.yaw);
     const cp = Math.cos(this.pitch);
     const sp = Math.sin(this.pitch);
 
-    const forward = [sy * cp, sp, cy * cp];
-    // Right = normalize(cross(forward, [0, 1, 0])) = normalize([-forward.z, 0, forward.x])
-    const rLen = Math.hypot(forward[2], forward[0]) || 1;
-    const right = [-forward[2] / rLen, 0, forward[0] / rLen];
-    // Up = cross(right, forward)
-    const up = [
-      right[1] * forward[2] - right[2] * forward[1],
-      right[2] * forward[0] - right[0] * forward[2],
-      right[0] * forward[1] - right[1] * forward[0]
+    // Look direction from camera toward origin
+    const fwd = [-sy * cp, -sp, -cy * cp];
+    // Base right = normalize(cross(fwd, [0, 1, 0]))
+    const r0x = -fwd[2];
+    const r0z = fwd[0];
+    const rLen = Math.hypot(r0x, r0z) || 1;
+    const baseRight = [r0x / rLen, 0, r0z / rLen];
+
+    // Base up = cross(baseRight, fwd)
+    const baseUp = [
+      baseRight[1] * fwd[2] - baseRight[2] * fwd[1],
+      baseRight[2] * fwd[0] - baseRight[0] * fwd[2],
+      baseRight[0] * fwd[1] - baseRight[1] * fwd[0]
     ];
 
-    // Camera position in world space
-    const ro = [-forward[0] * camDist, -forward[1] * camDist, -forward[2] * camDist];
-    const rel = [x - ro[0], y - ro[1], z - ro[2]];
+    // Apply 6-DOF Space Roll (Q / E keys!) around the forward look axis
+    const cr = Math.cos(this.roll);
+    const sr = Math.sin(this.roll);
+    this.camRight = [
+      baseRight[0] * cr + baseUp[0] * sr,
+      baseRight[1] * cr + baseUp[1] * sr,
+      baseRight[2] * cr + baseUp[2] * sr
+    ];
+    this.camUp = [
+      -baseRight[0] * sr + baseUp[0] * cr,
+      -baseRight[1] * sr + baseUp[1] * cr,
+      -baseRight[2] * sr + baseUp[2] * cr
+    ];
+    this.camForward = fwd;
+    this.camOrigin = [
+      -fwd[0] * camDist + this.panOffset.x,
+      -fwd[1] * camDist + this.panOffset.y,
+      -fwd[2] * camDist + this.panOffset.z
+    ];
+  }
 
-    const vx = rel[0] * right[0] + rel[1] * right[1] + rel[2] * right[2];
-    const vy = rel[0] * up[0] + rel[1] * up[1] + rel[2] * up[2];
-    const vz = rel[0] * forward[0] + rel[1] * forward[1] + rel[2] * forward[2];
+  /**
+   * Project 3D world point using the exact CPU-precomputed 6-DOF Camera Basis!
+   */
+  project3D(point3D) {
+    const relX = point3D[0] - this.camOrigin[0];
+    const relY = point3D[1] - this.camOrigin[1];
+    const relZ = point3D[2] - this.camOrigin[2];
+
+    const vx = relX * this.camRight[0] + relY * this.camRight[1] + relZ * this.camRight[2];
+    const vy = relX * this.camUp[0] + relY * this.camUp[1] + relZ * this.camUp[2];
+    const vz = relX * this.camForward[0] + relY * this.camForward[1] + relZ * this.camForward[2];
 
     if (vz <= 0.15) {
       return { visible: false, x: 0, y: 0, depth: vz, scale: 0 };
@@ -5544,67 +6503,134 @@ class UniverseRenderer {
     const ndcX = (vx * fov) / (vz * aspect);
     const ndcY = (vy * fov) / vz;
 
-    const screenX = (ndcX * 0.5 + 0.5) * this.width;
-    const screenY = (-ndcY * 0.5 + 0.5) * this.height;
-
     return {
       visible: true,
-      x: screenX,
-      y: screenY,
+      x: (ndcX * 0.5 + 0.5) * this.width,
+      y: (-ndcY * 0.5 + 0.5) * this.height,
       depth: vz,
       scale: fov / vz
     };
   }
 
   /**
-   * Main render loop execution
+   * Capture composite high-resolution PNG screenshot (F10 Photo Tool)
+   */
+  captureScreenshot() {
+    const out = document.createElement('canvas');
+    out.width = this.overlayCanvas.width;
+    out.height = this.overlayCanvas.height;
+    const octx = out.getContext('2d');
+    octx.drawImage(this.webglCanvas, 0, 0, out.width, out.height);
+    octx.drawImage(this.overlayCanvas, 0, 0, out.width, out.height);
+    const link = document.createElement('a');
+    link.download = `PARALLAX-${Date.now()}.png`;
+    link.href = out.toDataURL('image/png');
+    link.click();
+  }
+
+  /**
+   * Main render loop with Dynamic Adaptive Resolution Scaling (DRS) & 6-DOF Flight
    */
   render(dtSeconds) {
-    // Update FPS counter
+    // 1. Rolling FPS & Dynamic Adaptive Resolution Scaling (locks 60 FPS automatically!)
     this._frameCount++;
     const now = performance.now();
-    if (now - this._fpsTimer >= 500) {
+    if (now - this._fpsTimer >= 550) {
       this.fps = Math.round((this._frameCount * 1000) / (now - this._fpsTimer));
       this._frameCount = 0;
       this._fpsTimer = now;
+
+      if (this.engine.qualityMode === 'auto') {
+        if (this.fps < 42 && this.shaderScale > 0.55) {
+          this.shaderScale = Math.max(0.55, this.shaderScale - 0.12);
+          if (this.fps < 32) this.qualityLevel = 0;
+          this.applyShaderResolution();
+        } else if (this.fps >= 56 && this.shaderScale < Math.min(window.devicePixelRatio || 1, 1.15)) {
+          this.shaderScale = Math.min(Math.min(window.devicePixelRatio || 1, 1.15), this.shaderScale + 0.06);
+          if (this.fps >= 58 && this.qualityLevel < 1) this.qualityLevel = 1;
+          this.applyShaderResolution();
+        }
+      }
     }
 
-    // Apply WASD / Arrow / Q-E flight controls
+    // 2. Universe Sandbox 2 Exact 6-DOF Keyboard Controls (WASD + RF + QE Roll + Arrow Keys)
     if (this.keysPressed.size > 0) {
       const k = this.keysPressed;
       const isSurface = this.engine.currentLogScale < 4.5;
-      const speed = dtSeconds * (isSurface ? 2.4 : 1.2);
-      if (k.has('a') || k.has('arrowleft')) this.targetYaw -= speed;
-      if (k.has('d') || k.has('arrowright')) this.targetYaw += speed;
-      if (k.has('w') || k.has('arrowup')) {
+      const moveSpeed = dtSeconds * (isSurface ? 2.6 : 1.5);
+
+      // W / S: Forward / Backward flight (zooms in/out or flies across surface)
+      if (k.has('w')) {
         if (isSurface) {
-          this.surfaceOffset.x += Math.sin(this.yaw * 0.72) * speed * 1.4;
-          this.surfaceOffset.z += Math.cos(this.yaw * 0.72) * speed * 1.4;
+          this.surfaceOffset.x += Math.sin(this.yaw * 0.72) * moveSpeed * 1.4;
+          this.surfaceOffset.z += Math.cos(this.yaw * 0.72) * moveSpeed * 1.4;
         } else {
-          this.targetPitch = Math.min(1.38, this.targetPitch + speed * 0.75);
+          this.engine.setTargetLogScale(this.engine.targetLogScale - dtSeconds * 3.4);
         }
       }
-      if (k.has('s') || k.has('arrowdown')) {
+      if (k.has('s')) {
         if (isSurface) {
-          this.surfaceOffset.x -= Math.sin(this.yaw * 0.72) * speed * 1.4;
-          this.surfaceOffset.z -= Math.cos(this.yaw * 0.72) * speed * 1.4;
+          this.surfaceOffset.x -= Math.sin(this.yaw * 0.72) * moveSpeed * 1.4;
+          this.surfaceOffset.z -= Math.cos(this.yaw * 0.72) * moveSpeed * 1.4;
         } else {
-          this.targetPitch = Math.max(-1.38, this.targetPitch - speed * 0.75);
+          this.engine.setTargetLogScale(this.engine.targetLogScale + dtSeconds * 3.4);
         }
       }
-      if (k.has('q')) this.engine.setTargetLogScale(this.engine.targetLogScale + dtSeconds * 3.8);
-      if (k.has('e')) this.engine.setTargetLogScale(this.engine.targetLogScale - dtSeconds * 3.8);
+      // A / D: Strafe camera left / right
+      if (k.has('a')) {
+        if (isSurface) this.targetYaw -= moveSpeed;
+        else {
+          this.targetPan.x -= this.camRight[0] * moveSpeed;
+          this.targetPan.y -= this.camRight[1] * moveSpeed;
+          this.targetPan.z -= this.camRight[2] * moveSpeed;
+        }
+      }
+      if (k.has('d')) {
+        if (isSurface) this.targetYaw += moveSpeed;
+        else {
+          this.targetPan.x += this.camRight[0] * moveSpeed;
+          this.targetPan.y += this.camRight[1] * moveSpeed;
+          this.targetPan.z += this.camRight[2] * moveSpeed;
+        }
+      }
+      // R / F: Move camera up / down vertically (exact Universe Sandbox 2!)
+      if (k.has('r')) {
+        this.targetPan.x += this.camUp[0] * moveSpeed;
+        this.targetPan.y += this.camUp[1] * moveSpeed;
+        this.targetPan.z += this.camUp[2] * moveSpeed;
+      }
+      if (k.has('f')) {
+        this.targetPan.x -= this.camUp[0] * moveSpeed;
+        this.targetPan.y -= this.camUp[1] * moveSpeed;
+        this.targetPan.z -= this.camUp[2] * moveSpeed;
+      }
+      // Q / E: True 6-DOF Roll counterclockwise / clockwise (exact Universe Sandbox 2!)
+      if (k.has('q')) this.targetRoll -= dtSeconds * 1.25;
+      if (k.has('e')) this.targetRoll += dtSeconds * 1.25;
+
+      // Arrow keys: Up/Down zoom in/out on locked object, Left/Right orbit azimuth!
+      if (k.has('arrowup')) this.engine.setTargetLogScale(this.engine.targetLogScale - dtSeconds * 3.6);
+      if (k.has('arrowdown')) this.engine.setTargetLogScale(this.engine.targetLogScale + dtSeconds * 3.6);
+      if (k.has('arrowleft')) this.targetYaw -= dtSeconds * 1.4;
+      if (k.has('arrowright')) this.targetYaw += dtSeconds * 1.4;
     }
 
-    // Smooth orbital camera interpolation
-    this.yaw += (this.targetYaw - this.yaw) * Math.min(1.0, dtSeconds * 10.0);
-    this.pitch += (this.targetPitch - this.pitch) * Math.min(1.0, dtSeconds * 10.0);
+    // Smooth camera damping
+    const damp = Math.min(1.0, dtSeconds * 10.0);
+    this.yaw += (this.targetYaw - this.yaw) * damp;
+    this.pitch += (this.targetPitch - this.pitch) * damp;
+    this.roll += (this.targetRoll - this.roll) * damp;
+    this.panOffset.x += (this.targetPan.x - this.panOffset.x) * damp;
+    this.panOffset.y += (this.targetPan.y - this.panOffset.y) * damp;
+    this.panOffset.z += (this.targetPan.z - this.panOffset.z) * damp;
 
-    // Subtle slow orbital drift when not dragging
-    if (!this.isDragging) {
-      this.targetYaw += dtSeconds * (this.engine.autopilotActive ? 0.14 : 0.028);
+    if (!this.isDragging && !this.isPanning && this.engine.autopilotActive) {
+      this.targetYaw += dtSeconds * 0.14;
+    } else if (!this.isDragging && !this.isPanning && this.engine.sandboxTool === 'select') {
+      this.targetYaw += dtSeconds * 0.018;
     }
 
+    this.updateCameraBasis(3.35 / Math.max(0.25, this.cameraZoom));
     this.renderWebGLPass();
     this.renderAstrographicOverlayPass();
   }
@@ -5622,17 +6648,22 @@ class UniverseRenderer {
     const sys = eng.getActivePlanetarySystem();
     const star = sys.star;
     const planet = eng.getActivePlanet();
+    const nbTarget = eng.getActiveNBodyTarget();
 
     gl.uniform2f(this.uniforms.u_resolution, this.webglCanvas.width, this.webglCanvas.height);
     gl.uniform1f(this.uniforms.u_time, eng.visualTime);
     gl.uniform1f(this.uniforms.u_logScale, eng.currentLogScale);
+    gl.uniform3fv(this.uniforms.u_camRight, this.camRight);
+    gl.uniform3fv(this.uniforms.u_camUp, this.camUp);
+    gl.uniform3fv(this.uniforms.u_camForward, this.camForward);
+    gl.uniform3fv(this.uniforms.u_camOrigin, this.camOrigin);
     gl.uniform2f(this.uniforms.u_cameraAngles, this.yaw, this.pitch);
     gl.uniform2f(this.uniforms.u_surfaceOffset, this.surfaceOffset.x, this.surfaceOffset.z);
-    gl.uniform1f(this.uniforms.u_cameraZoom, this.cameraZoom);
     gl.uniform1f(this.uniforms.u_warpFactor, eng.warpFactor || 0.0);
     gl.uniform1f(this.uniforms.u_seed, (sys.seed % 10000) * 0.1);
+    gl.uniform1i(this.uniforms.u_qualityLevel, this.qualityLevel);
+    gl.uniform1i(this.uniforms.u_lightingMode, eng.lightingMode || 0);
 
-    // Star uniforms
     gl.uniform3fv(this.uniforms.u_starColor, star.rgb);
     gl.uniform1f(this.uniforms.u_starTempK, star.tempK);
     gl.uniform1f(this.uniforms.u_starRadiusNorm, Math.min(2.2, Math.max(0.4, Math.pow(star.radiusSolar, 0.25))));
@@ -5644,12 +6675,8 @@ class UniverseRenderer {
     gl.uniform1i(this.uniforms.u_remnantType, remnantInt);
     gl.uniform1f(this.uniforms.u_hasNebulaHalo, star.hasNebulaHalo ? 1.0 : 0.0);
     gl.uniform1f(this.uniforms.u_isBinary, sys.isBinary ? 1.0 : 0.0);
-    gl.uniform3fv(
-      this.uniforms.u_companionColor,
-      sys.companion ? sys.companion.rgb : [0.8, 0.9, 1.0]
-    );
+    gl.uniform3fv(this.uniforms.u_companionColor, sys.companion ? sys.companion.rgb : [0.8, 0.9, 1.0]);
 
-    // Galaxy uniforms
     let galFam = 0;
     if (gal.morphology.family === 'barred') galFam = 1;
     else if (gal.morphology.family === 'elliptical') galFam = 2;
@@ -5662,7 +6689,6 @@ class UniverseRenderer {
     const nebCol = gal.nebulae && gal.nebulae.length ? gal.nebulae[0].color : [0.95, 0.28, 0.48];
     gl.uniform3fv(this.uniforms.u_nebulaColor, nebCol);
 
-    // Planet uniforms
     if (planet) {
       const archMap = {
         temperate_terrestrial: 0,
@@ -5685,9 +6711,7 @@ class UniverseRenderer {
       gl.uniform3fv(this.uniforms.u_colAtmo, planet.palette.atmosphere);
       gl.uniform3fv(
         this.uniforms.u_colFoliage,
-        planet.biosphere.active && planet.biosphere.foliageRGB
-          ? planet.biosphere.foliageRGB
-          : planet.palette.lowland
+        planet.biosphere.active && planet.biosphere.foliageRGB ? planet.biosphere.foliageRGB : planet.palette.lowland
       );
       gl.uniform1f(this.uniforms.u_oceanCoverage, planet.oceanCoverage);
       gl.uniform1f(this.uniforms.u_iceCoverage, planet.iceCoverage);
@@ -5695,31 +6719,26 @@ class UniverseRenderer {
       gl.uniform1f(this.uniforms.u_terrainRoughness, planet.terrainRoughness);
       gl.uniform1f(this.uniforms.u_volcanism, planet.volcanism);
       gl.uniform1f(this.uniforms.u_pressureAtm, planet.pressureAtm);
-      gl.uniform1f(
-        this.uniforms.u_bioComplexity,
-        planet.biosphere.active ? planet.biosphere.complexityIndex : 0.0
-      );
-      gl.uniform1f(
-        this.uniforms.u_cityLights,
-        planet.civilization.active ? planet.civilization.cityLightIntensity : 0.0
-      );
+      gl.uniform1f(this.uniforms.u_bioComplexity, planet.biosphere.active ? planet.biosphere.complexityIndex : 0.0);
+      gl.uniform1f(this.uniforms.u_cityLights, planet.civilization.active ? planet.civilization.cityLightIntensity : 0.0);
       gl.uniform1f(this.uniforms.u_isTidallyLocked, planet.isTidallyLocked ? 1.0 : 0.0);
+      gl.uniform1f(this.uniforms.u_moltenHeat, nbTarget ? nbTarget.moltenHeat : 0.0);
       gl.uniform1f(this.uniforms.u_hasRings, planet.rings ? 1.0 : 0.0);
       gl.uniform1f(this.uniforms.u_ringInner, planet.rings ? planet.rings.innerRadiusRatio : 1.4);
       gl.uniform1f(this.uniforms.u_ringOuter, planet.rings ? planet.rings.outerRadiusRatio : 2.3);
       gl.uniform1f(this.uniforms.u_planetSeed, (planet.seed % 1000) * 0.1);
     }
 
-    // Transient phenomena uniforms
     gl.uniform1f(this.uniforms.u_superflare, eng.transientEffects.superflareIntensity);
     gl.uniform1f(this.uniforms.u_impactFlash, eng.transientEffects.impactFlashIntensity);
     gl.uniform1f(this.uniforms.u_evoPulse, eng.transientEffects.evolutionPulseIntensity);
+    gl.uniform1f(this.uniforms.u_laserActive, eng.laserActive ? 1.0 : 0.0);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
   }
 
   /**
-   * Synchronized 2D/3D High-DPI Astrographic Vector Telemetry & Interactive Picking Layer
+   * Synchronized 3D Vector Overlay: N-Body Trails, Grid, Collisions, Laser Beam & Picking
    */
   renderAstrographicOverlayPass() {
     const ctx = this.ctx;
@@ -5730,8 +6749,13 @@ class UniverseRenderer {
 
     this.interactiveTargets = [];
     const s = this.engine.currentLogScale;
+    const flags = this.engine.displayFlags;
 
-    // Blend weights matching the GLSL shader scale zones
+    // Universe Sandbox 3D Simulation Reference Grid (Key G)
+    if (flags.grid && s > 4.5) {
+      this.drawAstrographicDiscGrid(ctx, 'rgba(56, 189, 248, 0.16)');
+    }
+
     const wCosmos = this.smoothstep(21.4, 23.0, s);
     const wGalaxy = this.smoothstep(17.5, 19.2, s) * (1.0 - this.smoothstep(22.2, 23.6, s));
     const wSector = this.smoothstep(14.5, 15.8, s) * (1.0 - this.smoothstep(18.0, 19.4, s));
@@ -5742,11 +6766,19 @@ class UniverseRenderer {
     if (wCosmos > 0.05) this.drawCosmosOverlay(ctx, wCosmos);
     if (wGalaxy > 0.05) this.drawGalaxyOverlay(ctx, wGalaxy);
     if (wSector > 0.05) this.drawStellarSectorOverlay(ctx, wSector);
-    if (wSystem > 0.05) this.drawPlanetarySystemOverlay(ctx, wSystem);
+    if (wSystem > 0.05) this.drawPlanetarySystemNBodyOverlay(ctx, wSystem);
     if (wPlanet > 0.05) this.drawPlanetOrbitOverlay(ctx, wPlanet);
     if (wSurface > 0.05) this.drawSurfaceAndBioOverlay(ctx, wSurface);
 
-    // Update hover cursor feedback
+    // Universe Sandbox Tool Visual Feedback (Add Orbit Preview & Laser Beam)
+    if (this.engine.sandboxTool === 'add' && wSystem > 0.25 && this.hoverPointer.x > 0) {
+      this.drawAddOrbitPreview(ctx);
+    }
+    if (this.engine.laserActive) {
+      this.drawThermalLaserBeam(ctx);
+    }
+
+    // Hover picking feedback
     this.hoveredTarget = null;
     for (const target of this.interactiveTargets) {
       const d = Math.hypot(this.hoverPointer.x - target.screenX, this.hoverPointer.y - target.screenY);
@@ -5755,7 +6787,12 @@ class UniverseRenderer {
         break;
       }
     }
-    this.overlayCanvas.style.cursor = this.hoveredTarget ? 'pointer' : this.isDragging ? 'grabbing' : 'grab';
+
+    if (this.engine.sandboxTool === 'add' || this.engine.sandboxTool === 'laser' || this.engine.sandboxTool === 'explode') {
+      this.overlayCanvas.style.cursor = 'crosshair';
+    } else {
+      this.overlayCanvas.style.cursor = this.hoveredTarget ? 'pointer' : this.isDragging || this.isPanning ? 'grabbing' : 'grab';
+    }
 
     if (this.hoveredTarget) {
       this.drawHoverReticle(ctx, this.hoveredTarget);
@@ -5764,31 +6801,96 @@ class UniverseRenderer {
     ctx.restore();
   }
 
+  drawAddOrbitPreview(ctx) {
+    const { point3D } = this.unprojectToEcliptic(this.hoverPointer.x, this.hoverPointer.y);
+    const r = Math.hypot(point3D[0], point3D[2]);
+    if (r < 0.15 || r > 5.0) return;
+
+    ctx.save();
+    if (this.engine.addMode === 'orbit' || this.engine.addMode === 'binary') {
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.65)';
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (let i = 0; i <= 60; i++) {
+        const a = (i / 60) * Math.PI * 2;
+        const p = this.project3D([Math.cos(a) * r, 0, Math.sin(a) * r]);
+        if (p.visible) {
+          if (i === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        }
+      }
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    ctx.strokeStyle = '#e5a93c';
+    ctx.beginPath();
+    ctx.arc(this.hoverPointer.x, this.hoverPointer.y, 10, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#e5a93c';
+    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.fillText(`+ ${this.engine.addPresetId.toUpperCase()} [${this.engine.addMode.toUpperCase()}]`, this.hoverPointer.x + 14, this.hoverPointer.y + 3);
+    ctx.restore();
+  }
+
+  drawThermalLaserBeam(ctx) {
+    ctx.save();
+    const targetX = this.width * 0.5;
+    const targetY = this.height * 0.5;
+    const srcX = this.width * 0.12;
+    const srcY = this.height * 0.88;
+
+    const grad = ctx.createLinearGradient(srcX, srcY, targetX, targetY);
+    grad.addColorStop(0, 'rgba(56, 189, 248, 0.15)');
+    grad.addColorStop(0.5, 'rgba(56, 189, 248, 0.92)');
+    grad.addColorStop(1, 'rgba(255, 245, 220, 1.0)');
+
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(srcX, srcY);
+    ctx.lineTo(targetX, targetY);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(srcX, srcY);
+    ctx.lineTo(targetX, targetY);
+    ctx.stroke();
+
+    const flare = ctx.createRadialGradient(targetX, targetY, 2, targetX, targetY, 44);
+    flare.addColorStop(0, 'rgba(255, 250, 220, 0.95)');
+    flare.addColorStop(0.4, 'rgba(251, 146, 60, 0.65)');
+    flare.addColorStop(1, 'rgba(251, 146, 60, 0)');
+    ctx.fillStyle = flare;
+    ctx.beginPath();
+    ctx.arc(targetX, targetY, 44, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   smoothstep(edge0, edge1, x) {
     const t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
     return t * t * (3 - 2 * t);
   }
 
-  /**
-   * SCALE 1 OVERLAY: Cosmic Web Filaments, Voids & Superclusters
-   */
   drawCosmosOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     const web = this.engine.cosmicWeb;
     const activeIdx = this.engine.activeSuperclusterIndex;
+    const showLabels = this.engine.displayFlags.labels;
 
-    // 1. Draw Cosmic Filaments connecting superclusters
     for (const fil of web.filaments) {
-      const pA = this.project3D(fil.start, 4.2);
-      const pB = this.project3D(fil.end, 4.2);
+      const pA = this.project3D(fil.start);
+      const pB = this.project3D(fil.end);
       if (!pA.visible || !pB.visible) continue;
 
       const grad = ctx.createLinearGradient(pA.x, pA.y, pB.x, pB.y);
       grad.addColorStop(0, 'rgba(56, 189, 248, 0.28)');
       grad.addColorStop(0.5, `rgba(229, 169, 60, ${0.15 + fil.linearDensity * 0.22})`);
       grad.addColorStop(1, 'rgba(56, 189, 248, 0.28)');
-
       ctx.strokeStyle = grad;
       ctx.lineWidth = 1.2 + fil.linearDensity * 1.4;
       ctx.beginPath();
@@ -5797,62 +6899,41 @@ class UniverseRenderer {
       ctx.stroke();
     }
 
-    // 2. Draw Cosmic Voids
-    for (const v of web.voids) {
-      const pV = this.project3D(v.position, 4.2);
-      if (!pV.visible) continue;
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
-      ctx.setLineDash([3, 5]);
-      ctx.beginPath();
-      ctx.arc(pV.x, pV.y, 26 * pV.scale, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.45)';
-      ctx.font = '500 10px "JetBrains Mono", monospace';
-      ctx.fillText(`${v.name.toUpperCase()} (δ=${v.underdensityDelta.toFixed(2)})`, pV.x - 42, pV.y + 4);
-    }
-
-    // 3. Draw Supercluster Nodes
     web.superclusters.forEach((sc, idx) => {
-      const proj = this.project3D(sc.position, 4.2);
+      const proj = this.project3D(sc.position);
       if (!proj.visible) return;
       const isSelected = idx === activeIdx;
-      const radius = (isSelected ? 10 : 6.5) * Math.min(1.6, proj.scale * 1.8);
+      const radius = (isSelected ? 9 : 6) * Math.min(1.5, proj.scale * 1.6);
 
-      // Outer glow
       const [r, g, b] = sc.color.map((c) => Math.round(c * 255));
-      const glow = ctx.createRadialGradient(proj.x, proj.y, 1, proj.x, proj.y, radius * 3.8);
+      const glow = ctx.createRadialGradient(proj.x, proj.y, 1, proj.x, proj.y, radius * 3.4);
       glow.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.85)`);
-      glow.addColorStop(0.4, `rgba(${r}, ${g}, ${b}, 0.25)`);
       glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(proj.x, proj.y, radius * 3.8, 0, Math.PI * 2);
+      ctx.arc(proj.x, proj.y, radius * 3.4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Core node
       ctx.fillStyle = isSelected ? '#fde047' : `rgb(${r}, ${g}, ${b})`;
       ctx.beginPath();
-      ctx.arc(proj.x, proj.y, Math.max(3, radius * 0.55), 0, Math.PI * 2);
+      ctx.arc(proj.x, proj.y, Math.max(3, radius * 0.52), 0, Math.PI * 2);
       ctx.fill();
 
-      if (isSelected) {
-        this.drawSelectionReticle(ctx, proj.x, proj.y, radius * 2.3, '#e5a93c');
-      }
+      if (isSelected) this.drawSelectionReticle(ctx, proj.x, proj.y, radius * 2.2, '#e5a93c');
 
-      // Telemetry label
-      ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.78)';
-      ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
-      ctx.fillText(sc.name, proj.x + radius + 8, proj.y - 2);
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.75)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`${sc.catalogId} • z=${sc.redshift.toFixed(4)} • ${(sc.galaxyCount / 1000).toFixed(1)}k gal`, proj.x + radius + 8, proj.y + 11);
+      if (showLabels) {
+        ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.78)';
+        ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
+        ctx.fillText(sc.name, proj.x + radius + 8, proj.y - 2);
+        ctx.fillStyle = 'rgba(148, 163, 184, 0.75)';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(`${sc.catalogId} • z=${sc.redshift.toFixed(4)}`, proj.x + radius + 8, proj.y + 10);
+      }
 
       this.interactiveTargets.push({
         type: 'supercluster',
         index: idx,
         label: sc.name,
-        sublabel: `${sc.catalogId} (${sc.galaxyCount.toLocaleString()} galaxies)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 26
@@ -5862,157 +6943,103 @@ class UniverseRenderer {
     ctx.restore();
   }
 
-  /**
-   * SCALE 2 OVERLAY: Galactic Structure, Nebulae, SMBH & Cluster Galaxies
-   */
   drawGalaxyOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     const gal = this.engine.getActiveGalaxy();
+    const showLabels = this.engine.displayFlags.labels;
 
-    // 1. Central Supermassive Black Hole Marker
-    const pCore = this.project3D([0, 0, 0], 3.35);
-    if (pCore.visible) {
+    const pCore = this.project3D([0, 0, 0]);
+    if (pCore.visible && showLabels) {
       ctx.strokeStyle = 'rgba(229, 169, 60, 0.75)';
       ctx.lineWidth = 1.2;
       ctx.beginPath();
       ctx.arc(pCore.x, pCore.y, 12, 0, Math.PI * 2);
       ctx.stroke();
-
       ctx.fillStyle = 'rgba(253, 224, 71, 0.9)';
       ctx.font = '600 10px "JetBrains Mono", monospace';
       ctx.fillText(`SMBH ${gal.smbh.name} (${(gal.smbh.massSolar / 1e6).toFixed(1)}M M☉)`, pCore.x + 16, pCore.y - 4);
     }
 
-    // 2. HII Star-Forming Nebulae inside the Galaxy
-    const rot = this.engine.visualTime * 0.035;
-    gal.nebulae.forEach((neb) => {
-      const [nx, ny, nz] = neb.position;
-      const rx = nx * Math.cos(rot) - nz * Math.sin(rot);
-      const rz = nx * Math.sin(rot) + nz * Math.cos(rot);
-      const pNeb = this.project3D([rx * 1.4, ny, rz * 1.4], 3.35);
-      if (!pNeb.visible) return;
-
-      const [r, g, b] = neb.color.map((c) => Math.round(c * 255));
-      ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.65)`;
-      ctx.setLineDash([2, 3]);
-      ctx.beginPath();
-      ctx.arc(pNeb.x, pNeb.y, 9, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.88)`;
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`${neb.name} (${Math.round(neb.radiusPc)} pc)`, pNeb.x + 12, pNeb.y + 3);
-    });
-
-    // 3. Active Stellar Sector Beacon (Click to enter Stellar Sector)
+    const rot = this.engine.visualTime * 0.032;
     const sectorPos = [Math.cos(rot + 0.8) * 0.75, 0.02, Math.sin(rot + 0.8) * 0.75];
-    const pSec = this.project3D(sectorPos, 3.35);
+    const pSec = this.project3D(sectorPos);
     if (pSec.visible) {
       this.drawSelectionReticle(ctx, pSec.x, pSec.y, 18, '#38bdf8');
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '600 11px "Space Grotesk", sans-serif';
-      ctx.fillText(`ACTIVE SECTOR: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.75)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Click to explore ${this.engine.stellarSector.systems.length} star systems`, pSec.x + 22, pSec.y + 11);
-
+      if (showLabels) {
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = '600 11px "Space Grotesk", sans-serif';
+        ctx.fillText(`ACTIVE SECTOR: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
+      }
       this.interactiveTargets.push({
         type: 'system',
         index: this.engine.activeSystemIndex,
         label: this.engine.stellarSector.name,
-        sublabel: 'Zoom into Star Sector',
         screenX: pSec.x,
         screenY: pSec.y,
         hitRadius: 30
       });
     }
-
     ctx.restore();
   }
 
-  /**
-   * SCALE 3 OVERLAY: 3D Stellar Sector & Local Star Systems
-   */
   drawStellarSectorOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     const systems = this.engine.stellarSector.systems;
     const activeSysIdx = this.engine.activeSystemIndex;
-
-    // Subtle 3D Galactic Plane Astrographic Grid
-    this.drawAstrographicDiscGrid(ctx, 3.35, 'rgba(56, 189, 248, 0.12)');
+    const showLabels = this.engine.displayFlags.labels;
 
     systems.forEach((sys, idx) => {
-      const pStar = this.project3D(sys.position, 3.35);
-      const pPlane = this.project3D([sys.position[0], 0, sys.position[2]], 3.35);
+      const pStar = this.project3D(sys.position);
+      const pPlane = this.project3D([sys.position[0], 0, sys.position[2]]);
       if (!pStar.visible) return;
 
       const isSelected = idx === activeSysIdx;
 
-      // Vertical 3D coordinate projection stalk onto galactic reference plane
       if (pPlane.visible) {
-        ctx.strokeStyle = isSelected ? 'rgba(229, 169, 60, 0.55)' : 'rgba(148, 163, 184, 0.18)';
+        ctx.strokeStyle = isSelected ? 'rgba(229, 169, 60, 0.55)' : 'rgba(148, 163, 184, 0.16)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(pStar.x, pStar.y);
         ctx.lineTo(pPlane.x, pPlane.y);
         ctx.stroke();
-
-        ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
-        ctx.beginPath();
-        ctx.arc(pPlane.x, pPlane.y, 2, 0, Math.PI * 2);
-        ctx.fill();
       }
 
-      // Star glow colored by Planck blackbody temperature
       const [r, g, b] = sys.star.rgb.map((c) => Math.round(c * 255));
       const baseR = isSelected ? 9 : 5.5;
-      const glow = ctx.createRadialGradient(pStar.x, pStar.y, 1, pStar.x, pStar.y, baseR * 3.2);
+      const glow = ctx.createRadialGradient(pStar.x, pStar.y, 1, pStar.x, pStar.y, baseR * 3.0);
       glow.addColorStop(0, '#ffffff');
       glow.addColorStop(0.3, `rgba(${r}, ${g}, ${b}, 0.9)`);
       glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(pStar.x, pStar.y, baseR * 3.2, 0, Math.PI * 2);
+      ctx.arc(pStar.x, pStar.y, baseR * 3.0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Biosignature / Civilization emerald or amber orbital indicator ring
       if (sys.hasCivilization || sys.hasBiosphere) {
         ctx.strokeStyle = sys.hasCivilization ? 'rgba(229, 169, 60, 0.85)' : 'rgba(52, 211, 153, 0.8)';
-        ctx.lineWidth = 1.3;
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.arc(pStar.x, pStar.y, baseR * 1.9, 0, Math.PI * 2);
         ctx.stroke();
       }
 
-      if (isSelected) {
-        this.drawSelectionReticle(ctx, pStar.x, pStar.y, 20, '#e5a93c');
+      if (isSelected) this.drawSelectionReticle(ctx, pStar.x, pStar.y, 20, '#e5a93c');
+
+      if (showLabels) {
+        ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.82)';
+        ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
+        ctx.fillText(sys.name, pStar.x + 12, pStar.y - 2);
+        ctx.fillStyle = sys.hasCivilization ? '#e5a93c' : sys.hasBiosphere ? '#34d399' : 'rgba(148, 163, 184, 0.72)';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(`${sys.star.spectralClass} • ${Math.round(sys.star.tempK)}K`, pStar.x + 12, pStar.y + 10);
       }
-
-      // Star system label & spectral classification
-      ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.82)';
-      ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
-      ctx.fillText(sys.name, pStar.x + 12, pStar.y - 2);
-
-      let tag = `${sys.star.spectralClass} • ${Math.round(sys.star.tempK)}K`;
-      if (sys.hasCivilization) tag += ' • [CIVILIZATION]';
-      else if (sys.hasBiosphere) tag += ' • [LIFE]';
-
-      ctx.fillStyle = sys.hasCivilization
-        ? '#e5a93c'
-        : sys.hasBiosphere
-        ? '#34d399'
-        : 'rgba(148, 163, 184, 0.72)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(tag, pStar.x + 12, pStar.y + 10);
 
       this.interactiveTargets.push({
         type: 'system',
         index: idx,
         label: sys.name,
-        sublabel: `${sys.star.spectralClass} • ${sys.notableFeature}`,
         screenX: pStar.x,
         screenY: pStar.y,
         hitRadius: 24
@@ -6023,181 +7050,181 @@ class UniverseRenderer {
   }
 
   /**
-   * SCALE 4 OVERLAY: Keplerian Planetary System Orbits, Habitable Zone, Comets & Planets
+   * SCALE 4 OVERLAY: LIVE N-BODY GRAVITY SYSTEM (Trails, Orbits, Collisions, Fragments, Shockwaves!)
    */
-  drawPlanetarySystemOverlay(ctx, alpha) {
+  drawPlanetarySystemNBodyOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
 
     const pSys = this.engine.getActivePlanetarySystem();
-    const planets = pSys.planets;
+    const nbody = this.engine.nbody;
+    const flags = this.engine.displayFlags;
     const activePlanetIdx = this.engine.activePlanetIndex;
-    const maxAU = planets.length ? planets[planets.length - 1].orbit.a : 10;
+    const maxAU = pSys.planets.length ? pSys.planets[pSys.planets.length - 1].orbit.a : 10;
 
-    // Non-linear power compression so both inner terrestrial and outer gas giant orbits fit gracefully in 3D view
-    const mapAU = (au) => 0.36 + Math.pow(au / Math.max(0.5, maxAU), 0.52) * 1.75;
+    // Consistent spatial compression mapping AU -> 3D viewport units
+    const mapPos3D = (x, y, z) => {
+      const r = Math.hypot(x, y, z);
+      if (r < 1e-4) return [0, 0, 0];
+      const rScaled = 0.36 + Math.pow(r / Math.max(0.5, maxAU), 0.52) * 1.75;
+      const f = rScaled / r;
+      return [x * f, y * f, z * f];
+    };
 
-    // 1. Circumstellar Habitable Zone (CHZ) 3D Ring Band
-    if (!pSys.star.isRemnant) {
-      const rIn = mapAU(pSys.star.hzInnerAU);
-      const rOut = mapAU(pSys.star.hzOuterAU);
-      this.draw3DRingBand(ctx, (rIn + rOut) * 0.5, Math.max(2, (rOut - rIn) * 45), 'rgba(52, 211, 153, 0.08)');
+    const mapRadius = (au) => 0.36 + Math.pow(au / Math.max(0.5, maxAU), 0.52) * 1.75;
+
+    // 1. Circumstellar Habitable Zone (Key H)
+    if (flags.hz && !pSys.star.isRemnant) {
+      const rIn = mapRadius(pSys.star.hzInnerAU);
+      const rOut = mapRadius(pSys.star.hzOuterAU);
+      this.draw3DRingBand(ctx, (rIn + rOut) * 0.5, Math.max(2, (rOut - rIn) * 45), 'rgba(52, 211, 153, 0.09)');
     }
 
-    // 2. Asteroid Belt Particle Field
-    if (pSys.asteroidBelts && pSys.asteroidBelts.length) {
-      const belt = pSys.asteroidBelts[0];
-      const rBelt = mapAU((belt.innerRadiusAU + belt.outerRadiusAU) * 0.5);
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.42)';
-      for (let a = 0; a < 140; a++) {
-        const theta = a * 2.39996 + this.engine.visualTime * 0.03;
-        const rad = rBelt + Math.sin(a * 17.3) * 0.06;
-        const py = Math.cos(a * 9.1) * 0.03;
-        const proj = this.project3D([Math.cos(theta) * rad, py, Math.sin(theta) * rad], 3.35);
-        if (proj.visible) {
-          ctx.fillRect(proj.x, proj.y, 1.6, 1.6);
-        }
-      }
-    }
-
-    // 3. Comets with Dual Ion & Dust Tails oriented away from the Star
-    if (pSys.comets) {
-      pSys.comets.forEach((comet) => {
-        const state = solveKeplerOrbit(comet.orbit, this.engine.elapsedYears + 1.5);
-        const rScaled = mapAU(state.r);
-        const len = Math.hypot(state.x, state.y, state.z) || 1;
-        const pos3D = [(state.x / len) * rScaled, (state.y / len) * rScaled, (state.z / len) * rScaled];
-        const pHead = this.project3D(pos3D, 3.35);
-        // Anti-solar tail vector pointing away from star at origin
-        const tail3D = [pos3D[0] * 1.28, pos3D[1] * 1.28, pos3D[2] * 1.28];
-        const pTail = this.project3D(tail3D, 3.35);
-
-        if (pHead.visible && pTail.visible) {
-          const grad = ctx.createLinearGradient(pHead.x, pHead.y, pTail.x, pTail.y);
-          grad.addColorStop(0, 'rgba(125, 211, 252, 0.85)');
-          grad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
-          ctx.strokeStyle = grad;
-          ctx.lineWidth = 2.2;
-          ctx.beginPath();
-          ctx.moveTo(pHead.x, pHead.y);
-          ctx.lineTo(pTail.x, pTail.y);
-          ctx.stroke();
-
-          ctx.fillStyle = '#e0f2fe';
-          ctx.beginPath();
-          ctx.arc(pHead.x, pHead.y, 2.2, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      });
-    }
-
-    // 4. Planets & Their 3D Keplerian Elliptical Orbits
-    planets.forEach((planet, idx) => {
-      const isSelected = idx === activePlanetIdx;
-
-      // Draw full 3D elliptical orbit path
+    // 2. Molten Collision & Supernova Debris Fragments!
+    for (const frag of nbody.fragments) {
+      const p3 = mapPos3D(frag.x, frag.y, frag.z);
+      const proj = this.project3D(p3);
+      if (!proj.visible) continue;
+      const [fr, fg, fb] = frag.color.map((c) => Math.round(c * 255));
+      ctx.fillStyle = `rgba(${fr}, ${fg}, ${fb}, ${Math.max(0.1, frag.life)})`;
       ctx.beginPath();
-      let started = false;
-      const segments = 72;
-      for (let s = 0; s <= segments; s++) {
-        const fakeTime = (s / segments) * planet.orbit.periodYears;
-        const st = solveKeplerOrbit(planet.orbit, fakeTime);
-        const stLen = Math.hypot(st.x, st.y, st.z) || 1;
-        const orbScale = mapAU(st.r);
-        const pt = [(st.x / stLen) * orbScale, (st.y / stLen) * orbScale, (st.z / stLen) * orbScale];
-        const proj = this.project3D(pt, 3.35);
-        if (proj.visible) {
-          if (!started) {
-            ctx.moveTo(proj.x, proj.y);
-            started = true;
-          } else {
-            ctx.lineTo(proj.x, proj.y);
+      ctx.arc(proj.x, proj.y, frag.size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 3. Expanding Supernova & Collision Shockwaves!
+    for (const sw of nbody.shockwaves) {
+      const pCenter = this.project3D(mapPos3D(sw.x, sw.y, sw.z));
+      if (!pCenter.visible) continue;
+      const [sr, sg, sb] = sw.color.map((c) => Math.round(c * 255));
+      ctx.strokeStyle = `rgba(${sr}, ${sg}, ${sb}, ${sw.alpha})`;
+      ctx.lineWidth = 2.8;
+      ctx.beginPath();
+      ctx.arc(pCenter.x, pCenter.y, sw.radius * 180 * pCenter.scale, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // 4. Live N-Body Bodies (Procedural Planets + User-Spawned Stars, Black Holes & Rogue Planets!)
+    nbody.bodies.forEach((body, bIdx) => {
+      if (!body.alive) return;
+
+      const isCentralAnchor = bIdx === 0;
+      const isSelected = body.planetIndex >= 0 && body.planetIndex === activePlanetIdx;
+
+      // Reference elliptical orbit (Key O) for procedural planets
+      if (flags.orbits && body.sourcePlanet) {
+        const pl = body.sourcePlanet;
+        ctx.beginPath();
+        let started = false;
+        for (let s = 0; s <= 56; s++) {
+          const st = solveKeplerOrbit(pl.orbit, (s / 56) * pl.orbit.periodYears);
+          const proj = this.project3D(mapPos3D(st.x, st.y, st.z));
+          if (proj.visible) {
+            if (!started) { ctx.moveTo(proj.x, proj.y); started = true; }
+            else ctx.lineTo(proj.x, proj.y);
           }
         }
-      }
-      ctx.strokeStyle = isSelected
-        ? 'rgba(229, 169, 60, 0.72)'
-        : planet.biosphere.active
-        ? 'rgba(52, 211, 153, 0.35)'
-        : 'rgba(148, 163, 184, 0.24)';
-      ctx.lineWidth = isSelected ? 1.6 : 1.0;
-      ctx.stroke();
-
-      // Current planet 3D position
-      const liveState = solveKeplerOrbit(planet.orbit, this.engine.elapsedYears);
-      const liveLen = Math.hypot(liveState.x, liveState.y, liveState.z) || 1;
-      const liveR = mapAU(liveState.r);
-      const planet3D = [
-        (liveState.x / liveLen) * liveR,
-        (liveState.y / liveLen) * liveR,
-        (liveState.z / liveLen) * liveR
-      ];
-
-      const pProj = this.project3D(planet3D, 3.35);
-      if (!pProj.visible) return;
-
-      const bodyR = Math.max(4.5, Math.min(13, Math.pow(planet.radiusEarths, 0.38) * 5.2));
-      const [cr, cg, cb] = planet.palette.atmosphere.map((c) => Math.round(c * 255));
-
-      // Planetary ring ellipse if ringed
-      if (planet.rings) {
-        ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.65)`;
-        ctx.lineWidth = 2.0;
-        ctx.beginPath();
-        ctx.ellipse(pProj.x, pProj.y, bodyR * 2.1, bodyR * 0.75, 0.35, 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? 'rgba(229, 169, 60, 0.55)' : 'rgba(148, 163, 184, 0.16)';
+        ctx.lineWidth = isSelected ? 1.4 : 0.9;
         ctx.stroke();
       }
 
-      // Planet sphere with day/night directional shading away from central star
-      const pCenter = this.project3D([0, 0, 0], 3.35);
-      const sunAngle = Math.atan2(pCenter.y - pProj.y, pCenter.x - pProj.x);
-      const litX = pProj.x + Math.cos(sunAngle) * bodyR * 0.35;
-      const litY = pProj.y + Math.sin(sunAngle) * bodyR * 0.35;
-
-      const sphereGrad = ctx.createRadialGradient(litX, litY, 1, pProj.x, pProj.y, bodyR);
-      const [lr, lg, lb] = planet.palette.lowland.map((c) => Math.round(c * 255));
-      sphereGrad.addColorStop(0, `rgb(${Math.min(255, lr + 55)}, ${Math.min(255, lg + 55)}, ${Math.min(255, lb + 55)})`);
-      sphereGrad.addColorStop(0.65, `rgb(${lr}, ${lg}, ${lb})`);
-      sphereGrad.addColorStop(1, '#090d16');
-
-      ctx.fillStyle = sphereGrad;
-      ctx.beginPath();
-      ctx.arc(pProj.x, pProj.y, bodyR, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Atmospheric halo
-      ctx.strokeStyle = `rgba(${cr}, ${cg}, ${cb}, 0.75)`;
-      ctx.lineWidth = 1.2;
-      ctx.beginPath();
-      ctx.arc(pProj.x, pProj.y, bodyR + 1.5, 0, Math.PI * 2);
-      ctx.stroke();
-
-      if (isSelected) {
-        this.drawSelectionReticle(ctx, pProj.x, pProj.y, bodyR + 10, '#e5a93c');
+      // Live N-Body Dynamic Motion Trails (Key T — exact Universe Sandbox 2 ribbon!)
+      if (flags.trails && body.trail && body.trail.length > 1) {
+        const [tr, tg, tb] = (body.atmoColor || body.color).map((c) => Math.round(c * 255));
+        ctx.strokeStyle = isSelected
+          ? 'rgba(229, 169, 60, 0.85)'
+          : `rgba(${tr}, ${tg}, ${tb}, 0.55)`;
+        ctx.lineWidth = isSelected ? 2.0 : 1.4;
+        ctx.beginPath();
+        let started = false;
+        for (let t = 0; t < body.trail.length; t++) {
+          const pt = body.trail[t];
+          const proj = this.project3D(mapPos3D(pt.x, pt.y, pt.z));
+          if (proj.visible) {
+            if (!started) { ctx.moveTo(proj.x, proj.y); started = true; }
+            else ctx.lineTo(proj.x, proj.y);
+          }
+        }
+        ctx.stroke();
       }
 
-      // Label & telemetry
-      ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.88)';
-      ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
-      ctx.fillText(planet.name, pProj.x + bodyR + 8, pProj.y - 2);
+      if (isCentralAnchor) {
+        // Still allow clicking central star with Explode tool for Supernova!
+        const pStar0 = this.project3D(mapPos3D(body.x, body.y, body.z));
+        if (pStar0.visible) {
+          this.interactiveTargets.push({
+            type: 'star_center',
+            index: 0,
+            nbodyRef: body,
+            label: body.name,
+            screenX: pStar0.x,
+            screenY: pStar0.y,
+            hitRadius: 34
+          });
+        }
+        return;
+      }
 
-      let sub = `${planet.orbit.a.toFixed(2)} AU • ${Math.round(planet.surfaceTempC)}°C`;
-      if (planet.civilization.active) sub += ` • K-${planet.civilization.kardashev.toFixed(2)}`;
-      else if (planet.biosphere.active) sub += ' • BIOSPHERE';
+      const pProj = this.project3D(mapPos3D(body.x, body.y, body.z));
+      if (!pProj.visible) return;
 
-      ctx.fillStyle = planet.civilization.active
-        ? '#e5a93c'
-        : planet.biosphere.active
-        ? '#34d399'
-        : 'rgba(148, 163, 184, 0.78)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(sub, pProj.x + bodyR + 8, pProj.y + 10);
+      const bodyR = body.kind === 'star'
+        ? 11
+        : body.kind === 'black_hole'
+        ? 9
+        : Math.max(4.5, Math.min(13, body.radiusVisual * 190));
+
+      const [lr, lg, lb] = body.color.map((c) => Math.round(c * 255));
+
+      if (body.kind === 'black_hole') {
+        // Spawned Rogue Black Hole with glowing photon ring!
+        ctx.fillStyle = '#020306';
+        ctx.beginPath();
+        ctx.arc(pProj.x, pProj.y, bodyR, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+      } else if (body.kind === 'star') {
+        const sg = ctx.createRadialGradient(pProj.x, pProj.y, 1, pProj.x, pProj.y, bodyR * 2.4);
+        sg.addColorStop(0, '#ffffff');
+        sg.addColorStop(0.4, `rgb(${lr}, ${lg}, ${lb})`);
+        sg.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = sg;
+        ctx.beginPath();
+        ctx.arc(pProj.x, pProj.y, bodyR * 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Planet or Spawned Moon/Asteroid with molten heat glow if recently impacted!
+        const [cr, cg, cb] = (body.atmoColor || body.color).map((c) => Math.round(c * 255));
+        ctx.fillStyle = body.moltenHeat > 0.25 ? '#fb923c' : `rgb(${lr}, ${lg}, ${lb})`;
+        ctx.beginPath();
+        ctx.arc(pProj.x, pProj.y, bodyR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = body.moltenHeat > 0.25 ? '#fde047' : `rgba(${cr}, ${cg}, ${cb}, 0.78)`;
+        ctx.lineWidth = 1.3;
+        ctx.stroke();
+      }
+
+      if (isSelected) this.drawSelectionReticle(ctx, pProj.x, pProj.y, bodyR + 10, '#e5a93c');
+
+      if (flags.labels) {
+        ctx.fillStyle = isSelected ? '#f8fafc' : 'rgba(226, 232, 240, 0.88)';
+        ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
+        ctx.fillText(body.name, pProj.x + bodyR + 8, pProj.y - 2);
+        const speedKmS = Math.hypot(body.vx, body.vy, body.vz) * 4.74;
+        ctx.fillStyle = body.moltenHeat > 0.2 ? '#fb923c' : 'rgba(148, 163, 184, 0.82)';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(`${Math.round(body.tempK - 273.15)}°C • ${speedKmS.toFixed(1)} km/s`, pProj.x + bodyR + 8, pProj.y + 10);
+      }
 
       this.interactiveTargets.push({
-        type: 'planet',
-        index: idx,
-        label: planet.name,
-        sublabel: `${planet.typeLabel} (${planet.orbit.a.toFixed(2)} AU)`,
+        type: body.planetIndex >= 0 ? 'planet' : 'spawned',
+        index: body.planetIndex >= 0 ? body.planetIndex : bIdx,
+        nbodyRef: body,
+        label: body.name,
         screenX: pProj.x,
         screenY: pProj.y,
         hitRadius: Math.max(22, bodyR + 10)
@@ -6207,93 +7234,51 @@ class UniverseRenderer {
     ctx.restore();
   }
 
-  /**
-   * SCALE 5 OVERLAY: Planetary Globe Landmarks, Orbiting Moons & Civilization Megastructures
-   */
   drawPlanetOrbitOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     const planet = this.engine.getActivePlanet();
-    if (!planet) {
-      ctx.restore();
-      return;
-    }
+    if (!planet) { ctx.restore(); return; }
 
     const planetR = 1.05;
-    const rot = this.engine.visualTime * 0.09;
+    const rot = planet.isTidallyLocked ? 0.0 : (this.engine.visualTime * 0.085);
+    const showLabels = this.engine.displayFlags.labels;
 
-    // 1. Civilization Orbital Ring & Dyson Nodes if active
-    if (planet.civilization.active && planet.civilization.kardashev >= 0.8) {
-      const ringR = planetR * 1.16;
-      ctx.beginPath();
-      for (let i = 0; i <= 64; i++) {
-        const a = (i / 64) * Math.PI * 2;
-        const p3 = [Math.cos(a) * ringR, Math.sin(a * 2) * 0.02, Math.sin(a) * ringR];
-        const proj = this.project3D(p3, 3.35);
-        if (proj.visible) {
-          if (i === 0) ctx.moveTo(proj.x, proj.y);
-          else ctx.lineTo(proj.x, proj.y);
-        }
-      }
-      ctx.strokeStyle = 'rgba(229, 169, 60, 0.55)';
-      ctx.setLineDash([4, 4]);
-      ctx.lineWidth = 1.4;
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
-
-    // 2. Orbiting Moons
+    // Moons
     planet.moons.forEach((moon, mIdx) => {
       const mOrbitR = 1.55 + mIdx * 0.35;
       const mAngle = moon.angleOffset + this.engine.visualTime * (0.45 / (mIdx + 1));
-      const mPos = [
-        Math.cos(mAngle) * mOrbitR,
-        Math.sin(mAngle * 0.7) * 0.18,
-        Math.sin(mAngle) * mOrbitR
-      ];
-      const pMoon = this.project3D(mPos, 3.35);
-      if (!pMoon.visible || (pMoon.depth > 3.35 && Math.hypot(mPos[0], mPos[1]) < planetR)) return;
+      const mPos = [Math.cos(mAngle) * mOrbitR, Math.sin(mAngle * 0.7) * 0.18, Math.sin(mAngle) * mOrbitR];
+      const pMoon = this.project3D(mPos);
+      if (!pMoon.visible) return;
 
       ctx.fillStyle = '#cbd5e1';
       ctx.beginPath();
       ctx.arc(pMoon.x, pMoon.y, 4.5, 0, Math.PI * 2);
       ctx.fill();
-
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Moon ${moon.name} (${Math.round(moon.radiusKm)} km)`, pMoon.x + 8, pMoon.y + 3);
+      if (showLabels) {
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillText(`Moon ${moon.name}`, pMoon.x + 8, pMoon.y + 3);
+      }
     });
 
-    // 3. 3D Spherical Surface Landmarks
-    const cy = Math.cos(this.yaw);
-    const sy = Math.sin(this.yaw);
-    const cp = Math.cos(this.pitch);
-    const sp = Math.sin(this.pitch);
-    const camDir = [sy * cp, sp, cy * cp];
-
+    // Surface landmarks on front hemisphere
     planet.landmarks.forEach((lm, idx) => {
       const latRad = (lm.lat * Math.PI) / 180;
       const lonRad = (lm.lon * Math.PI) / 180 + rot;
-
       const nx = Math.cos(latRad) * Math.cos(lonRad);
       const ny = Math.sin(latRad);
       const nz = Math.cos(latRad) * Math.sin(lonRad);
 
-      const facing = -(nx * camDir[0] + ny * camDir[1] + nz * camDir[2]);
+      const facing = -(nx * this.camForward[0] + ny * this.camForward[1] + nz * this.camForward[2]);
       if (facing < 0.18) return;
 
-      const pos3D = [nx * planetR * 1.01, ny * planetR * 1.01, nz * planetR * 1.01];
-      const proj = this.project3D(pos3D, 3.35);
+      const proj = this.project3D([nx * planetR * 1.01, ny * planetR * 1.01, nz * planetR * 1.01]);
       if (!proj.visible) return;
 
       const isSelected = idx === this.engine.activeLandmarkIndex;
-      const pinColor = lm.icon === 'city'
-        ? '#e5a93c'
-        : lm.icon === 'biosphere'
-        ? '#34d399'
-        : lm.icon === 'volcano'
-        ? '#f43f5e'
-        : '#38bdf8';
+      const pinColor = lm.icon === 'city' ? '#e5a93c' : lm.icon === 'biosphere' ? '#34d399' : lm.icon === 'volcano' ? '#f43f5e' : '#38bdf8';
 
       ctx.strokeStyle = pinColor;
       ctx.lineWidth = isSelected ? 1.8 : 1.2;
@@ -6301,23 +7286,16 @@ class UniverseRenderer {
       ctx.arc(proj.x, proj.y, isSelected ? 7 : 4.5, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.fillStyle = pinColor;
-      ctx.beginPath();
-      ctx.arc(proj.x, proj.y, 2, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(241, 245, 249, 0.85)';
-      ctx.font = isSelected ? '600 10px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
-      ctx.fillText(lm.name, proj.x + 10, proj.y - 1);
-      ctx.fillStyle = 'rgba(148, 163, 184, 0.78)';
-      ctx.font = '9px "JetBrains Mono", monospace';
-      ctx.fillText(`${lm.category.split(' ')[0]} • ${lm.lat.toFixed(1)}°, ${lm.lon.toFixed(1)}°`, proj.x + 10, proj.y + 9);
+      if (showLabels) {
+        ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(241, 245, 249, 0.85)';
+        ctx.font = '500 10px "Space Grotesk", sans-serif';
+        ctx.fillText(lm.name, proj.x + 10, proj.y + 3);
+      }
 
       this.interactiveTargets.push({
         type: 'landmark',
         index: idx,
         label: lm.name,
-        sublabel: `${lm.category} (Click to descend to surface)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 22
@@ -6327,39 +7305,28 @@ class UniverseRenderer {
     ctx.restore();
   }
 
-  /**
-   * SCALE 6 & 7 OVERLAY: Surface Horizon Telemetry, Organism Bio-Morphology & Civilization Nodes
-   */
   drawSurfaceAndBioOverlay(ctx, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     const planet = this.engine.getActivePlanet();
     const lm = this.engine.getActiveLandmark();
-    if (!planet) {
-      ctx.restore();
-      return;
-    }
+    if (!planet) { ctx.restore(); return; }
 
     const cx = this.width * 0.5;
     const cy = this.height * 0.5;
 
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx - 120, 82);
-    ctx.lineTo(cx + 120, 82);
-    ctx.stroke();
-
-    const headingDeg = Math.round((((this.yaw * 180) / Math.PI) % 360 + 360) % 360);
-    ctx.fillStyle = 'rgba(226, 232, 240, 0.82)';
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      `AZIMUTH ${headingDeg.toString().padStart(3, '0')}°  •  SITE: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  G=${planet.gravityG.toFixed(2)}g  •  P=${planet.pressureAtm.toFixed(2)} atm`,
-      cx,
-      74
-    );
-    ctx.textAlign = 'left';
+    if (this.engine.displayFlags.labels) {
+      const headingDeg = Math.round((((this.yaw * 180) / Math.PI) % 360 + 360) % 360);
+      ctx.fillStyle = 'rgba(226, 232, 240, 0.82)';
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(
+        `AZIMUTH ${headingDeg.toString().padStart(3, '0')}°  •  SITE: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  ${planet.surfaceTempC.toFixed(1)}°C  •  PRESS C TO LIFTOFF`,
+        cx,
+        74
+      );
+      ctx.textAlign = 'left';
+    }
 
     if (planet.biosphere.active && planet.biosphere.clades.length > 0) {
       planet.biosphere.clades.forEach((clade, idx) => {
@@ -6368,21 +7335,11 @@ class UniverseRenderer {
         const sy = cy + 65 + (idx % 2) * 48;
         const isSelected = idx === this.engine.activeCladeIndex;
 
-        this.drawProceduralOrganismSpecimen(
-          ctx,
-          sx,
-          sy,
-          clade,
-          isSelected ? 34 : 20,
-          this.engine.visualTime,
-          isSelected
-        );
-
+        this.drawProceduralOrganismSpecimen(ctx, sx, sy, clade, isSelected ? 34 : 20, this.engine.visualTime, isSelected);
         this.interactiveTargets.push({
           type: 'clade',
           index: idx,
           label: clade.binomialName,
-          sublabel: `${clade.commonArchetype} (Click for morphological scan)`,
           screenX: sx,
           screenY: sy,
           hitRadius: 34
@@ -6390,27 +7347,15 @@ class UniverseRenderer {
       });
     }
 
-    const wMicro = 1.0 - this.smoothstep(1.1, 2.2, this.engine.currentLogScale);
-    if (wMicro > 0.05) {
-      ctx.save();
-      ctx.globalAlpha = alpha * wMicro;
-      this.drawMicroSpecimenHologram(ctx, cx, cy - 10, planet);
-      ctx.restore();
-    }
-
     ctx.restore();
   }
 
-  /**
-   * Procedural Organism Morphology & Biomechanical Renderer
-   */
   drawProceduralOrganismSpecimen(ctx, x, y, clade, radius, time, isSelected) {
     ctx.save();
     const hue = clade.hueDeg;
     const color = `hsl(${hue}, 82%, 62%)`;
     const glowColor = `hsla(${hue}, 90%, 55%, 0.28)`;
 
-    // Outer bio-field aura
     const grad = ctx.createRadialGradient(x, y, 2, x, y, radius * 1.9);
     grad.addColorStop(0, glowColor);
     grad.addColorStop(1, 'rgba(0,0,0,0)');
@@ -6419,14 +7364,12 @@ class UniverseRenderer {
     ctx.arc(x, y, radius * 1.9, 0, Math.PI * 2);
     ctx.fill();
 
-    // Animated biomechanical appendages / fractal fronds
     const appendages = clade.appendageCount || 6;
     const segments = clade.bodySegments || 6;
     ctx.strokeStyle = color;
     ctx.lineWidth = isSelected ? 1.8 : 1.2;
 
     if (clade.icon === 'flora' || clade.icon === 'colonial') {
-      // Fractal phototrophic / colonial radial morphology
       for (let i = 0; i < appendages; i++) {
         const baseA = (i / appendages) * Math.PI * 2 + Math.sin(time * 1.2 + i) * 0.12;
         ctx.beginPath();
@@ -6437,106 +7380,38 @@ class UniverseRenderer {
         const ey = y + Math.sin(baseA + Math.sin(time * 2 + i) * 0.25) * radius * 1.15;
         ctx.quadraticCurveTo(mx, my, ex, ey);
         ctx.stroke();
-
-        // Bioluminescent photophore node at tip
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(ex, ey, 2, 0, Math.PI * 2);
-        ctx.fill();
       }
     } else {
-      // Articulated bilateral / hexapod / cephalopod mobile organism morphology
       for (let s = 0; s < segments; s++) {
         const frac = s / segments;
         const sx = x + (frac - 0.45) * radius * 1.4;
         const sy = y + Math.sin(time * 3.5 + s * 0.9) * (radius * 0.16);
-        const segR = radius * (0.36 - Math.abs(frac - 0.35) * 0.28);
-
         ctx.beginPath();
-        ctx.arc(sx, sy, Math.max(2, segR), 0, Math.PI * 2);
+        ctx.arc(sx, sy, Math.max(2, radius * 0.28), 0, Math.PI * 2);
         ctx.stroke();
-
-        // Paired articulated limbs
-        if (s > 0 && s < segments - 1) {
-          const swing = Math.sin(time * 4.2 + s * 1.3) * 0.35;
-          ctx.beginPath();
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(sx + Math.sin(swing) * radius * 0.55, sy + radius * 0.65);
-          ctx.moveTo(sx, sy);
-          ctx.lineTo(sx - Math.sin(swing) * radius * 0.55, sy - radius * 0.55);
-          ctx.stroke();
-        }
       }
     }
 
-    if (isSelected) {
-      this.drawSelectionReticle(ctx, x, y, radius * 1.5, '#34d399');
+    if (this.engine.displayFlags.labels) {
+      ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(226, 232, 240, 0.88)';
+      ctx.font = '600 10px "Space Grotesk", sans-serif';
+      ctx.fillText(clade.binomialName, x + radius * 1.3, y + 3);
     }
-
-    ctx.fillStyle = isSelected ? '#ffffff' : 'rgba(226, 232, 240, 0.88)';
-    ctx.font = isSelected ? '600 11px "Space Grotesk", sans-serif' : '500 10px "Space Grotesk", sans-serif';
-    ctx.fillText(clade.binomialName, x + radius * 1.3, y - 2);
-    ctx.fillStyle = color;
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillText(`${clade.commonArchetype} (Trophic Lvl ${clade.trophicLevel})`, x + radius * 1.3, y + 10);
     ctx.restore();
   }
 
-  /**
-   * High-Detail Scale 7 Micro-Specimen & Civilization Technosphere Holographic Scanner
-   */
-  drawMicroSpecimenHologram(ctx, cx, cy, planet) {
-    const clade = this.engine.getActiveClade();
-    const r = 135;
-
-    ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
-    ctx.lineWidth = 1.2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-    ctx.stroke();
-
-    ctx.setLineDash([4, 6]);
-    ctx.beginPath();
-    ctx.arc(cx, cy, r + 16, -this.engine.visualTime * 0.3, -this.engine.visualTime * 0.3 + Math.PI * 1.5);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    if (clade) {
-      this.drawProceduralOrganismSpecimen(ctx, cx, cy, clade, 78, this.engine.visualTime, false);
-      ctx.fillStyle = '#34d399';
-      ctx.font = '600 11px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(`BIO-MORPHOLOGICAL SCAN: ${clade.binomialName.toUpperCase()}`, cx, cy - r - 26);
-      ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
-      ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`${clade.symmetry} • ${clade.sensoryMode}`, cx, cy + r + 28);
-      ctx.textAlign = 'left';
-    } else if (planet.civilization.active) {
-      ctx.fillStyle = '#e5a93c';
-      ctx.font = '600 11px "JetBrains Mono", monospace';
-      ctx.textAlign = 'center';
-      ctx.fillText(`TECHNOSPHERE MATRIX: ${planet.civilization.speciesName.toUpperCase()}`, cx, cy - r - 24);
-      ctx.textAlign = 'left';
-    }
-  }
-
-  drawAstrographicDiscGrid(ctx, camDist, strokeColor) {
+  drawAstrographicDiscGrid(ctx, strokeColor) {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 1;
-    const rings = [0.6, 1.2, 1.8];
-    for (const rad of rings) {
+    for (const rad of [0.6, 1.2, 1.8, 2.4]) {
       ctx.beginPath();
       let started = false;
       for (let i = 0; i <= 48; i++) {
         const a = (i / 48) * Math.PI * 2;
-        const p = this.project3D([Math.cos(a) * rad, 0, Math.sin(a) * rad], camDist);
+        const p = this.project3D([Math.cos(a) * rad, 0, Math.sin(a) * rad]);
         if (p.visible) {
-          if (!started) {
-            ctx.moveTo(p.x, p.y);
-            started = true;
-          } else {
-            ctx.lineTo(p.x, p.y);
-          }
+          if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+          else ctx.lineTo(p.x, p.y);
         }
       }
       ctx.stroke();
@@ -6550,14 +7425,10 @@ class UniverseRenderer {
     let started = false;
     for (let i = 0; i <= 60; i++) {
       const a = (i / 60) * Math.PI * 2;
-      const p = this.project3D([Math.cos(a) * radius3D, 0, Math.sin(a) * radius3D], 3.35);
+      const p = this.project3D([Math.cos(a) * radius3D, 0, Math.sin(a) * radius3D]);
       if (p.visible) {
-        if (!started) {
-          ctx.moveTo(p.x, p.y);
-          started = true;
-        } else {
-          ctx.lineTo(p.x, p.y);
-        }
+        if (!started) { ctx.moveTo(p.x, p.y); started = true; }
+        else ctx.lineTo(p.x, p.y);
       }
     }
     ctx.stroke();
@@ -6567,11 +7438,10 @@ class UniverseRenderer {
     ctx.save();
     ctx.strokeStyle = color;
     ctx.lineWidth = 1.4;
-    const span = 0.42;
     for (let q = 0; q < 4; q++) {
       const a0 = q * (Math.PI * 0.5) + 0.15;
       ctx.beginPath();
-      ctx.arc(x, y, radius, a0, a0 + span);
+      ctx.arc(x, y, radius, a0, a0 + 0.42);
       ctx.stroke();
     }
     ctx.restore();
@@ -6579,12 +7449,11 @@ class UniverseRenderer {
 
   drawHoverReticle(ctx, target) {
     ctx.save();
-    const { screenX: x, screenY: y } = target;
     ctx.strokeStyle = '#38bdf8';
     ctx.lineWidth = 1.2;
     ctx.setLineDash([2, 2]);
     ctx.beginPath();
-    ctx.arc(x, y, 16, 0, Math.PI * 2);
+    ctx.arc(target.screenX, target.screenY, 16, 0, Math.PI * 2);
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
@@ -6775,14 +7644,17 @@ class ObservatoryHUD {
     this.renderScalePresets();
     this.renderTimeControls();
     this.renderWondersGrid();
+    this.renderAddPresets();
     this.syncDrawerStates();
     this.refreshAll();
 
     this.engine.onChange((_eng, reason) => {
       if (reason === 'select_planet' || reason === 'scanner_lock' || reason === 'wonder_jump') {
         this.soundscape.playTelemetryPing(660, 0.14);
-      } else if (reason === 'phenomenon') {
-        this.soundscape.playTelemetryPing(440, 0.22);
+      } else if (reason === 'phenomenon' || reason === 'explode' || reason === 'nbody_event') {
+        this.soundscape.playTelemetryPing(360, 0.24);
+      } else if (reason === 'spawn_body') {
+        this.soundscape.playTelemetryPing(740, 0.12);
       }
       this.refreshAll();
     });
@@ -6813,8 +7685,10 @@ class ObservatoryHUD {
     this.breadcrumbContainer = document.getElementById('cosmic-breadcrumb');
     this.seedInput = document.getElementById('seed-input');
     this.btnApplySeed = document.getElementById('btn-apply-seed');
-    this.btnAutopilot = document.getElementById('btn-autopilot');
     this.btnSetiScanner = document.getElementById('btn-seti-scanner');
+    this.btnLightingMode = document.getElementById('btn-lighting-mode');
+    this.btnQualityMode = document.getElementById('btn-quality-mode');
+    this.btnPhotoCapture = document.getElementById('btn-photo-capture');
     this.btnBookmark = document.getElementById('btn-bookmark');
     this.btnAudio = document.getElementById('btn-audio');
     this.btnZen = document.getElementById('btn-zen');
@@ -6823,6 +7697,7 @@ class ObservatoryHUD {
     this.scaleExponentTag = document.getElementById('scale-exponent-tag');
     this.scaleSlider = document.getElementById('scale-slider');
     this.scalePresetsContainer = document.getElementById('scale-presets-grid');
+    this.displayToggleBtns = document.querySelectorAll('.toggle-chip');
     this.catalogHeaderTitle = document.getElementById('catalog-header-title');
     this.catalogCountBadge = document.getElementById('catalog-count-badge');
     this.catalogListContainer = document.getElementById('catalog-list-container');
@@ -6833,13 +7708,17 @@ class ObservatoryHUD {
     this.dossierTabBtns = document.querySelectorAll('.dossier-tab-btn');
     this.dossierContent = document.getElementById('dossier-content-scroll');
 
+    this.addToolPalette = document.getElementById('add-tool-palette');
+    this.addModeBtns = document.querySelectorAll('[data-add-mode]');
+    this.addPresetsBar = document.getElementById('add-presets-bar');
+    this.sandboxToolBtns = document.querySelectorAll('.sandbox-tool-btn');
+    this.btnReverseTime = document.getElementById('btn-reverse-time');
+    this.btnLandToggle = document.getElementById('btn-land-toggle');
+    this.btnResetNBody = document.getElementById('btn-reset-nbody');
+
     this.epochTimeVal = document.getElementById('epoch-time-val');
     this.timePillsContainer = document.getElementById('time-speed-pills');
     this.liveTickerText = document.getElementById('live-ticker-text');
-    this.btnPhenomStar = document.getElementById('btn-phenom-star');
-    this.btnPhenomImpact = document.getElementById('btn-phenom-impact');
-    this.btnPhenomBio = document.getElementById('btn-phenom-bio');
-    this.btnPhenomCiv = document.getElementById('btn-phenom-civ');
   }
 
   syncDrawerStates() {
@@ -6872,9 +7751,7 @@ class ObservatoryHUD {
     if (this.btnToggleLeft) {
       this.btnToggleLeft.addEventListener('click', () => {
         this.leftDrawerCollapsed = !this.leftDrawerCollapsed;
-        if (window.innerWidth <= 820 && !this.leftDrawerCollapsed) {
-          this.rightDrawerCollapsed = true;
-        }
+        if (window.innerWidth <= 820 && !this.leftDrawerCollapsed) this.rightDrawerCollapsed = true;
         this.syncDrawerStates();
       });
     }
@@ -6882,22 +7759,16 @@ class ObservatoryHUD {
     if (this.btnToggleRight) {
       this.btnToggleRight.addEventListener('click', () => {
         this.rightDrawerCollapsed = !this.rightDrawerCollapsed;
-        if (window.innerWidth <= 820 && !this.rightDrawerCollapsed) {
-          this.leftDrawerCollapsed = true;
-        }
+        if (window.innerWidth <= 820 && !this.rightDrawerCollapsed) this.leftDrawerCollapsed = true;
         this.syncDrawerStates();
       });
     }
 
     if (this.btnOpenWonders) {
-      this.btnOpenWonders.addEventListener('click', () => {
-        this.wondersModal.classList.remove('hidden');
-      });
+      this.btnOpenWonders.addEventListener('click', () => this.wondersModal.classList.remove('hidden'));
     }
     if (this.btnCloseWonders) {
-      this.btnCloseWonders.addEventListener('click', () => {
-        this.wondersModal.classList.add('hidden');
-      });
+      this.btnCloseWonders.addEventListener('click', () => this.wondersModal.classList.add('hidden'));
     }
     if (this.wondersModal) {
       this.wondersModal.addEventListener('click', (e) => {
@@ -6949,12 +7820,91 @@ class ObservatoryHUD {
           try {
             this.engine.importUniverseSnapshot(String(reader.result));
             this.wondersModal.classList.add('hidden');
-            this.liveTickerText.textContent = `[IMPORTED] Universe seed ${this.engine.universeSeed} restored.`;
           } catch (err) {
-            this.liveTickerText.textContent = `[ERROR] Invalid universe snapshot file.`;
+            this.liveTickerText.textContent = '[ERROR] Invalid universe snapshot JSON.';
           }
         };
         reader.readAsText(file);
+      });
+    }
+
+    // Lighting Mode (Realistic -> Studio -> Flashlight)
+    if (this.btnLightingMode) {
+      this.btnLightingMode.addEventListener('click', () => {
+        const m = this.engine.cycleLightingMode();
+        const labels = ['☀ REALISTIC', '☀ STUDIO', '☀ FLASHLIGHT'];
+        this.btnLightingMode.textContent = labels[m];
+      });
+    }
+
+    // Adaptive Graphics Quality Mode (Auto DRS -> Fast -> Balanced -> Ultra)
+    if (this.btnQualityMode) {
+      const modes = ['auto', 'low', 'medium', 'ultra'];
+      const labels = { auto: '⚙ AUTO DRS', low: '⚙ FAST', medium: '⚙ BALANCED', ultra: '⚙ ULTRA' };
+      this.btnQualityMode.addEventListener('click', () => {
+        const next = modes[(modes.indexOf(this.engine.qualityMode) + 1) % modes.length];
+        this.renderer.setQualityMode(next);
+        this.btnQualityMode.textContent = labels[next];
+      });
+    }
+
+    // F10 Photo Tool
+    if (this.btnPhotoCapture) {
+      this.btnPhotoCapture.addEventListener('click', () => {
+        this.renderer.captureScreenshot();
+        this.liveTickerText.textContent = '[PHOTO CAPTURED] High-resolution PNG saved.';
+      });
+    }
+
+    // Universe Sandbox Display Toggles (O / T / G / H / L)
+    this.displayToggleBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.engine.toggleDisplayFlag(btn.dataset.flag);
+      });
+    });
+
+    // Universe Sandbox Interactive Tool Selector (Select / Add / Laser / Explode)
+    this.sandboxToolBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tool = btn.dataset.tool;
+        this.engine.setSandboxTool(tool);
+        if (tool === 'add' && this.engine.getActiveScaleLevel().index !== 3) {
+          this.engine.flyToScale(3); // Fly to Star System so user sees live N-Body placement!
+        }
+        if (tool === 'laser' && this.engine.getActiveScaleLevel().index !== 4) {
+          this.engine.flyToScale(4); // Fly to Planet Globe to watch crust melt & oceans boil!
+        }
+      });
+    });
+
+    // Add Placement Modes (Orbit / Binary / Launch / Still)
+    this.addModeBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        this.engine.addMode = btn.dataset.addMode;
+        this.addModeBtns.forEach((b) => b.classList.toggle('active', b === btn));
+      });
+    });
+
+    // Reverse Time & Reset N-Body & Land Toggle
+    if (this.btnReverseTime) {
+      this.btnReverseTime.addEventListener('click', () => {
+        this.engine.nbody.timeReversed = !this.engine.nbody.timeReversed;
+        this.btnReverseTime.classList.toggle('active', this.engine.nbody.timeReversed);
+      });
+    }
+
+    if (this.btnLandToggle) {
+      this.btnLandToggle.addEventListener('click', () => {
+        const lvl = this.engine.getActiveScaleLevel();
+        this.engine.flyToScale(lvl.index >= 5 ? 4 : 5);
+      });
+    }
+
+    if (this.btnResetNBody) {
+      this.btnResetNBody.addEventListener('click', () => {
+        this.engine.refreshPlanetarySystem();
+        this.renderer.resetCameraFocus();
+        this.liveTickerText.textContent = '[N-BODY RESET] Restored orbital elements & cleared collision debris.';
       });
     }
 
@@ -6965,16 +7915,8 @@ class ObservatoryHUD {
     });
 
     this.seedInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.engine.resetUniverse(this.seedInput.value);
-      }
+      if (e.key === 'Enter') this.engine.resetUniverse(this.seedInput.value);
     });
-
-    if (this.btnAutopilot) {
-      this.btnAutopilot.addEventListener('click', () => {
-        this.engine.toggleAutopilot();
-      });
-    }
 
     this.btnSetiScanner.addEventListener('click', () => {
       this.engine.toggleAutopilot(false);
@@ -6989,28 +7931,55 @@ class ObservatoryHUD {
 
     this.btnAudio.addEventListener('click', () => {
       const on = this.soundscape.toggle();
-      this.btnAudio.textContent = on ? 'AUDIO: ON' : 'AUDIO: OFF';
+      this.btnAudio.textContent = on ? 'AUDIO: ON' : 'AUDIO';
       this.btnAudio.classList.toggle('accent-emerald', on);
       if (on) this.soundscape.playTelemetryPing(520, 0.18);
     });
 
-    this.btnZen.addEventListener('click', () => {
-      this.toggleZenMode();
-    });
+    this.btnZen.addEventListener('click', () => this.toggleZenMode());
 
+    // Exact Universe Sandbox 2 Keyboard Shortcuts!
     window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT') return;
-      if (e.key === 'h' || e.key === 'H') {
-        this.toggleZenMode();
-      } else if (e.key === 't' || e.key === 'T') {
-        this.engine.toggleAutopilot();
-      } else if (e.key === 'm' || e.key === 'M') {
-        this.btnAudio.click();
-      } else if (e.key === 'Escape' && this.wondersModal) {
-        this.wondersModal.classList.add('hidden');
-      } else if (e.key === ' ') {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      const key = e.key.toLowerCase();
+
+      if (key === ' ') {
         e.preventDefault();
         this.engine.setTimeScale(this.engine.timeScaleIndex === 0 ? 4 : 0);
+      } else if (e.key === ',') {
+        this.engine.setTimeScale(this.engine.timeScaleIndex - 1);
+      } else if (e.key === '.') {
+        this.engine.setTimeScale(this.engine.timeScaleIndex + 1);
+      } else if (key === 'c') {
+        const lvl = this.engine.getActiveScaleLevel();
+        this.engine.flyToScale(lvl.index >= 5 ? 4 : 5);
+      } else if (key === 'o') {
+        this.engine.toggleDisplayFlag('orbits');
+      } else if (key === 't') {
+        this.engine.toggleDisplayFlag('trails');
+      } else if (key === 'g') {
+        this.engine.toggleDisplayFlag('grid');
+      } else if (key === 'h') {
+        this.engine.toggleDisplayFlag('hz');
+      } else if (key === 'l') {
+        this.engine.toggleDisplayFlag('labels');
+      } else if (key === 'u') {
+        this.toggleZenMode();
+      } else if (key === 'm') {
+        this.btnAudio.click();
+      } else if (key === 'v') {
+        this.renderer.resetCameraFocus();
+      } else if (e.key === 'F10') {
+        e.preventDefault();
+        this.renderer.captureScreenshot();
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = this.engine.getActiveNBodyTarget();
+        if (target && this.engine.nbody.deleteBody(target.id)) {
+          this.liveTickerText.textContent = `[DELETED] Removed ${target.name} from live simulation.`;
+        }
+      } else if (e.key === 'Escape') {
+        if (this.wondersModal) this.wondersModal.classList.add('hidden');
+        this.engine.setSandboxTool('select');
       } else if (e.key >= '1' && e.key <= '7') {
         this.engine.toggleAutopilot(false);
         this.engine.flyToScale(parseInt(e.key, 10) - 1);
@@ -7019,8 +7988,7 @@ class ObservatoryHUD {
 
     this.scaleSlider.addEventListener('input', (e) => {
       this.engine.toggleAutopilot(false);
-      const val = parseFloat(e.target.value);
-      this.engine.setTargetLogScale(val);
+      this.engine.setTargetLogScale(parseFloat(e.target.value));
     });
 
     this.dossierTabBtns.forEach((btn) => {
@@ -7030,18 +7998,23 @@ class ObservatoryHUD {
         this.renderDossierContent();
       });
     });
+  }
 
-    this.btnPhenomStar.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('stellar_evolution_step');
-    });
-    this.btnPhenomImpact.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('asteroid_impact');
-    });
-    this.btnPhenomBio.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('abiogenesis_surge');
-    });
-    this.btnPhenomCiv.addEventListener('click', () => {
-      this.engine.triggerPhenomenon('kardashev_breakthrough');
+  renderAddPresets() {
+    if (!this.addPresetsBar) return;
+    this.addPresetsBar.innerHTML = '';
+    SANDBOX_PRESETS.forEach((preset) => {
+      const btn = document.createElement('button');
+      btn.className = `preset-chip ${preset.id === this.engine.addPresetId ? 'active' : ''}`;
+      btn.dataset.presetId = preset.id;
+      btn.textContent = preset.name;
+      btn.addEventListener('click', () => {
+        this.engine.addPresetId = preset.id;
+        this.addPresetsBar.querySelectorAll('.preset-chip').forEach((c) => {
+          c.classList.toggle('active', c.dataset.presetId === preset.id);
+        });
+      });
+      this.addPresetsBar.appendChild(btn);
     });
   }
 
@@ -7058,6 +8031,7 @@ class ObservatoryHUD {
       `;
       card.addEventListener('click', () => {
         this.engine.toggleAutopilot(false);
+        this.renderer.resetCameraFocus();
         this.engine.jumpToWonder(wonder);
         this.wondersModal.classList.add('hidden');
       });
@@ -7068,7 +8042,7 @@ class ObservatoryHUD {
   toggleZenMode() {
     this.zenMode = !this.zenMode;
     this.hudLayer.classList.toggle('zen-mode', this.zenMode);
-    this.btnZen.textContent = this.zenMode ? 'EXIT ZEN' : 'ZEN';
+    this.btnZen.textContent = this.zenMode ? 'SHOW UI' : 'UI';
     this.btnZen.classList.toggle('accent-amber', this.zenMode);
   }
 
@@ -7136,12 +8110,24 @@ class ObservatoryHUD {
     this.seedInput.value = this.engine.universeSeed;
     const activeLvl = this.engine.getActiveScaleLevel();
 
-    if (this.btnAutopilot) {
-      this.btnAutopilot.textContent = this.engine.autopilotActive ? 'TOUR: ON' : 'TOUR: OFF';
-      this.btnAutopilot.classList.toggle('accent-amber', this.engine.autopilotActive);
-    }
     if (this.sectorCoordsBadge) {
       this.sectorCoordsBadge.textContent = `[${this.engine.sectorCoords.join(', ')}]`;
+    }
+
+    this.sandboxToolBtns.forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.tool === this.engine.sandboxTool);
+    });
+
+    if (this.addToolPalette) {
+      this.addToolPalette.classList.toggle('hidden', this.engine.sandboxTool !== 'add');
+    }
+
+    this.displayToggleBtns.forEach((btn) => {
+      btn.classList.toggle('active', Boolean(this.engine.displayFlags[btn.dataset.flag]));
+    });
+
+    if (this.btnLandToggle) {
+      this.btnLandToggle.textContent = activeLvl.index >= 5 ? '↑ Liftoff (C)' : '↓ Land (C)';
     }
 
     this.scalePresetsContainer.querySelectorAll('.scale-preset-btn').forEach((btn) => {
@@ -7678,6 +8664,48 @@ class ObservatoryHUD {
 
       <div class="instrument-box">
         <div class="instrument-header">
+          <span class="instrument-title">Live Sandbox Property Editor (Real-Time Physics)</span>
+          <span class="panel-badge">INTERACTIVE</span>
+        </div>
+        <div class="comp-bar-list">
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Surface Temperature</span>
+              <span style="color:var(--accent-amber)">${pl.surfaceTempC.toFixed(0)} °C</span>
+            </div>
+            <input id="edit-temp" class="live-editor-slider" type="range" min="-220" max="2200" step="10" value="${Math.round(pl.surfaceTempC)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Liquid Ocean / Water Level</span>
+              <span style="color:var(--accent-cyan)">${Math.round(pl.oceanCoverage * 100)}%</span>
+            </div>
+            <input id="edit-ocean" class="live-editor-slider" type="range" min="0" max="100" step="2" value="${Math.round(pl.oceanCoverage * 100)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Atmospheric Pressure</span>
+              <span style="color:var(--accent-emerald)">${pl.pressureAtm.toFixed(2)} atm</span>
+            </div>
+            <input id="edit-pressure" class="live-editor-slider" type="range" min="0" max="25" step="0.2" value="${Math.min(25, pl.pressureAtm).toFixed(1)}" />
+          </div>
+          <div class="comp-row">
+            <div class="comp-row-label">
+              <span>Host Star Mass (Changes All Orbits!)</span>
+              <span style="color:var(--accent-amber)">${pSys.star.currentMassSolar.toFixed(2)} M☉</span>
+            </div>
+            <input id="edit-starmass" class="live-editor-slider" type="range" min="0.1" max="12" step="0.1" value="${Math.min(12, pSys.star.currentMassSolar).toFixed(1)}" />
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">
+            <button id="btn-vel-down" class="icon-btn">-10% Orbit Vel</button>
+            <button id="btn-vel-up" class="icon-btn">+10% Orbit Vel</button>
+            <button id="btn-star-evo-inline" class="action-btn">✦ Age Star +Gyr</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="instrument-box">
+        <div class="instrument-header">
           <span class="instrument-title">Tectonic & Geophysical Regime</span>
         </div>
         <div style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono)">
@@ -7718,6 +8746,26 @@ class ObservatoryHUD {
     `;
 
     this.drawAbsorptionSpectrumCanvas(pl);
+
+    const bindSlider = (id, prop, transform = (v) => v) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('change', (e) => {
+          this.engine.editActivePlanetProperty(prop, transform(parseFloat(e.target.value)));
+        });
+      }
+    };
+    bindSlider('edit-temp', 'surfaceTempC');
+    bindSlider('edit-ocean', 'oceanCoverage', (v) => v / 100);
+    bindSlider('edit-pressure', 'pressureAtm');
+    bindSlider('edit-starmass', 'starMassSolar');
+
+    const btnDown = document.getElementById('btn-vel-down');
+    if (btnDown) btnDown.addEventListener('click', () => this.engine.nbody.scaleAllVelocities(0.9));
+    const btnUp = document.getElementById('btn-vel-up');
+    if (btnUp) btnUp.addEventListener('click', () => this.engine.nbody.scaleAllVelocities(1.1));
+    const btnEvo = document.getElementById('btn-star-evo-inline');
+    if (btnEvo) btnEvo.addEventListener('click', () => this.engine.triggerPhenomenon('stellar_evolution_step'));
   }
 
   drawAbsorptionSpectrumCanvas(pl) {

@@ -184,10 +184,10 @@ jobs:
           | **Offline Web** | \`PARALLAX-${VERSION}-Web-Standalone.html\` | Open directly in any WebGL2 browser offline |
 
           ## Highlights in ${TAG}
-          - **Cinematic WebGL2 Raymarching Pipeline:** Ray-deflected gravitational lensing black holes with double-imaged Doppler-beamed accretion disks, pulsar polar jets, active galactic nucleus quasar jets, relativistic warp star streaks, cratered rocky worlds, tidally locked eyeball worlds, volumetric clouds with cast shadows, and Rayleigh/Mie atmospheric scattering.
-          - **Deep Living Simulation:** Tidal locking physics, tectonic regimes, atmospheric scale height, habitable zone migration during stellar evolution, Lotka-Volterra trophic biospheres, and Kardashev civilizations with persistent historical chronicles.
-          - **Discovery Guide & Infinite Cosmic Sectors:** Jump directly to 9 curated Cosmic Wonders, explore infinite 3D cosmic sectors \`[sx, sy, sz]\`, launch Cinematic Autopilot Tour, and export/import universe JSON snapshots.
-          - **Native Touch & Desktop Ergonomics:** Two-finger pinch-to-zoom across 26 orders of magnitude, collapsible drawers, hardware back-button navigation on Android, and WASD surface flight on Desktop.
+          - **Universe Sandbox-Inspired N-Body Physics Engine:** Real-time symplectic Velocity-Verlet Newtonian gravity, momentum-conserving planetary collisions with thermal crust melting & molten debris clouds, Roche limit tidal disruption, expanding supernova shockwaves, and dynamic motion trails (\`T\`).
+          - **Interactive Sandbox Tools & Live Editor:** Spawn or launch Asteroids, Comets, Moons, Earths, Gas Giants, Stars & Black Holes (\`Orbit\`, \`Binary\`, \`Launch\`, \`Still\`), fire a plasma **Heating Laser** to boil oceans and melt planetary crusts, detonate worlds or trigger supernovae (**Explode**), and tweak Temperature, Ocean Level, Pressure, Star Mass, and Orbital Velocities in real time.
+          - **6-DOF Space Camera & Controls:** Left-Drag Orbit, Right-Drag Pan, \`WASD\` + \`R/F\` 6-DOF Fly, \`Q/E\` Roll, \`C\` Land/Liftoff, \`,/.\` Speed, \`O/T/G/H/L\` Display Overlays, \`F10\` PNG Photo Capture, plus Realistic / Studio / Flashlight lighting modes.
+          - **Extreme WebGL2 Optimization:** Dynamic Adaptive Resolution Scaling (**Auto DRS**) locking smooth 60 FPS on laptops & Android devices, CPU-precomputed 6-DOF camera basis, adaptive GPU raymarch step budgets, and 5x faster analytical crater relief.
           EOF
 
           if gh release view "$TAG" >/dev/null 2>&1; then

@@ -15,6 +15,7 @@ const ROOT = path.resolve(__dirname, '..');
 const MODULE_ORDER = [
   'src/math/prng.js',
   'src/universe/generator.js',
+  'src/simulation/nbody.js',
   'src/simulation/engine.js',
   'src/renderer/shaders.js',
   'src/renderer/webgl_renderer.js',
