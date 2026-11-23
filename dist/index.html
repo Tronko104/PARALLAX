@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PARALLAX — A Universe Beyond Observation | Simulatore Cosmologico Multi-Scala</title>
+  <title>PARALLAX — A Universe Beyond Observation | Multi-Scale Cosmological Simulator</title>
   <meta
     name="description"
-    content="PARALLAX è un simulatore di universo procedurale, infinito e persistente con raymarching WebGL2, dai filamenti cosmici fino alla biosfera e alle civiltà planetarie."
+    content="PARALLAX is a procedural, infinite, persistent multi-scale universe simulator with WebGL2 volumetric raymarching — from cosmic web filaments down to planetary biospheres and civilizations."
   />
   
   
@@ -878,7 +878,7 @@ body {
 </head>
 <body>
   <!-- Fullscreen WebGL2 Volumetric Raymarching & 3D Astrographic Projection Viewport -->
-  <main id="viewport-container" aria-label="Simulazione 3D dell'Universo">
+  <main id="viewport-container" aria-label="3D Universe Simulation Viewport">
     <canvas id="webgl-canvas"></canvas>
     <canvas id="overlay-canvas"></canvas>
   </main>
@@ -895,30 +895,30 @@ body {
         <span class="brand-subtitle">A Universe Beyond Observation</span>
       </div>
 
-      <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Gerarchia Cosmica"></nav>
+      <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Cosmic Hierarchy"></nav>
 
       <div class="top-controls-cluster">
-        <div class="seed-input-group" title="Seed Deterministico dell'Universo">
+        <div class="seed-input-group" title="Deterministic Universe Seed">
           <label for="seed-input" class="seed-label">SEED</label>
           <input id="seed-input" type="text" value="PARALLAX-2026-OMEGA" spellcheck="false" />
         </div>
-        <button id="btn-apply-seed" class="icon-btn" title="Rigenera o sintonizza coordinate seed">
-          SINTONIZZA
+        <button id="btn-apply-seed" class="icon-btn" title="Regenerate or tune universe seed coordinates">
+          TUNE SEED
         </button>
         <button
           id="btn-seti-scanner"
           class="action-btn accent-emerald"
-          title="Scansiona il settore e salta al prossimo esopianeta con Biosfera o Civiltà attiva"
+          title="Scan sector and jump to the next exoplanet with an active Biosphere or Civilization"
         >
-          ◉ SCANNER BIO / SETI
+          ◉ BIO / SETI SCAN
         </button>
-        <button id="btn-bookmark" class="icon-btn" title="Salva coordinate attuali nei segnalibri persistenti">
-          ★ SALVA
+        <button id="btn-bookmark" class="icon-btn" title="Save current coordinates to persistent bookmarks">
+          ★ BOOKMARK
         </button>
-        <button id="btn-audio" class="icon-btn" title="Attiva/Disattiva sintesi acustica WebAudio Deep Space">
+        <button id="btn-audio" class="icon-btn" title="Toggle WebAudio Deep Space acoustic synthesis">
           AUDIO: OFF
         </button>
-        <button id="btn-zen" class="icon-btn" title="Modalità Osservazione Pura (Tasto H)">
+        <button id="btn-zen" class="icon-btn" title="Pure Observation Mode (Key H)">
           HUD: FULL
         </button>
       </div>
@@ -927,15 +927,15 @@ body {
     <!-- 2. Middle Workspace: Left Scale Ladder & Catalog + Right Scientific Dossier -->
     <div id="middle-workspace">
       <!-- Left Panel: Continuous Logarithmic Scale & Spatial Object Catalog -->
-      <aside id="left-navigator-panel" class="hud-panel" aria-label="Scala Spaziale e Catalogo">
+      <aside id="left-navigator-panel" class="hud-panel" aria-label="Spatial Scale and Catalog">
         <div class="panel-header">
-          <span class="panel-title">Scala Spaziale Continua</span>
+          <span class="panel-title">Continuous Spatial Scale</span>
           <span id="scale-exponent-tag" class="scale-exponent-tag">10^24.60 m</span>
         </div>
 
         <div class="scale-ladder-section">
           <div class="scale-readout-row">
-            <span style="font-size:11px;color:var(--text-secondary)">Campo Visivo (FOV)</span>
+            <span style="font-size:11px;color:var(--text-secondary)">Field of View (FOV)</span>
             <span id="scale-metric-big" class="scale-metric-big">1.29 Gpc</span>
           </div>
           <input
@@ -945,34 +945,34 @@ body {
             max="25.5"
             step="0.05"
             value="24.6"
-            aria-label="Cursore logaritmico di scala spaziale"
+            aria-label="Logarithmic spatial scale slider"
           />
           <div id="scale-presets-grid" class="scale-presets-grid"></div>
         </div>
 
         <div class="panel-header">
-          <span id="catalog-header-title" class="panel-title">Superammassi Cosmici</span>
-          <span id="catalog-count-badge" class="panel-badge">14 nodi</span>
+          <span id="catalog-header-title" class="panel-title">Cosmic Superclusters</span>
+          <span id="catalog-count-badge" class="panel-badge">14 nodes</span>
         </div>
 
         <div id="catalog-list-container" class="catalog-list-container"></div>
       </aside>
 
       <!-- Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector -->
-      <aside id="right-dossier-panel" class="hud-panel" aria-label="Dossier Scientifico e Spettrometria">
+      <aside id="right-dossier-panel" class="hud-panel" aria-label="Scientific Dossier and Spectrometry">
         <div class="dossier-entity-hero">
-          <div id="entity-category-overline" class="entity-category-overline">STRUTTURA COSMOLOGICA</div>
+          <div id="entity-category-overline" class="entity-category-overline">COSMOLOGICAL STRUCTURE</div>
           <div class="entity-title-row">
-            <h2 id="entity-main-title" class="entity-main-title">Superammasso Laniakea-Prime</h2>
+            <h2 id="entity-main-title" class="entity-main-title">Laniakea-Prime Supercluster</h2>
             <span id="entity-catalog-code" class="entity-catalog-code">PCL-N0000</span>
           </div>
         </div>
 
         <div class="dossier-tabs" role="tablist">
-          <button class="dossier-tab-btn active" data-tab="physics" role="tab">1. Fisica</button>
-          <button class="dossier-tab-btn" data-tab="climate" role="tab">2. Clima</button>
-          <button class="dossier-tab-btn" data-tab="life" role="tab">3. Vita</button>
-          <button class="dossier-tab-btn" data-tab="civ" role="tab">4. Civiltà</button>
+          <button class="dossier-tab-btn active" data-tab="physics" role="tab">1. Physics</button>
+          <button class="dossier-tab-btn" data-tab="climate" role="tab">2. Climate</button>
+          <button class="dossier-tab-btn" data-tab="life" role="tab">3. Life</button>
+          <button class="dossier-tab-btn" data-tab="civ" role="tab">4. Civ</button>
         </div>
 
         <div id="dossier-content-scroll" class="dossier-content-scroll"></div>
@@ -980,48 +980,48 @@ body {
     </div>
 
     <!-- 3. Bottom Temporal Simulation & Causal Phenomena Dock -->
-    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Controllo Temporale ed Eventi Cosmici">
+    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Time Dilation and Cosmic Events">
       <div class="time-controls-cluster">
         <div class="epoch-clock-box">
-          <span class="epoch-overline">Epoca Cosmica Universale</span>
+          <span class="epoch-overline">Universal Cosmic Epoch</span>
           <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr (+0.0 h)</span>
         </div>
-        <div id="time-speed-pills" class="time-speed-pills" role="group" aria-label="Moltiplicatore Temporale"></div>
+        <div id="time-speed-pills" class="time-speed-pills" role="group" aria-label="Time Multiplier"></div>
       </div>
 
-      <div class="live-event-ticker" title="Registro autonomo degli eventi cosmici in tempo reale">
+      <div class="live-event-ticker" title="Autonomous real-time log of cosmic events across the universe">
         <span class="ticker-pulse-dot" aria-hidden="true"></span>
-        <span id="live-ticker-text" class="ticker-text">Sintonizzazione telemetria PARALLAX...</span>
+        <span id="live-ticker-text" class="ticker-text">Tuning PARALLAX telemetry...</span>
       </div>
 
       <div class="phenomena-actions-cluster">
         <button
           id="btn-phenom-star"
           class="action-btn"
-          title="Avanza l'evoluzione astrofisica della stella madre lungo il diagramma H-R (+Gyr)"
+          title="Advance host star astrophysical evolution along the H-R diagram (+Gyr)"
         >
-          ✦ Evoluzione Stellare
+          ✦ Stellar Evolution
         </button>
         <button
           id="btn-phenom-impact"
           class="action-btn"
-          title="Simula l'impatto di un asteroide sul pianeta attivo con effetti climatici ed evolutivi"
+          title="Simulate an asteroid bolide impact on the active planet with climatic and evolutionary effects"
         >
-          ☄ Impatto Bolide
+          ☄ Bolide Impact
         </button>
         <button
           id="btn-phenom-bio"
           class="action-btn accent-emerald"
-          title="Catalizza abiogenesi o accelera la radiazione evolutiva della biosfera"
+          title="Catalyze abiogenesis or accelerate evolutionary radiation of the biosphere"
         >
-          ❋ Impulso Evolutivo
+          ❋ Evolution Surge
         </button>
         <button
           id="btn-phenom-civ"
           class="action-btn accent-amber"
-          title="Innesca un salto tecnologico sulla scala di Kardashev e costruisci megastrutture orbitali"
+          title="Trigger a Kardashev technological breakthrough and construct orbital megastructures"
         >
-          ⬡ Salto Kardashev
+          ⬡ Kardashev Leap
         </button>
       </div>
     </footer>
@@ -1443,24 +1443,24 @@ function generateStarDesignation(prng, galaxyCode, index) {
 /**
  * PARALLAX — Procedural Multi-Scale Universe Generator
  * Generates coherent, physically plausible, and deterministic entities across 7 scales:
- * 1. Cosmo (Cosmic Web, Superclusters, Filaments, Voids)
- * 2. Galassie (Spirals, Barred, Ellipticals, Irregulars, SMBH, Nebulae)
- * 3. Stelle (O..M spectral classes, Protostars, Main Sequence, Giants, White Dwarfs, Pulsars, Black Holes)
- * 4. Sistemi Planetari (Keplerian Orbits, Moons, Rings, Asteroid Belts, Comets)
- * 5. Pianeti (Tectonics, Continents, Oceans, Craters, Volcanoes, Rayleigh/Mie Atmospheres, Climate)
- * 6. Vita (Abiogenesis, Trophic Food Webs, Clades, Morphology, Adaptations, Extinctions)
- * 7. Civiltà (Kardashev Scale, Culture, Tech Matrix, Conflict/Cooperation, Megastructures, History)
+ * 1. Cosmos (Cosmic Web, Superclusters, Filaments, Voids)
+ * 2. Galaxies (Spirals, Barred, Ellipticals, Irregulars, SMBH, Nebulae)
+ * 3. Stars (O..M spectral classes, Protostars, Main Sequence, Giants, White Dwarfs, Pulsars, Black Holes)
+ * 4. Planetary Systems (Keplerian Orbits, Moons, Rings, Asteroid Belts, Comets)
+ * 5. Planets (Tectonics, Continents, Oceans, Craters, Volcanoes, Rayleigh/Mie Atmospheres, Climate)
+ * 6. Life (Abiogenesis, Trophic Food Webs, Clades, Morphology, Adaptations, Extinctions)
+ * 7. Civilizations (Kardashev Scale, Culture, Tech Matrix, Conflict/Cooperation, Megastructures, History)
  */
 
 
 const SCALE_LEVELS = [
-  { id: 'cosmos', index: 0, name: 'Cosmo', subtitle: 'Rete Cosmica, Superammassi e Vuoti', defaultLogScale: 24.6, minLog: 22.8, maxLog: 26.0 },
-  { id: 'galaxy', index: 1, name: 'Galassia', subtitle: 'Struttura Galattica, Nebulose e Nucleo', defaultLogScale: 20.6, minLog: 18.8, maxLog: 22.8 },
-  { id: 'sector', index: 2, name: 'Settore Stellare', subtitle: 'Ammasso Locale ed Evoluzione Stellare', defaultLogScale: 17.2, minLog: 14.8, maxLog: 18.8 },
-  { id: 'system', index: 3, name: 'Sistema Planetario', subtitle: 'Dinamica Orbitale Kepleriana', defaultLogScale: 12.3, minLog: 9.8, maxLog: 14.8 },
-  { id: 'planet', index: 4, name: 'Pianeta', subtitle: 'Geofisica, Atmosfera e Clima Globale', defaultLogScale: 7.4, minLog: 4.8, maxLog: 9.8 },
-  { id: 'surface', index: 5, name: 'Superficie & Vita', subtitle: 'Orizzonte Planetario ed Ecosistema', defaultLogScale: 3.1, minLog: 1.5, maxLog: 4.8 },
-  { id: 'civilization', index: 6, name: 'Biosfera & Civiltà', subtitle: 'Morfologia Organica e Tecnosfera', defaultLogScale: 0.7, minLog: -0.5, maxLog: 1.5 }
+  { id: 'cosmos', index: 0, name: 'Cosmos', subtitle: 'Cosmic Web, Superclusters & Voids', defaultLogScale: 24.6, minLog: 22.8, maxLog: 26.0 },
+  { id: 'galaxy', index: 1, name: 'Galaxy', subtitle: 'Galactic Structure, Nebulae & Core', defaultLogScale: 20.6, minLog: 18.8, maxLog: 22.8 },
+  { id: 'sector', index: 2, name: 'Star Sector', subtitle: 'Local Cluster & Stellar Evolution', defaultLogScale: 17.2, minLog: 14.8, maxLog: 18.8 },
+  { id: 'system', index: 3, name: 'Star System', subtitle: 'Keplerian Orbital Dynamics', defaultLogScale: 12.3, minLog: 9.8, maxLog: 14.8 },
+  { id: 'planet', index: 4, name: 'Planet', subtitle: 'Geophysics, Atmosphere & Global Climate', defaultLogScale: 7.4, minLog: 4.8, maxLog: 9.8 },
+  { id: 'surface', index: 5, name: 'Surface & Life', subtitle: 'Planetary Horizon & Ecosystems', defaultLogScale: 3.1, minLog: 1.5, maxLog: 4.8 },
+  { id: 'civilization', index: 6, name: 'Biosphere & Civ', subtitle: 'Organic Morphology & Technosphere', defaultLogScale: 0.7, minLog: -0.5, maxLog: 1.5 }
 ];
 
 /**
@@ -1480,7 +1480,6 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
     const scSeed = hashHierarchy(seed, 'SC', i);
     const scPrng = new PRNG(scSeed);
 
-    // Position along 3D cosmic web density ridges
     let x = scPrng.range(-1.8, 1.8);
     let y = scPrng.range(-1.1, 1.1);
     let z = scPrng.range(-1.8, 1.8);
@@ -1491,15 +1490,15 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
     }
 
     const density = fbm3D(x * 1.5 + 3.1, y * 1.5 + 1.7, z * 1.5 + 5.3, 4);
-    const massLogSolar = scPrng.range(15.2, 16.8); // 10^15 to 10^16.8 M_sun
+    const massLogSolar = scPrng.range(15.2, 16.8);
     const galaxyCount = Math.round(scPrng.range(1800, 45000));
     const spanMpc = scPrng.range(45, 190);
     const distMpc = Math.hypot(x + sx * 4, y + sy * 4, z + sz * 4) * 140;
     const redshift = Math.max(0.001, (distMpc * 67.4) / 299792.458);
 
     const name = i === 0
-      ? 'Superammasso Laniakea-Prime'
-      : `Superammasso ${generateAstronomicalName(scPrng)}`;
+      ? 'Laniakea-Prime Supercluster'
+      : `${generateAstronomicalName(scPrng)} Supercluster`;
 
     superclusters.push({
       id: `sc-${sx}-${sy}-${sz}-${i}`,
@@ -1515,12 +1514,12 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
       distMpc,
       redshift,
       darkMatterFraction: scPrng.range(0.81, 0.86),
-      icmTempKelvin: scPrng.range(1.5e7, 8.5e7), // Intracluster medium X-ray gas temp
+      icmTempKelvin: scPrng.range(1.5e7, 8.5e7),
       dominantMorphology: scPrng.pick([
-        'Nodo Filamentare Ricco',
-        'Attrattore Gravitazionale Centrale',
-        'Arco Cosmico Multi-Ammasso',
-        'Parete Galattica (Great Wall)'
+        'Rich Filamentary Node',
+        'Central Gravitational Attractor',
+        'Multi-Cluster Cosmic Arc',
+        'Galactic Great Wall'
       ]),
       color: i === 0 ? [0.95, 0.75, 0.42] : [
         scPrng.range(0.55, 0.98),
@@ -1530,7 +1529,6 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
     });
   }
 
-  // Build cosmic filaments connecting nearby superclusters
   for (let i = 0; i < superclusters.length; i++) {
     for (let j = i + 1; j < superclusters.length; j++) {
       const a = superclusters[i].position;
@@ -1549,12 +1547,11 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
     }
   }
 
-  // Cosmic Voids
   for (let v = 0; v < 5; v++) {
     const vPrng = new PRNG(hashHierarchy(seed, 'VOID', v));
     voids.push({
       id: `void-${v}`,
-      name: `Vuoto di ${generateAstronomicalName(vPrng)}`,
+      name: `${generateAstronomicalName(vPrng)} Void`,
       position: [vPrng.range(-1.6, 1.6), vPrng.range(-0.9, 0.9), vPrng.range(-1.6, 1.6)],
       diameterMpc: vPrng.range(65, 210),
       underdensityDelta: vPrng.range(-0.88, -0.72)
@@ -1574,12 +1571,12 @@ function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
  * 2. GALAXY GENERATOR (Inside a Supercluster)
  */
 const GALAXY_TYPES = [
-  { code: 'SA(s)bc', label: 'Spirale Grand-Design', family: 'spiral', arms: 2, bar: 0.1, bulge: 0.25, dust: 0.85, starFormation: 0.85 },
-  { code: 'SB(r)b', label: 'Spirale Barrata', family: 'barred', arms: 2, bar: 0.55, bulge: 0.32, dust: 0.78, starFormation: 0.75 },
-  { code: 'SA(s)c', label: 'Spirale Multi-Braccio Flocculenta', family: 'spiral', arms: 4, bar: 0.08, bulge: 0.18, dust: 0.92, starFormation: 0.95 },
-  { code: 'E2', label: 'Ellittica Gigante', family: 'elliptical', arms: 0, bar: 0.0, bulge: 0.95, dust: 0.12, starFormation: 0.08 },
-  { code: 'S0', label: 'Lenticolare', family: 'lenticular', arms: 0, bar: 0.2, bulge: 0.60, dust: 0.35, starFormation: 0.22 },
-  { code: 'Irr-I', label: 'Irregolare Magellanica Starburst', family: 'irregular', arms: 3, bar: 0.15, bulge: 0.10, dust: 0.95, starFormation: 1.0 }
+  { code: 'SA(s)bc', label: 'Grand-Design Spiral', family: 'spiral', arms: 2, bar: 0.1, bulge: 0.25, dust: 0.85, starFormation: 0.85 },
+  { code: 'SB(r)b', label: 'Barred Spiral', family: 'barred', arms: 2, bar: 0.55, bulge: 0.32, dust: 0.78, starFormation: 0.75 },
+  { code: 'SA(s)c', label: 'Flocculent Multi-Arm Spiral', family: 'spiral', arms: 4, bar: 0.08, bulge: 0.18, dust: 0.92, starFormation: 0.95 },
+  { code: 'E2', label: 'Giant Elliptical', family: 'elliptical', arms: 0, bar: 0.0, bulge: 0.95, dust: 0.12, starFormation: 0.08 },
+  { code: 'S0', label: 'Lenticular Disk', family: 'lenticular', arms: 0, bar: 0.2, bulge: 0.60, dust: 0.35, starFormation: 0.22 },
+  { code: 'Irr-I', label: 'Magellanic Starburst Irregular', family: 'irregular', arms: 3, bar: 0.15, bulge: 0.10, dust: 0.95, starFormation: 1.0 }
 ];
 
 function generateGalaxiesForSupercluster(supercluster) {
@@ -1623,10 +1620,9 @@ function generateGalaxiesForSupercluster(supercluster) {
     const armTwist = prng.range(2.6, 4.8);
 
     const name = i === 0 && supercluster.index === 0
-      ? 'Galassia Aethelgard (NGC-7491)'
-      : `Galassia ${generateAstronomicalName(prng)}`;
+      ? 'Aethelgard Galaxy (NGC-7491)'
+      : `${generateAstronomicalName(prng)} Galaxy`;
 
-    // Position in supercluster cluster coordinates
     const angle = i * 2.39996 + prng.range(-0.2, 0.2);
     const dist = i === 0 ? 0 : Math.pow(i / count, 0.7) * 1.65;
     const pos = [
@@ -1635,7 +1631,6 @@ function generateGalaxiesForSupercluster(supercluster) {
       Math.sin(angle) * dist
     ];
 
-    // Generate HII Regions / Nebulae inside the galaxy
     const nebulae = [];
     const nebCount = morph.family === 'elliptical' ? 2 : 7;
     for (let n = 0; n < nebCount; n++) {
@@ -1644,15 +1639,15 @@ function generateGalaxiesForSupercluster(supercluster) {
       const spiralTheta = nAngle + Math.log(nR + 0.1) * armTwist;
       nebulae.push({
         id: `neb-${i}-${n}`,
-        name: `Nebulosa ${generateAstronomicalName(prng)}`,
-        type: prng.pick(['Regione HII ad Emissione', 'Nube Molecolare Gigante', 'Resto di Supernova', 'Nebulosa Oscura Polverosa']),
+        name: `${generateAstronomicalName(prng)} Nebula`,
+        type: prng.pick(['HII Emission Region', 'Giant Molecular Cloud', 'Supernova Remnant', 'Dark Dust Nebula']),
         position: [Math.cos(spiralTheta) * nR, prng.range(-0.04, 0.04), Math.sin(spiralTheta) * nR],
         radiusPc: prng.range(15, 140),
         ionizationTempK: prng.range(8000, 14000),
         color: prng.pick([
-          [0.95, 0.28, 0.48], // H-alpha crimson-magenta
-          [0.22, 0.82, 0.88], // O-III doubly ionized oxygen teal
-          [0.42, 0.58, 0.98]  // Reflection nebula blue
+          [0.95, 0.28, 0.48],
+          [0.22, 0.82, 0.88],
+          [0.42, 0.58, 0.98]
         ])
       });
     }
@@ -1672,7 +1667,7 @@ function generateGalaxiesForSupercluster(supercluster) {
       massLogSolar,
       starCountBillions,
       smbh: {
-        name: `${name.split(' ')[1] || 'Core'} A*`,
+        name: `${name.split(' ')[0]} A*`,
         massSolar: smbhMassSolar,
         schwarzschildRadiusAU: (2 * 6.674e-11 * smbhMassSolar * 1.988e30) / (299792458 ** 2) / 1.496e11,
         agnActive: prng.chance(0.28),
@@ -1693,11 +1688,10 @@ function generateGalaxiesForSupercluster(supercluster) {
  */
 function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH = 0.0) {
   const M = Math.max(0.08, initialMassSolar);
-  // Main sequence lifetime in Gyr: solar mass = ~10 Gyr
   const msLifetimeGyr = 10.0 * Math.pow(M, -2.5);
   const lifeFraction = ageGyr / Math.max(1e-5, msLifetimeGyr);
 
-  let phase = 'Sequenza Principale';
+  let phase = 'Main Sequence';
   let phaseCode = 'V';
   let currentMass = M;
   let radiusSolar = Math.pow(M, 0.8);
@@ -1708,15 +1702,14 @@ function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH =
   let hasNebulaHalo = false;
 
   if (ageGyr < Math.min(0.015, msLifetimeGyr * 0.02)) {
-    phase = 'Protostella T-Tauri con Disco';
+    phase = 'T-Tauri Protostar with Accretion Disk';
     phaseCode = 'PMS';
     radiusSolar = Math.pow(M, 0.8) * 2.4;
     luminositySolar = Math.pow(M, 2.8) * 1.6;
     tempK = Math.max(2900, 4400 * Math.pow(M, 0.25));
     hasNebulaHalo = true;
   } else if (lifeFraction <= 1.0) {
-    // On Main Sequence: stars gradually brighten by ~30-50% over their MS life
-    phase = 'Sequenza Principale (Fusione H → He)';
+    phase = 'Main Sequence (H → He Core Fusion)';
     phaseCode = 'V';
     const brighten = 1.0 + 0.42 * lifeFraction;
     const swell = 1.0 + 0.25 * lifeFraction;
@@ -1724,16 +1717,15 @@ function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH =
     luminositySolar = Math.pow(M, 3.5) * brighten;
     tempK = 5778 * Math.pow(luminositySolar / (radiusSolar * radiusSolar), 0.25);
   } else if (lifeFraction <= 1.15) {
-    // Red Giant / Supergiant helium burning phase
     const giantProgress = (lifeFraction - 1.0) / 0.15;
     if (M >= 8.5) {
-      phase = giantProgress < 0.5 ? 'Supergigante Blu (Fusione He/C)' : 'Supergigante Rossa (Pre-Supernova)';
+      phase = giantProgress < 0.5 ? 'Blue Supergiant (He/C Fusion)' : 'Red Supergiant (Pre-Supernova)';
       phaseCode = 'Ia';
       radiusSolar = Math.pow(M, 0.8) * (15 + giantProgress * 180);
       luminositySolar = Math.pow(M, 3.2) * (2.5 + giantProgress * 4.0);
       tempK = giantProgress < 0.5 ? 14500 : 3650;
     } else {
-      phase = giantProgress < 0.35 ? 'Subgigante (Esaurimento H Core)' : 'Gigante Rossa (Ramo RGB/AGB)';
+      phase = giantProgress < 0.35 ? 'Subgiant (Core H Exhaustion)' : 'Red Giant (RGB/AGB Branch)';
       phaseCode = giantProgress < 0.35 ? 'IV' : 'III';
       radiusSolar = Math.pow(M, 0.75) * (2.5 + Math.pow(giantProgress, 1.6) * 45);
       luminositySolar = Math.pow(M, 2.5) * (3.0 + Math.pow(giantProgress, 1.8) * 180);
@@ -1741,40 +1733,38 @@ function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH =
     }
     currentMass = M * (1.0 - 0.15 * giantProgress);
   } else {
-    // Post-stellar Remnant Phase!
     isRemnant = true;
     const remnantAgeGyr = ageGyr - msLifetimeGyr * 1.15;
-    hasNebulaHalo = remnantAgeGyr < 0.08; // Ejected planetary nebula or supernova remnant visible!
+    hasNebulaHalo = remnantAgeGyr < 0.08;
 
     if (M < 8.0) {
-      phase = hasNebulaHalo ? 'Nebulosa Planetaria & Nana Bianca' : 'Nana Bianca Degenerata (Carbonio-Ossigeno)';
+      phase = hasNebulaHalo ? 'Planetary Nebula & White Dwarf' : 'Degenerate Carbon-Oxygen White Dwarf';
       phaseCode = 'DA';
       remnantType = 'white_dwarf';
       currentMass = Math.min(1.38, 0.45 + M * 0.11);
-      radiusSolar = 0.012 * Math.pow(currentMass, -0.33); // Earth-sized!
+      radiusSolar = 0.012 * Math.pow(currentMass, -0.33);
       const coolingFactor = Math.exp(-remnantAgeGyr / 1.8);
       tempK = Math.max(4500, 38000 * coolingFactor + 4500);
       luminositySolar = Math.pow(radiusSolar, 2) * Math.pow(tempK / 5778, 4);
     } else if (M < 21.0) {
-      phase = hasNebulaHalo ? 'Resto di Supernova & Pulsar' : 'Stella di Neutroni / Pulsar Magnetica';
+      phase = hasNebulaHalo ? 'Supernova Remnant & Pulsar' : 'Neutron Star / Magnetar Pulsar';
       phaseCode = 'PSR';
       remnantType = 'neutron_star';
       currentMass = 1.35 + (M - 8.0) * 0.06;
-      radiusSolar = 0.00002; // ~14 km
+      radiusSolar = 0.00002;
       tempK = 42000;
       luminositySolar = 0.04;
     } else {
-      phase = 'Buco Nero Stellare (Orizzonte degli Eventi)';
+      phase = 'Stellar-Mass Black Hole (Event Horizon)';
       phaseCode = 'BH';
       remnantType = 'black_hole';
       currentMass = M * 0.38;
       radiusSolar = 0.000045 * currentMass;
-      tempK = 28000; // Accretion disk effective color temperature
+      tempK = 28000;
       luminositySolar = 0.08;
     }
   }
 
-  // Determine spectral letter from effective temperature
   let spectralLetter = 'G';
   if (remnantType === 'black_hole') spectralLetter = 'BH';
   else if (remnantType === 'neutron_star') spectralLetter = 'NS';
@@ -1798,7 +1788,6 @@ function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH =
     ? [0.45, 0.85, 1.0]
     : planckBlackbodyRGB(tempK);
 
-  // Circumstellar Habitable Zone (Kopparapu et al. approximation in AU)
   const sqrtL = Math.sqrt(Math.max(0.00001, luminositySolar));
   const hzInnerAU = 0.95 * sqrtL;
   const hzOuterAU = 1.67 * sqrtL;
@@ -1829,7 +1818,7 @@ function computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH =
 }
 
 /**
- * Generate a Star Sector inside a Galaxy, containing 28 interactive Star Systems
+ * Generate a Star Sector inside a Galaxy, containing 26 interactive Star Systems
  */
 function generateStellarSector(galaxy, sectorIndex = 0) {
   const sectorSeed = hashHierarchy(galaxy.seed, 'SECTOR', sectorIndex);
@@ -1841,8 +1830,6 @@ function generateStellarSector(galaxy, sectorIndex = 0) {
     const sysSeed = hashHierarchy(sectorSeed, 'STAR_SYS', i);
     const sysPrng = new PRNG(sysSeed);
 
-    // System 0 is guaranteed to be a rich solar/temperate anchor system with biosphere & civilization;
-    // Systems 1..5 guarantee diverse exotic astrophysical classes (Red Giant, O-Supergiant, Pulsar, Black Hole, M-Dwarf Trappist-like)
     let initialMassSolar;
     let ageGyr;
     let isBinary = sysPrng.chance(0.28);
@@ -1852,35 +1839,29 @@ function generateStellarSector(galaxy, sectorIndex = 0) {
       ageGyr = 4.62;
       isBinary = false;
     } else if (i === 1) {
-      // K-type orange dwarf with lush biosphere
       initialMassSolar = 0.82;
       ageGyr = 6.1;
     } else if (i === 2) {
-      // Evolved Red Giant
       initialMassSolar = 1.45;
-      ageGyr = 4.25; // past MS lifetime (~3.95 Gyr)
+      ageGyr = 4.25;
     } else if (i === 3) {
-      // Massive Blue O/B Star
       initialMassSolar = 14.2;
       ageGyr = 0.008;
       isBinary = true;
     } else if (i === 4) {
-      // Stellar Black Hole / Pulsar remnant system
       initialMassSolar = 26.0;
       ageGyr = 0.04;
     } else if (i === 5) {
-      // White Dwarf with Planetary Nebula
       initialMassSolar = 2.2;
       ageGyr = 1.61;
     } else {
-      // Realistic Kroupa IMF biased toward exploratory variety
       initialMassSolar = sysPrng.weightedPick([
-        { value: sysPrng.range(0.18, 0.55), weight: 32 }, // M dwarf
-        { value: sysPrng.range(0.60, 0.89), weight: 24 }, // K dwarf
-        { value: sysPrng.range(0.90, 1.25), weight: 20 }, // G/F star
-        { value: sysPrng.range(1.30, 2.80), weight: 14 }, // A/F star
-        { value: sysPrng.range(3.20, 11.0), weight: 6 },  // B star
-        { value: sysPrng.range(12.0, 35.0), weight: 4 }   // O star / remnant
+        { value: sysPrng.range(0.18, 0.55), weight: 32 },
+        { value: sysPrng.range(0.60, 0.89), weight: 24 },
+        { value: sysPrng.range(0.90, 1.25), weight: 20 },
+        { value: sysPrng.range(1.30, 2.80), weight: 14 },
+        { value: sysPrng.range(3.20, 11.0), weight: 6 },
+        { value: sysPrng.range(12.0, 35.0), weight: 4 }
       ]);
       const msLife = 10.0 * Math.pow(initialMassSolar, -2.5);
       ageGyr = sysPrng.chance(0.78)
@@ -1891,7 +1872,6 @@ function generateStellarSector(galaxy, sectorIndex = 0) {
     const metallicityFeH = Math.max(-1.2, Math.min(0.5, galaxy.metallicityFeH + sysPrng.range(-0.25, 0.25)));
     const evolution = computeStellarEvolutionState(initialMassSolar, ageGyr, metallicityFeH);
 
-    // Companion star if binary
     let companion = null;
     if (isBinary) {
       const compMass = initialMassSolar * sysPrng.range(0.25, 0.85);
@@ -1916,7 +1896,6 @@ function generateStellarSector(galaxy, sectorIndex = 0) {
           sysPrng.range(-1.65, 1.65)
         ];
 
-    // Summary badge for quick sector scanning (does it have life or civilization?)
     const previewSummary = peekSystemBiosignature(sysSeed, evolution, i);
 
     systems.push({
@@ -1944,7 +1923,7 @@ function generateStellarSector(galaxy, sectorIndex = 0) {
     id: `${galaxy.id}-sec-${sectorIndex}`,
     seed: sectorSeed,
     galaxyId: galaxy.id,
-    name: `Settore Orion-Cygnus ${sectorIndex + 1}`,
+    name: `Orion-Cygnus Sector ${sectorIndex + 1}`,
     systems
   };
 }
@@ -1958,7 +1937,7 @@ function peekSystemBiosignature(sysSeed, starEvo, sysIndex) {
       hasBiosphere: true,
       hasCivilization: true,
       maxHabitability: 0.94,
-      notableFeature: 'Civiltà Tecnologica & Biosfera Complessa'
+      notableFeature: 'Technological Civilization & Complex Biosphere'
     };
   }
   if (sysIndex === 1) {
@@ -1967,16 +1946,16 @@ function peekSystemBiosignature(sysSeed, starEvo, sysIndex) {
       hasBiosphere: true,
       hasCivilization: true,
       maxHabitability: 0.89,
-      notableFeature: 'Mondo Oceanico Abitato & Rete Orbitale'
+      notableFeature: 'Inhabited Pelagic Ocean World & Orbital Ring'
     };
   }
   const canHostLife = !starEvo.isRemnant && starEvo.ageGyr > 0.6 && starEvo.tempK < 8500;
   const hasBiosphere = canHostLife && (sysIndex % 3 === 0 || prng.chance(0.42));
   const hasCivilization = hasBiosphere && (sysIndex % 5 === 0 || prng.chance(0.38));
   let notableFeature = starEvo.phase;
-  if (hasCivilization) notableFeature = 'Tecnofirma Rilevata (Civiltà Attiva)';
-  else if (hasBiosphere) notableFeature = 'Biofirma Spettroscopica (O₂ / CH₄)';
-  else if (starEvo.hasNebulaHalo) notableFeature = 'Guscio Nebulare Ionizzato';
+  if (hasCivilization) notableFeature = 'Technosignature Detected (Active Civilization)';
+  else if (hasBiosphere) notableFeature = 'Spectroscopic Biosignature (O₂ / CH₄)';
+  else if (starEvo.hasNebulaHalo) notableFeature = 'Ionized Nebular Shell';
 
   return {
     planetCount,
@@ -2005,7 +1984,6 @@ function generatePlanetarySystem(starSystem, timeOffsetGyr = 0) {
   const asteroidBelts = [];
   const comets = [];
 
-  // Titius-Bode-like logarithmic orbital spacing scaled by stellar luminosity / mass
   const baseScaleAU = Math.max(0.12, Math.min(1.6, Math.pow(star.initialMassSolar, 1.35) * 0.35));
 
   for (let p = 0; p < planetCount; p++) {
@@ -2014,7 +1992,6 @@ function generatePlanetarySystem(starSystem, timeOffsetGyr = 0) {
 
     let semiMajorAxisAU = baseScaleAU * Math.pow(1.72, p) * pPrng.range(0.88, 1.14);
 
-    // Ensure planet 2 in anchor systems sits squarely inside the Circumstellar Habitable Zone!
     if ((starSystem.index === 0 || starSystem.index === 1 || starSystem.hasBiosphere) && p === 2 && !star.isRemnant) {
       semiMajorAxisAU = (star.hzInnerAU + star.hzOuterAU) * 0.48;
     }
@@ -2031,19 +2008,17 @@ function generatePlanetarySystem(starSystem, timeOffsetGyr = 0) {
     planets.push(planet);
   }
 
-  // Generate 1-2 Asteroid Belts (typically near the frost line)
   const beltAU = star.frostLineAU * prng.range(0.82, 1.15);
   asteroidBelts.push({
     id: `${starSystem.id}-belt-0`,
-    name: `Fascia Principale di ${starSystem.name.split(' ')[0]}`,
+    name: `${starSystem.name.split(' ')[0]} Main Asteroid Belt`,
     innerRadiusAU: beltAU * 0.88,
     outerRadiusAU: beltAU * 1.14,
-    composition: 'Silicati Condritici, Carbonacei e Nucleo Metallico Fe-Ni',
+    composition: 'Chondritic Silicates, Carbonaceous Dust & Fe-Ni Metallic Cores',
     totalMassEarths: prng.range(0.0004, 0.015),
     particleCount: 450
   });
 
-  // Generate 3 Comets on eccentric orbits
   for (let c = 0; c < 3; c++) {
     const cPrng = new PRNG(hashHierarchy(sysSeed, 'COMET', c));
     const a = star.frostLineAU * cPrng.range(1.6, 3.8);
@@ -2085,12 +2060,9 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
   const isAnchorHomeworld = (starSystem.index === 0 && pIndex === 2) || (starSystem.index === 1 && pIndex === 2);
   const isSecondaryHabitable = !isAnchorHomeworld && starSystem.hasBiosphere && pIndex === 2;
 
-  // Compute solar irradiance and equilibrium temperature
-  const solarFluxEarths = star.luminositySolar / Math.max(0.001, semiMajorAxisAU * semiMajorAxisAU);
   const inHabitableZone = semiMajorAxisAU >= star.hzInnerAU * 0.82 && semiMajorAxisAU <= star.hzOuterAU * 1.22;
   const beyondFrostLine = semiMajorAxisAU > star.frostLineAU;
 
-  // Determine planetary archetype from astrophysical zone
   let archetype;
   if (isAnchorHomeworld) {
     archetype = starSystem.index === 1 ? 'pelagic_ocean' : 'temperate_terrestrial';
@@ -2106,7 +2078,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     archetype = prng.pick(['ice_giant', 'cryo_glacial', 'iron_cratered']);
   }
 
-  // Physical Dimensions & Interior Geophysics
   let massEarths, radiusEarths, albedo, pressureAtm, oceanCoverage, iceCoverage, cloudCoverage;
   let typeLabel, atmosphereComposition, palette, terrainRoughness, volcanism, tectonics;
 
@@ -2114,7 +2085,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     case 'temperate_terrestrial':
     case 'super_earth_temperate': {
       const isSuper = archetype === 'super_earth_temperate';
-      typeLabel = isSuper ? 'Super-Terra Temperata' : 'Pianeta Roccioso Temperato';
+      typeLabel = isSuper ? 'Temperate Super-Earth' : 'Temperate Terrestrial World';
       massEarths = isAnchorHomeworld ? 1.08 : isSuper ? prng.range(1.6, 3.8) : prng.range(0.65, 1.55);
       radiusEarths = Math.pow(massEarths, 0.28);
       albedo = prng.range(0.27, 0.34);
@@ -2126,12 +2097,12 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = prng.range(0.65, 0.92);
       volcanism = prng.range(0.25, 0.55);
       atmosphereComposition = [
-        { formula: 'N₂', name: 'Azoto Molecolare', pct: 75.4, color: '#38bdf8' },
-        { formula: 'O₂', name: 'Ossigeno Biogenico', pct: 21.8, color: '#34d399' },
+        { formula: 'N₂', name: 'Molecular Nitrogen', pct: 75.4, color: '#38bdf8' },
+        { formula: 'O₂', name: 'Biogenic Oxygen', pct: 21.8, color: '#34d399' },
         { formula: 'Ar', name: 'Argon', pct: 1.4, color: '#94a3b8' },
-        { formula: 'H₂O', name: 'Vapore Acqueo', pct: 0.95, color: '#60a5fa' },
-        { formula: 'CO₂', name: 'Anidride Carbonica', pct: 0.41, color: '#f59e0b' },
-        { formula: 'CH₄', name: 'Metano in Tracce', pct: 0.04, color: '#a78bfa' }
+        { formula: 'H₂O', name: 'Water Vapor', pct: 0.95, color: '#60a5fa' },
+        { formula: 'CO₂', name: 'Carbon Dioxide', pct: 0.41, color: '#f59e0b' },
+        { formula: 'CH₄', name: 'Trace Methane', pct: 0.04, color: '#a78bfa' }
       ];
       palette = {
         deepOcean: [0.03, 0.13, 0.28],
@@ -2146,7 +2117,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'pelagic_ocean': {
-      typeLabel = 'Mondo Pelagico Oceanico';
+      typeLabel = 'Pelagic Ocean World';
       massEarths = prng.range(1.1, 2.9);
       radiusEarths = Math.pow(massEarths, 0.31) * 1.06;
       albedo = prng.range(0.22, 0.32);
@@ -2158,10 +2129,10 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = prng.range(0.55, 0.85);
       volcanism = prng.range(0.35, 0.65);
       atmosphereComposition = [
-        { formula: 'N₂', name: 'Azoto Molecolare', pct: 71.2, color: '#38bdf8' },
-        { formula: 'O₂', name: 'Ossigeno Disciolto', pct: 23.5, color: '#34d399' },
-        { formula: 'H₂O', name: 'Vapore Acqueo', pct: 3.4, color: '#60a5fa' },
-        { formula: 'CO₂', name: 'Anidride Carbonica', pct: 1.9, color: '#f59e0b' }
+        { formula: 'N₂', name: 'Molecular Nitrogen', pct: 71.2, color: '#38bdf8' },
+        { formula: 'O₂', name: 'Dissolved Oxygen', pct: 23.5, color: '#34d399' },
+        { formula: 'H₂O', name: 'Water Vapor', pct: 3.4, color: '#60a5fa' },
+        { formula: 'CO₂', name: 'Carbon Dioxide', pct: 1.9, color: '#f59e0b' }
       ];
       palette = {
         deepOcean: [0.02, 0.16, 0.34],
@@ -2176,25 +2147,25 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'lava_world': {
-      typeLabel = 'Mondo Vulcanico Iper-Termico';
+      typeLabel = 'Hyper-Thermal Volcanic World';
       massEarths = prng.range(0.55, 2.1);
       radiusEarths = Math.pow(massEarths, 0.27);
       albedo = 0.12;
       pressureAtm = prng.range(0.15, 6.5);
-      oceanCoverage = 0.35; // Magma ocean fraction!
+      oceanCoverage = 0.35;
       iceCoverage = 0.0;
       cloudCoverage = prng.range(0.25, 0.55);
       terrainRoughness = 0.88;
       tectonics = 0.98;
       volcanism = 0.98;
       atmosphereComposition = [
-        { formula: 'SO₂', name: 'Anidride Solforosa', pct: 58.0, color: '#f59e0b' },
-        { formula: 'CO₂', name: 'Anidride Carbonica', pct: 32.5, color: '#fb7185' },
-        { formula: 'SiO', name: 'Vapore di Silicati', pct: 6.5, color: '#f97316' },
-        { formula: 'Na', name: 'Sodio Ionizzato', pct: 3.0, color: '#fde047' }
+        { formula: 'SO₂', name: 'Sulfur Dioxide', pct: 58.0, color: '#f59e0b' },
+        { formula: 'CO₂', name: 'Carbon Dioxide', pct: 32.5, color: '#fb7185' },
+        { formula: 'SiO', name: 'Silicate Vapor', pct: 6.5, color: '#f97316' },
+        { formula: 'Na', name: 'Ionized Sodium', pct: 3.0, color: '#fde047' }
       ];
       palette = {
-        deepOcean: [0.98, 0.32, 0.05], // Molten lava seas
+        deepOcean: [0.98, 0.32, 0.05],
         shallowOcean: [1.0, 0.62, 0.12],
         lowland: [0.14, 0.11, 0.11],
         highland: [0.25, 0.18, 0.16],
@@ -2206,7 +2177,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'venusian_greenhouse': {
-      typeLabel = 'Mondo Super-Serra Denso';
+      typeLabel = 'Runaway Greenhouse World';
       massEarths = prng.range(0.75, 1.8);
       radiusEarths = Math.pow(massEarths, 0.28);
       albedo = 0.76;
@@ -2218,9 +2189,9 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = 0.32;
       volcanism = 0.78;
       atmosphereComposition = [
-        { formula: 'CO₂', name: 'Anidride Carbonica Supercritica', pct: 95.8, color: '#f59e0b' },
-        { formula: 'N₂', name: 'Azoto', pct: 3.5, color: '#38bdf8' },
-        { formula: 'H₂SO₄', name: 'Aerosol Acido Solforico', pct: 0.7, color: '#eab308' }
+        { formula: 'CO₂', name: 'Supercritical Carbon Dioxide', pct: 95.8, color: '#f59e0b' },
+        { formula: 'N₂', name: 'Nitrogen', pct: 3.5, color: '#38bdf8' },
+        { formula: 'H₂SO₄', name: 'Sulfuric Acid Aerosols', pct: 0.7, color: '#eab308' }
       ];
       palette = {
         deepOcean: [0.38, 0.24, 0.12],
@@ -2235,7 +2206,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'arid_desert': {
-      typeLabel = 'Mondo Desertico & Canyon Tettonici';
+      typeLabel = 'Arid Desert & Tectonic Canyon World';
       massEarths = prng.range(0.25, 1.15);
       radiusEarths = Math.pow(massEarths, 0.28);
       albedo = 0.25;
@@ -2247,10 +2218,10 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = 0.35;
       volcanism = 0.28;
       atmosphereComposition = [
-        { formula: 'CO₂', name: 'Anidride Carbonica', pct: 88.4, color: '#f97316' },
-        { formula: 'N₂', name: 'Azoto', pct: 7.2, color: '#38bdf8' },
+        { formula: 'CO₂', name: 'Carbon Dioxide', pct: 88.4, color: '#f97316' },
+        { formula: 'N₂', name: 'Nitrogen', pct: 7.2, color: '#38bdf8' },
         { formula: 'Ar', name: 'Argon', pct: 3.1, color: '#94a3b8' },
-        { formula: 'O₂', name: 'Ossigeno', pct: 1.3, color: '#34d399' }
+        { formula: 'O₂', name: 'Oxygen', pct: 1.3, color: '#34d399' }
       ];
       palette = {
         deepOcean: [0.12, 0.28, 0.36],
@@ -2265,7 +2236,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'gas_giant': {
-      typeLabel = 'Gigante Gassoso Gioviano';
+      typeLabel = 'Jovian Gas Giant';
       massEarths = prng.range(65, 420);
       radiusEarths = prng.range(8.5, 12.2);
       albedo = prng.range(0.45, 0.58);
@@ -2277,10 +2248,10 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = 0.0;
       volcanism = 0.0;
       atmosphereComposition = [
-        { formula: 'H₂', name: 'Idrogeno Molecolare', pct: 87.6, color: '#38bdf8' },
-        { formula: 'He', name: 'Elio', pct: 11.8, color: '#fbbf24' },
-        { formula: 'CH₄', name: 'Metano', pct: 0.35, color: '#a78bfa' },
-        { formula: 'NH₃', name: 'Cristalli di Ammoniaca', pct: 0.25, color: '#f472b6' }
+        { formula: 'H₂', name: 'Molecular Hydrogen', pct: 87.6, color: '#38bdf8' },
+        { formula: 'He', name: 'Helium', pct: 11.8, color: '#fbbf24' },
+        { formula: 'CH₄', name: 'Methane', pct: 0.35, color: '#a78bfa' },
+        { formula: 'NH₃', name: 'Ammonia Ice Crystals', pct: 0.25, color: '#f472b6' }
       ];
       palette = prng.chance(0.5)
         ? {
@@ -2305,7 +2276,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'ice_giant': {
-      typeLabel = 'Gigante Ghiacciato Nettuniano';
+      typeLabel = 'Neptunian Ice Giant';
       massEarths = prng.range(12, 38);
       radiusEarths = prng.range(3.6, 5.4);
       albedo = prng.range(0.35, 0.48);
@@ -2317,10 +2288,10 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = 0.0;
       volcanism = 0.0;
       atmosphereComposition = [
-        { formula: 'H₂', name: 'Idrogeno Molecolare', pct: 79.5, color: '#38bdf8' },
-        { formula: 'He', name: 'Elio', pct: 17.2, color: '#fbbf24' },
-        { formula: 'CH₄', name: 'Idrocarburi e Metano', pct: 2.8, color: '#2dd4bf' },
-        { formula: 'H₂O/NH₃', name: 'Mantello Fluido Ghiacciato', pct: 0.5, color: '#818cf8' }
+        { formula: 'H₂', name: 'Molecular Hydrogen', pct: 79.5, color: '#38bdf8' },
+        { formula: 'He', name: 'Helium', pct: 17.2, color: '#fbbf24' },
+        { formula: 'CH₄', name: 'Hydrocarbons & Methane', pct: 2.8, color: '#2dd4bf' },
+        { formula: 'H₂O/NH₃', name: 'Superionic Ice Mantle', pct: 0.5, color: '#818cf8' }
       ];
       palette = {
         deepOcean: [0.06, 0.26, 0.58],
@@ -2335,27 +2306,27 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     case 'cryo_glacial': {
-      typeLabel = 'Mondo Criogenico con Oceano Sub-Glaciale';
+      typeLabel = 'Cryogenic World with Subsurface Ocean';
       massEarths = prng.range(0.18, 1.4);
       radiusEarths = Math.pow(massEarths, 0.3);
       albedo = prng.range(0.58, 0.74);
       pressureAtm = prng.chance(0.5) ? prng.range(0.05, 1.4) : 0.002;
-      oceanCoverage = 0.15; // Fractured ice leads / cryovolcanic plumes
+      oceanCoverage = 0.15;
       iceCoverage = 0.92;
       cloudCoverage = Math.min(0.65, pressureAtm * 0.4);
       terrainRoughness = 0.58;
-      tectonics = 0.45; // Cryo-tectonics
-      volcanism = 0.42; // Cryovolcanism
+      tectonics = 0.45;
+      volcanism = 0.42;
       atmosphereComposition = [
-        { formula: 'N₂', name: 'Azoto Criogenico', pct: 91.5, color: '#38bdf8' },
-        { formula: 'CH₄', name: 'Metano Liquido/Gassoso', pct: 6.8, color: '#2dd4bf' },
-        { formula: 'CO', name: 'Monossido di Carbonio', pct: 1.7, color: '#94a3b8' }
+        { formula: 'N₂', name: 'Cryogenic Nitrogen', pct: 91.5, color: '#38bdf8' },
+        { formula: 'CH₄', name: 'Liquid/Gaseous Methane', pct: 6.8, color: '#2dd4bf' },
+        { formula: 'CO', name: 'Carbon Monoxide', pct: 1.7, color: '#94a3b8' }
       ];
       palette = {
         deepOcean: [0.12, 0.28, 0.45],
         shallowOcean: [0.35, 0.58, 0.74],
         lowland: [0.68, 0.78, 0.88],
-        highland: [0.54, 0.46, 0.44], // Tholin cracks
+        highland: [0.54, 0.46, 0.44],
         peak: [0.94, 0.97, 1.0],
         atmosphere: [0.45, 0.82, 0.96],
         cloud: [0.88, 0.94, 0.98]
@@ -2364,7 +2335,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
 
     default: {
-      typeLabel = 'Pianeta Silicatico Craterizzato';
+      typeLabel = 'Cratered Silicate Planet';
       massEarths = prng.range(0.06, 0.65);
       radiusEarths = Math.pow(massEarths, 0.28);
       albedo = 0.14;
@@ -2376,7 +2347,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       tectonics = 0.05;
       volcanism = 0.05;
       atmosphereComposition = [
-        { formula: 'Exosfera', name: 'Tracce di Sodio / Elio da Vento Stellare', pct: 100.0, color: '#94a3b8' }
+        { formula: 'Exosphere', name: 'Stellar-Wind Sputtered Sodium & Helium', pct: 100.0, color: '#94a3b8' }
       ];
       palette = {
         deepOcean: [0.22, 0.21, 0.23],
@@ -2391,7 +2362,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     }
   }
 
-  // Compute physical Equilibrium & Surface Temperatures
   const eqTempK = star.tempK * Math.sqrt((star.radiusSolar * 695700) / (2 * semiMajorAxisAU * 1.496e8)) * Math.pow(1 - albedo, 0.25);
   let greenhouseDeltaK = 0;
   if (archetype === 'venusian_greenhouse') greenhouseDeltaK = 380;
@@ -2403,7 +2373,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
   const surfaceTempK = isAnchorHomeworld ? 289.5 : Math.max(25, eqTempK + greenhouseDeltaK);
   const surfaceTempC = surfaceTempK - 273.15;
 
-  // Gravity, escape velocity, magnetic field
   const gravityG = massEarths / Math.max(0.05, radiusEarths * radiusEarths);
   const escapeVelocityKmS = 11.186 * Math.sqrt(massEarths / Math.max(0.05, radiusEarths));
   const densityGcm3 = 5.51 * (massEarths / Math.pow(radiusEarths, 3));
@@ -2413,7 +2382,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     ? prng.range(0.35, 1.45)
     : prng.range(0.0, 0.08);
 
-  // Earth Similarity Index (ESI)
   const esiTemp = Math.max(0, 1 - Math.abs(surfaceTempK - 288) / 140);
   const esiRadius = Math.max(0, 1 - Math.abs(radiusEarths - 1.0) / 3.5);
   const esiAtm = archetype === 'gas_giant' || archetype === 'ice_giant' ? 0.05 : Math.max(0, 1 - Math.abs(Math.log10(Math.max(0.01, pressureAtm))) / 2.2);
@@ -2421,7 +2389,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     ? 0.95
     : Math.max(0.02, Math.min(0.98, esiTemp * 0.5 + esiRadius * 0.25 + esiAtm * 0.25));
 
-  // Keplerian Orbital Elements
   const periodYears = Math.sqrt(Math.pow(semiMajorAxisAU, 3) / Math.max(0.08, star.currentMassSolar));
   const orbit = {
     a: semiMajorAxisAU,
@@ -2433,7 +2400,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     periodYears
   };
 
-  // Ring System (common on gas/ice giants, occasional on massive terrestrial worlds)
   let rings = null;
   if (
     (archetype === 'gas_giant' && prng.chance(0.68)) ||
@@ -2445,12 +2411,11 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       outerRadiusRatio: prng.range(2.15, 2.85),
       tiltRad: prng.range(0.12, 0.45),
       opacity: prng.range(0.45, 0.88),
-      composition: beyondFrostLine ? 'Ghiaccio d’Acqua Cristallino & Silicati' : 'Polveri Silicatiche e Regolite',
+      composition: beyondFrostLine ? 'Crystalline Water Ice & Silicates' : 'Silicate Dust & Regolith',
       color: palette.peak
     };
   }
 
-  // Moons
   const moonCount = archetype === 'gas_giant'
     ? prng.int(3, 5)
     : archetype === 'ice_giant'
@@ -2472,10 +2437,10 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
       orbitalPeriodDays: 1.2 * Math.pow(mDistRadii, 1.5),
       angleOffset: mPrng.range(0, Math.PI * 2),
       type: m === 0 && archetype === 'gas_giant'
-        ? 'Luna Vulcanica Mareale (Tipo Io)'
+        ? 'Tidally Heated Volcanic Moon (Io-Analog)'
         : beyondFrostLine
-        ? 'Luna Ghiacciata con Oceano Interno (Tipo Europa)'
-        : 'Satellite Silicatico Craterizzato',
+        ? 'Cryo-Crustal Moon with Subsurface Ocean (Europa-Analog)'
+        : 'Cratered Silicate Satellite',
       color: m === 0 && archetype === 'gas_giant' ? [0.95, 0.78, 0.28] : [0.75, 0.78, 0.82]
     });
   }
@@ -2484,7 +2449,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     ? (starSystem.index === 1 ? 'Thalassa Prime' : 'Aurelia IV (Gaia-Nova)')
     : `${starSystem.name.split(' ')[1] || starSystem.name} ${roman}`;
 
-  // Generate Biosphere (Scale 6)
   const biosphere = generateBiosphere({
     pSeed,
     archetype,
@@ -2497,7 +2461,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     forceBiosphere: isAnchorHomeworld || isSecondaryHabitable
   });
 
-  // Generate Civilization (Scale 7)
   const civilization = generateCivilization({
     pSeed,
     properName,
@@ -2507,7 +2470,6 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     forceCivilization: isAnchorHomeworld || (starSystem.hasCivilization && pIndex === 2)
   });
 
-  // Generate Surface Landmarks (Continents, Oceans, Volcanoes, Craters, Biomes, Cities)
   const landmarks = generateSurfaceLandmarks(pSeed, properName, archetype, biosphere, civilization);
 
   return {
@@ -2570,15 +2532,15 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
   if (!canHaveSurfaceLife && !canHaveSubsurfaceLife) {
     return {
       active: false,
-      stage: 'Sterile / Chimica Prebiotica Inerte',
+      stage: 'Sterile / Inert Prebiotic Chemistry',
       complexityIndex: 0.0,
       biomassGt: 0,
-      biochemistry: 'Assente',
-      energySource: 'Nessuna',
+      biochemistry: 'None',
+      energySource: 'None',
       speciesCountEstimate: 0,
       clades: [],
       trophicLinks: [],
-      adaptations: ['Superficie priva di attività metabolica rilevabile'],
+      adaptations: ['No detectable metabolic activity on planetary surface'],
       extinctionEvents: 0
     };
   }
@@ -2592,39 +2554,37 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
     : Math.min(0.96, 0.35 + bioAgeGyr * 0.14);
 
   const stage = complexityIndex > 0.78
-    ? 'Biosfera Complessa Multicostituente (Ecosistemi Globali)'
+    ? 'Complex Multicellular Biosphere (Global Ecosystems)'
     : complexityIndex > 0.48
-    ? 'Rete Trofica Multicorporale & Flora Continentale'
-    : 'Ecosistema Chemiosintetico / Microbico Coloniale';
+    ? 'Multicellular Trophic Web & Continental Flora'
+    : 'Chemosynthetic / Colonial Microbial Ecosystem';
 
   const biochemistry = isSubsurface
-    ? 'Carbonio-Acqua Subglaciale (Idrotermale)'
+    ? 'Subglacial Carbon-Water (Hydrothermal)'
     : surfaceTempK < 210
-    ? 'Idrocarburi / Ammoniaca-Acqua Criogenica'
-    : 'Carbonio-Acqua Chirale con Biopolimeri Complessi';
+    ? 'Cryogenic Hydrocarbon / Ammonia-Water'
+    : 'Chiral Carbon-Water with Complex Biopolymers';
 
   const energySource = isSubsurface
-    ? 'Chemiosintesi da Camini Idrotermali Mareali'
+    ? 'Tidal Hydrothermal Vent Chemosynthesis'
     : star.tempK < 4100
-    ? 'Fotosintesi nell’Infrarosso Vicino (Pigmenti Nero-Porpora)'
+    ? 'Near-Infrared Photosynthesis (Deep Crimson-Black Pigments)'
     : star.tempK > 6600
-    ? 'Fotosintesi UV-Protettiva ad Alta Riflettanza (Pigmenti Oro-Ciano)'
-    : 'Fotosintesi Ossigenica Multi-Banda (Clorofilla & Ficobiline)';
+    ? 'High-Reflectance UV-Protective Photosynthesis (Gold-Teal Pigments)'
+    : 'Multi-Band Oxygenic Photosynthesis (Chlorophyll & Phycobilins)';
 
-  // Foliar pigment color on planet surface depending on star's Planck peak wavelength!
   const foliageRGB = star.tempK < 4200
-    ? [0.42, 0.14, 0.32] // Deep crimson-violet for M-dwarf infrared capture
+    ? [0.42, 0.14, 0.32]
     : star.tempK > 6600
-    ? [0.16, 0.56, 0.52] // Teal-amber UV protective
-    : [0.16, 0.46, 0.24]; // Classic emerald green
+    ? [0.16, 0.56, 0.52]
+    : [0.16, 0.46, 0.24];
 
-  // Generate 5 Ecological Trophic Clades
   const roles = [
-    { role: 'Produttore Primario', trophicLevel: 1, icon: 'flora', baseBiomass: 0.62 },
-    { role: 'Simbionte Coloniale / Corallino', trophicLevel: 1.5, icon: 'colonial', baseBiomass: 0.21 },
-    { role: 'Erbivoro / Filtratore Primario', trophicLevel: 2, icon: 'herbivore', baseBiomass: 0.11 },
-    { role: 'Predatore Apicale', trophicLevel: 3, icon: 'predator', baseBiomass: 0.025 },
-    { role: 'Decompositore & Riciclatore Biogeochimico', trophicLevel: 1.8, icon: 'decomposer', baseBiomass: 0.035 }
+    { role: 'Primary Producer', trophicLevel: 1, icon: 'flora', baseBiomass: 0.62 },
+    { role: 'Colonial / Reef Symbiont', trophicLevel: 1.5, icon: 'colonial', baseBiomass: 0.21 },
+    { role: 'Primary Herbivore / Filter Feeder', trophicLevel: 2, icon: 'herbivore', baseBiomass: 0.11 },
+    { role: 'Apex Predator', trophicLevel: 3, icon: 'predator', baseBiomass: 0.025 },
+    { role: 'Biogeochemical Decomposer', trophicLevel: 1.8, icon: 'decomposer', baseBiomass: 0.035 }
   ];
 
   const clades = roles.map((r, idx) => {
@@ -2633,32 +2593,32 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
     const species = cPrng.pick(CLADE_SPECIES);
 
     const symmetry = idx === 0
-      ? cPrng.pick(['Frattale Radiale', 'Elicoidale Fotonica', 'Reticolare Pneumatica'])
-      : cPrng.pick(['Bilaterale Esapode', 'Radiale Pentamerica', 'Cefalopode Idrodinamico', 'Articolata Corazzata']);
+      ? cPrng.pick(['Radial Fractal', 'Photonic Helical', 'Pneumatic Reticular'])
+      : cPrng.pick(['Bilateral Hexapod', 'Pentameric Radial', 'Hydrodynamic Cephalopod', 'Armored Articulated']);
 
     const locomotion = idx === 0
-      ? 'Sessile Radicata con Fototropismo Attivo'
+      ? 'Sessile Rooted with Active Phototropism'
       : idx === 1
-      ? 'Fluttuazione Aero-Planctonica / Barriera'
+      ? 'Aero-Planktonic Drift / Reef Matrix'
       : gravityG > 1.35
-      ? 'Locomozione Multi-Arto Bassa ad Alta Stabilità'
-      : 'Propulsione Biomeccanica / Planata Atmosferica';
+      ? 'Low-Center Multi-Limb High-Stability Gait'
+      : 'Biomechanical Propulsion / Atmospheric Gliding';
 
     const sensoryMode = cPrng.pick([
-      'Visione Multispettrale (UV + Infrarosso Termico)',
-      'Ecolocalizzazione Acustica a Fase Variabile',
-      'Elettrorecezione Magnetosferica',
-      'Chemiorecezione Fotonica Bioluminescente'
+      'Multispectral Vision (UV + Thermal Infrared)',
+      'Phase-Variable Acoustic Echolocation',
+      'Magnetospheric Electroreception',
+      'Bioluminescent Photonic Chemoreception'
     ]);
 
     const traits = [];
-    if (gravityG > 1.3) traits.push(`Endoscheletro rinforzato in composito carbonio-silicio (${gravityG.toFixed(2)} g)`);
-    else if (gravityG < 0.8) traits.push(`Morfologia slanciata a bassa gravità (${gravityG.toFixed(2)} g)`);
-    else traits.push('Omeostasi termica ed endoscheletro articolato');
+    if (gravityG > 1.3) traits.push(`Reinforced carbon-silicate composite endoskeleton (${gravityG.toFixed(2)} g)`);
+    else if (gravityG < 0.8) traits.push(`Elongated low-gravity morphology (${gravityG.toFixed(2)} g)`);
+    else traits.push('Articulated endoskeleton & active thermoregulation');
 
-    if (star.tempK < 4400) traits.push('Membrane cellulari schermate contro super-flare stellari XUV');
-    if (pressureAtm > 1.8) traits.push('Apparato respiratorio a scambio controcorrente ad alta densità');
-    traits.push(`Bioluminescenza adattiva (${sensoryMode.split(' ')[0]})`);
+    if (star.tempK < 4400) traits.push('Cellular membranes shielded against XUV stellar superflares');
+    if (pressureAtm > 1.8) traits.push('High-density counter-current respiratory exchange');
+    traits.push(`Adaptive bioluminescence (${sensoryMode.split(' ')[0]})`);
 
     return {
       id: `clade-${idx}`,
@@ -2682,11 +2642,11 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
   });
 
   const trophicLinks = [
-    { from: 0, to: 2, efficiency: 0.14, label: 'Flusso Fotosintetico' },
-    { from: 1, to: 2, efficiency: 0.12, label: 'Simbiosi Nutritiva' },
-    { from: 2, to: 3, efficiency: 0.11, label: 'Predazione Selettiva' },
-    { from: 3, to: 4, efficiency: 0.22, label: 'Ciclo Detritivoro' },
-    { from: 4, to: 0, efficiency: 0.85, label: 'Mineralizzazione Azoto/Fosforo' }
+    { from: 0, to: 2, efficiency: 0.14, label: 'Photosynthetic Flux' },
+    { from: 1, to: 2, efficiency: 0.12, label: 'Nutrient Symbiosis' },
+    { from: 2, to: 3, efficiency: 0.11, label: 'Selective Predation' },
+    { from: 3, to: 4, efficiency: 0.22, label: 'Detritivore Loop' },
+    { from: 4, to: 0, efficiency: 0.85, label: 'Nitrogen/Phosphorus Mineralization' }
   ];
 
   return {
@@ -2703,9 +2663,9 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
     clades,
     trophicLinks,
     adaptations: [
-      `Pigmentazione fotosintetica calibrata sullo spettro ${star.spectralClass} (${Math.round(star.tempK)} K)`,
-      `Adattamento biomeccanico a gravità superficiale di ${gravityG.toFixed(2)} g`,
-      `Ciclo metabolico sincronizzato con periodo di rotazione di ${(12 + (pSeed % 20)).toFixed(1)} ore`
+      `Photosynthetic pigmentation tuned to ${star.spectralClass} spectrum (${Math.round(star.tempK)} K)`,
+      `Biomechanical adaptation to ${gravityG.toFixed(2)} g surface gravity`,
+      `Circadian metabolism synchronized with ${(12 + (pSeed % 20)).toFixed(1)}-hour rotation`
     ],
     extinctionEvents: Math.floor(bioAgeGyr * 1.1)
   };
@@ -2716,24 +2676,24 @@ function generateBiosphere({ pSeed, archetype, habitabilityScore, surfaceTempK, 
  */
 const CIV_ETHOS = [
   {
-    name: 'Tecnocrazia Orbitale Armonica',
-    governance: 'Consiglio Scientifico Planetario & Rete Quantistica',
-    philosophy: 'Equilibrio tra espansione astrofisica e preservazione della biosfera nativa'
+    name: 'Harmonic Orbital Technocracy',
+    governance: 'Planetary Science Council & Quantum Mesh',
+    philosophy: 'Balancing astrophysical expansion with preservation of the native biosphere'
   },
   {
-    name: 'Simbiosi Ecosferica Collettiva',
-    governance: 'Sinapsi Bio-Digitale Distribuita',
-    philosophy: 'Integrazione genetica e tecnologica con le reti trofiche planetarie'
+    name: 'Collective Ecospheric Symbiosis',
+    governance: 'Distributed Bio-Digital Synapse',
+    philosophy: 'Genetic and technological integration with planetary trophic networks'
   },
   {
-    name: 'Coalizione Mercantile Interplanetaria',
-    governance: 'Federazione di Città-Stato Orbitali e Ascensori Spaziali',
-    philosophy: 'Estrazione mineraria asteroidea, commercio energetico e colonizzazione'
+    name: 'Interplanetary Mercantile Coalition',
+    governance: 'Federation of Orbital City-States & Space Elevators',
+    philosophy: 'Asteroid belt mining, energy commerce, and outer-moon colonization'
   },
   {
-    name: 'Ordine Archivistico Post-Biologico',
-    governance: 'Matrice Computazionale Autonoma',
-    philosophy: 'Osservazione cosmologica a lungo termine e simulazione di sottouniversi'
+    name: 'Post-Biological Archival Order',
+    governance: 'Autonomous Computational Matrix',
+    philosophy: 'Long-term cosmological observation and sub-universe simulation'
   }
 ];
 
@@ -2747,7 +2707,7 @@ function generateCivilization({ pSeed, properName, biosphere, habitabilityScore,
   if (!emerged) {
     return {
       active: false,
-      status: 'Nessuna Civiltà Tecnologica Presente',
+      status: 'No Technological Civilization Detected',
       kardashev: 0.0,
       history: generateNaturalChronicle(properName, currentAgeGyr, biosphere)
     };
@@ -2759,7 +2719,7 @@ function generateCivilization({ pSeed, properName, biosphere, habitabilityScore,
 
   const ethos = prng.pick(CIV_ETHOS);
   const speciesName = `Sapiens ${generateAstronomicalName(prng)}`;
-  const civAgeKy = Math.round(prng.range(14, 420)); // thousand years
+  const civAgeKy = Math.round(prng.range(14, 420));
   const populationBillions = Number((prng.range(4.2, 28.5) * kardashev).toFixed(2));
   const energyPowerTW = Math.round(Math.pow(10, (kardashev - 0.7) * 4.2) * 18);
 
@@ -2771,36 +2731,36 @@ function generateCivilization({ pSeed, properName, biosphere, habitabilityScore,
   if (kardashev >= 0.85) {
     megastructures.push({
       id: 'mega-ring',
-      name: 'Anello Orbitale Equatoriale & Ascensori Spaziali',
+      name: 'Equatorial Orbital Ring & Space Elevators',
       type: 'orbital_ring',
       completion: Math.min(1.0, (kardashev - 0.65) * 1.4),
-      description: 'Infrastruttura di lancio non-propulsivo ed energia solare geostazionaria'
+      description: 'Non-rocket orbital launch infrastructure and geostationary solar power relay'
     });
   }
   if (kardashev >= 1.05) {
     megastructures.push({
       id: 'mega-dyson',
-      name: 'Nodi Collettori dello Sciame di Dyson',
+      name: 'Dyson Swarm Collector Nodes',
       type: 'dyson_swarm',
       completion: Math.min(1.0, (kardashev - 0.9) * 0.95),
-      description: 'Specchi e collettori fotovoltaici in orbita eliocentrica ravvicinata'
+      description: 'Photovoltaic mirrors and quantum collectors in close heliocentric orbit'
     });
   }
   if (kardashev >= 0.95) {
     megastructures.push({
       id: 'mega-shield',
-      name: 'Griglia di Regolazione Climatica & Magnetosferica',
+      name: 'Climate & Magnetospheric Regulation Grid',
       type: 'climate_array',
       completion: 0.92,
-      description: 'Stabilizzazione dell’albedo planetario e schermatura dalle tempeste solari'
+      description: 'Planetary albedo stabilization and solar-storm magnetic shielding'
     });
   }
 
   const techDomains = [
-    { name: 'Produzione Energetica', level: kardashev > 1.2 ? 'Fusione He³ & Collettori Stellari' : 'Fusione Confinamento Magnetico & Solare Orbitale', progress: Math.min(100, Math.round(kardashev * 62)) },
-    { name: 'Propulsione Spaziale', level: kardashev > 1.3 ? 'Vele Laser Relativistiche & Antimateria Catalizzata' : 'Torce a Fusione Impulsiva & Magneto-Plasma', progress: Math.min(100, Math.round(kardashev * 58)) },
-    { name: 'Biotecnologia & Ecologia', level: 'Ingegneria Genomica Adattiva & Ripristino Biosferico', progress: Math.min(100, Math.round(sustainabilityIndex * 94)) },
-    { name: 'Computazione & IA', level: 'Reti Quantistiche Planetarie & Sintesi Cognitiva', progress: Math.min(100, Math.round(kardashev * 65)) }
+    { name: 'Energy Production', level: kardashev > 1.2 ? 'He³ Fusion & Stellar Collectors' : 'Magnetic Confinement Fusion & Orbital Solar', progress: Math.min(100, Math.round(kardashev * 62)) },
+    { name: 'Space Propulsion', level: kardashev > 1.3 ? 'Relativistic Laser Sails & Catalyzed Antimatter' : 'Pulsed Fusion Torches & Magneto-Plasma', progress: Math.min(100, Math.round(kardashev * 58)) },
+    { name: 'Biotech & Ecology', level: 'Adaptive Genomic Engineering & Biospheric Restoration', progress: Math.min(100, Math.round(sustainabilityIndex * 94)) },
+    { name: 'Computation & AI', level: 'Planetary Quantum Networks & Cognitive Synthesis', progress: Math.min(100, Math.round(kardashev * 65)) }
   ];
 
   const history = [
@@ -2808,32 +2768,32 @@ function generateCivilization({ pSeed, properName, biosphere, habitabilityScore,
     {
       epoch: `T - ${civAgeKy} kyr`,
       category: 'evolution',
-      title: `Emergenza cognitiva di ${speciesName}`,
-      detail: 'Sviluppo del linguaggio simbolico, trasmissione culturale cumulativa e primi insediamenti.'
+      title: `Cognitive Emergence of ${speciesName}`,
+      detail: 'Development of symbolic language, cumulative cultural transmission, and early settlements.'
     },
     {
       epoch: `T - ${Math.round(civAgeKy * 0.25)} kyr`,
       category: 'civ',
-      title: 'Rivoluzione Termodinamica & Unificazione Planetaria',
-      detail: `Superamento della crisi ecologica pre-Kardashev I; adozione del modello ${ethos.name}.`
+      title: 'Thermodynamic Revolution & Planetary Unification',
+      detail: `Resolved pre-Kardashev I ecological bottleneck; adopted the ${ethos.name} model.`
     },
     {
       epoch: `T - ${Math.round(civAgeKy * 0.08)} kyr`,
       category: 'tech',
-      title: 'Inaugurazione dell’Infrastruttura Orbitale',
-      detail: 'Costruzione dei primi ascensori spaziali equatoriali e colonizzazione delle lune.'
+      title: 'Inauguration of Orbital Infrastructure',
+      detail: 'Construction of equatorial space elevators and colonization of natural moons.'
     },
     {
-      epoch: 'Epoca Attuale',
+      epoch: 'Current Epoch',
       category: 'civ',
-      title: `Civiltà di Tipo Kardashev ${kardashev.toFixed(2)}`,
-      detail: `Popolazione di ${populationBillions} miliardi; potenza installata ${energyPowerTW} TW; indice cooperazione ${Math.round(cooperationIndex * 100)}%.`
+      title: `Kardashev Type ${kardashev.toFixed(2)} Civilization`,
+      detail: `Population ${populationBillions} billion; installed output ${energyPowerTW} TW; cooperation index ${Math.round(cooperationIndex * 100)}%.`
     }
   ];
 
   return {
     active: true,
-    status: 'Civiltà Interplanetaria Attiva',
+    status: 'Active Interplanetary Civilization',
     speciesName,
     ethos,
     kardashev,
@@ -2855,14 +2815,14 @@ function generateNaturalChronicle(properName, currentAgeGyr, biosphere) {
     {
       epoch: `T - ${currentAgeGyr.toFixed(2)} Gyr`,
       category: 'astro',
-      title: `Accrescimento protoplanetario di ${properName}`,
-      detail: 'Condensazione dei silicati e differenziazione gravitazionale del nucleo ferro-nichel.'
+      title: `Protoplanetary Accretion of ${properName}`,
+      detail: 'Silicate condensation and gravitational differentiation of the iron-nickel core.'
     },
     {
       epoch: `T - ${(currentAgeGyr * 0.85).toFixed(2)} Gyr`,
       category: 'geo',
-      title: 'Stabilizzazione crostale e degassamento atmosferico',
-      detail: 'Raffreddamento del mantello, formazione dell’atmosfera secondaria e condensazione dei volatili.'
+      title: 'Crustal Stabilization & Atmospheric Outgassing',
+      detail: 'Mantle cooling, secondary atmosphere formation, and condensation of volatile oceans.'
     }
   ];
 
@@ -2870,15 +2830,15 @@ function generateNaturalChronicle(properName, currentAgeGyr, biosphere) {
     chronicle.push({
       epoch: `T - ${biosphere.bioAgeGyr.toFixed(2)} Gyr`,
       category: 'bio',
-      title: 'Abiogenesi e comparsa dei primi replicatori',
-      detail: `Transizione dalla chimica prebiotica a membrane autoreplicanti (${biosphere.biochemistry}).`
+      title: 'Abiogenesis & Emergence of First Replicators',
+      detail: `Transition from prebiotic chemistry to self-replicating membranes (${biosphere.biochemistry}).`
     });
     if (biosphere.complexityIndex > 0.5) {
       chronicle.push({
         epoch: `T - ${(biosphere.bioAgeGyr * 0.45).toFixed(2)} Gyr`,
         category: 'bio',
-        title: 'Grande Ossidazione & Radiazione Multicorporale',
-        detail: `Espansione dei produttori primari (${biosphere.energySource}) e diversificazione trofica.`
+        title: 'Great Oxidation & Multicellular Radiation',
+        detail: `Expansion of primary producers (${biosphere.energySource}) and trophic diversification.`
       });
     }
   }
@@ -2895,16 +2855,16 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
 
   const geoTypes = archetype === 'gas_giant' || archetype === 'ice_giant'
     ? [
-        { type: 'Anticiclone Persistente', icon: 'storm' },
-        { type: 'Corrente a Getto Equatoriale', icon: 'wind' },
-        { type: 'Vortice Polare Esagonale', icon: 'vortex' }
+        { type: 'Persistent Anticyclone', icon: 'storm' },
+        { type: 'Equatorial Jet Stream', icon: 'wind' },
+        { type: 'Hexagonal Polar Vortex', icon: 'vortex' }
       ]
     : [
-        { type: 'Continente / Altopiano Cratonico', icon: 'continent' },
-        { type: 'Bacino Oceanico / Mare', icon: 'ocean' },
-        { type: 'Vulcano a Scudo / Caldera', icon: 'volcano' },
-        { type: 'Rift Valley / Canyon Tettonico', icon: 'canyon' },
-        { type: 'Cratere da Impatto Multi-Anello', icon: 'crater' }
+        { type: 'Cratonic Continent / Plateau', icon: 'continent' },
+        { type: 'Oceanic Basin / Mare', icon: 'ocean' },
+        { type: 'Shield Volcano / Caldera', icon: 'volcano' },
+        { type: 'Rift Valley / Tectonic Canyon', icon: 'canyon' },
+        { type: 'Multi-Ring Impact Crater', icon: 'crater' }
       ];
 
   for (let i = 0; i < 6; i++) {
@@ -2926,8 +2886,8 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
   if (biosphere && biosphere.active) {
     landmarks.push({
       id: 'lm-bio-0',
-      name: `Riserva Biosferica di ${generateAstronomicalName(prng)}`,
-      category: 'Hotspot di Biodiversità & Foresta Primaria',
+      name: `${generateAstronomicalName(prng)} Biosphere Reserve`,
+      category: 'Biodiversity Hotspot & Primary Forest',
       icon: 'biosphere',
       lat: prng.range(-25, 25),
       lon: prng.range(-120, 120),
@@ -2939,8 +2899,8 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
   if (civilization && civilization.active) {
     landmarks.push({
       id: 'lm-civ-0',
-      name: `Metropoli & Terminale Orbitale ${generateAstronomicalName(prng)}`,
-      category: 'Capitale Planetaria & Ancoraggio Ascensore Spaziale',
+      name: `${generateAstronomicalName(prng)} Metropolis & Tether`,
+      category: 'Planetary Capital & Space Elevator Anchor',
       icon: 'city',
       lat: prng.range(-18, 18),
       lon: prng.range(-90, 90),
@@ -2966,14 +2926,14 @@ function generateSurfaceLandmarks(pSeed, planetName, archetype, biosphere, civil
 
 
 const TIME_SCALES = [
-  { id: 'pause', label: 'PAUSA', short: '0x', yearsPerSec: 0, visualSpeed: 0.0, desc: 'Simulazione congelata' },
-  { id: 'realtime', label: 'Tempo Reale', short: '1x', yearsPerSec: 1 / 31557600, visualSpeed: 0.35, desc: 'Dinamica superficiale e atmosferica in tempo reale' },
-  { id: 'hours', label: 'Rotazione Planetaria', short: '2h/s', yearsPerSec: 2 / 8766, visualSpeed: 0.85, desc: 'Ciclo giorno/notte e circolazione meteorologica' },
-  { id: 'days', label: 'Dinamica Lunare', short: '15d/s', yearsPerSec: 15 / 365.25, visualSpeed: 1.4, desc: 'Orbite lunari e pianeti interni' },
-  { id: 'years', label: 'Meccanica Orbitale', short: '1 yr/s', yearsPerSec: 1.0, visualSpeed: 2.2, desc: 'Rivoluzioni kepleriane dell’intero sistema planetario' },
-  { id: 'millennia', label: 'Scala Storica & Civiltà', short: '2 kyr/s', yearsPerSec: 2000, visualSpeed: 3.0, desc: 'Sviluppo tecnologico, civiltà di Kardashev e clima' },
-  { id: 'megayears', label: 'Scala Evolutiva & Geologica', short: '5 Myr/s', yearsPerSec: 5e6, visualSpeed: 4.0, desc: 'Speciazione darwiniana, deriva tettonica ed ecosistemi' },
-  { id: 'gigayears', label: 'Scala Cosmica & Stellare', short: '200 Myr/s', yearsPerSec: 2e8, visualSpeed: 5.5, desc: 'Evoluzione stellare H-R, giganti rosse, supernovae e nane bianche' }
+  { id: 'pause', label: 'PAUSE', short: '0x', yearsPerSec: 0, visualSpeed: 0.0, desc: 'Simulation paused' },
+  { id: 'realtime', label: 'Real Time', short: '1x', yearsPerSec: 1 / 31557600, visualSpeed: 0.35, desc: 'Real-time surface and atmospheric dynamics' },
+  { id: 'hours', label: 'Planetary Rotation', short: '2h/s', yearsPerSec: 2 / 8766, visualSpeed: 0.85, desc: 'Day/night cycle and atmospheric circulation' },
+  { id: 'days', label: 'Lunar Dynamics', short: '15d/s', yearsPerSec: 15 / 365.25, visualSpeed: 1.4, desc: 'Moon orbits and inner rocky planets' },
+  { id: 'years', label: 'Orbital Mechanics', short: '1 yr/s', yearsPerSec: 1.0, visualSpeed: 2.2, desc: 'Keplerian revolutions across the planetary system' },
+  { id: 'millennia', label: 'Historical & Civ Scale', short: '2 kyr/s', yearsPerSec: 2000, visualSpeed: 3.0, desc: 'Technological development, Kardashev growth & climate' },
+  { id: 'megayears', label: 'Evolutionary & Tectonic', short: '5 Myr/s', yearsPerSec: 5e6, visualSpeed: 4.0, desc: 'Darwinian speciation, plate tectonics & ecosystems' },
+  { id: 'gigayears', label: 'Cosmic & Stellar Scale', short: '200 Myr/s', yearsPerSec: 2e8, visualSpeed: 5.5, desc: 'H-R stellar evolution, red giants, supernovae & white dwarfs' }
 ];
 
 const STORAGE_KEY = 'parallax_universe_persistence_v1';
@@ -2983,22 +2943,18 @@ class SimulationEngine {
     this.universeSeed = 'PARALLAX-2026-OMEGA';
     this.sectorCoords = [0, 0, 0];
 
-    // Continuous spatial scale: log10(meters)
-    this.currentLogScale = 24.6; // Starts at Cosmic Web view, or can smoothly fly anywhere
+    this.currentLogScale = 24.6;
     this.targetLogScale = 24.6;
 
-    // Temporal state
-    this.timeScaleIndex = 4; // Default: 1 yr/s orbital dynamics
+    this.timeScaleIndex = 4;
     this.elapsedYears = 0.0;
     this.baseCosmicEpochGyr = 13.800;
     this.visualTime = 0.0;
 
-    // Persistent deltas & bookmarks
     this.deltas = {};
     this.bookmarks = [];
     this.globalEvents = [];
 
-    // Active hierarchy selection
     this.cosmicWeb = null;
     this.activeSuperclusterIndex = 0;
     this.galaxies = [];
@@ -3006,11 +2962,10 @@ class SimulationEngine {
     this.stellarSector = null;
     this.activeSystemIndex = 0;
     this.planetarySystem = null;
-    this.activePlanetIndex = 2; // Anchor habitable homeworld by default
+    this.activePlanetIndex = 2;
     this.activeLandmarkIndex = 0;
     this.activeCladeIndex = 0;
 
-    // Dynamic transient effects (superflare, impact shockwave, etc.)
     this.transientEffects = {
       superflareIntensity: 0.0,
       impactFlashIntensity: 0.0,
@@ -3037,6 +2992,7 @@ class SimulationEngine {
 
   loadPersistence() {
     try {
+      if (typeof localStorage === 'undefined') return;
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
@@ -3046,12 +3002,13 @@ class SimulationEngine {
       if (Array.isArray(parsed.bookmarks)) this.bookmarks = parsed.bookmarks;
       if (Array.isArray(parsed.globalEvents)) this.globalEvents = parsed.globalEvents.slice(0, 35);
     } catch (e) {
-      console.warn('PARALLAX persistence load skipped:', e);
+      // Ignore storage unavailable errors
     }
   }
 
   savePersistence() {
     try {
+      if (typeof localStorage === 'undefined') return;
       const payload = {
         universeSeed: this.universeSeed,
         elapsedYears: this.elapsedYears,
@@ -3077,8 +3034,8 @@ class SimulationEngine {
     this.rebuildHierarchy();
     this.logEvent(
       'cosmos',
-      `Inizializzazione Coordinate Universali [${this.universeSeed}]`,
-      'Rete cosmica, campi di densità barionica e costante di Hubble sincronizzati.'
+      `Universal Coordinate Seed Initialized [${this.universeSeed}]`,
+      'Cosmic web filaments, baryonic density fields, and Hubble constant synchronized.'
     );
     this.savePersistence();
     this.emitChange('reset');
@@ -3096,21 +3053,21 @@ class SimulationEngine {
       const homePlanet = this.getActivePlanet();
       this.logEvent(
         'cosmos',
-        `Sintonizzazione Osservatorio su ${sc.name}`,
-        `Rilevate ${sc.galaxyCount.toLocaleString()} galassie lungo i filamenti di materia oscura (z = ${sc.redshift.toFixed(4)}).`
+        `Observatory Locked on ${sc.name}`,
+        `Cataloged ${sc.galaxyCount.toLocaleString()} galaxies along dark-matter filaments (z = ${sc.redshift.toFixed(4)}).`
       );
       if (homePlanet && homePlanet.biosphere.active) {
         this.logEvent(
           'bio',
-          `Biofirma Confermata su ${homePlanet.name}`,
-          `Spettro di assorbimento O₂/CH₄ in disequilibrio chimico; biomassa stimata ${homePlanet.biosphere.biomassGt} Gt.`
+          `Biosignature Confirmed on ${homePlanet.name}`,
+          `O₂/CH₄ atmospheric chemical disequilibrium detected; estimated biomass ${homePlanet.biosphere.biomassGt} Gt C.`
         );
       }
       if (homePlanet && homePlanet.civilization.active) {
         this.logEvent(
           'civ',
-          `Tecnofirma Kardashev ${homePlanet.civilization.kardashev.toFixed(2)} su ${homePlanet.name}`,
-          `${homePlanet.civilization.speciesName} (${homePlanet.civilization.ethos.name}) — emissione notturna e strutture orbitali attive.`
+          `Kardashev ${homePlanet.civilization.kardashev.toFixed(2)} Technosignature on ${homePlanet.name}`,
+          `${homePlanet.civilization.speciesName} (${homePlanet.civilization.ethos.name}) — nocturnal city grids & orbital megastructures active.`
         );
       }
     }
@@ -3122,7 +3079,6 @@ class SimulationEngine {
     const extraAgeGyr = (this.elapsedYears / 1e9) + (sysDelta.extraAgeGyr || 0);
     this.planetarySystem = generatePlanetarySystem(sysSummary, extraAgeGyr);
 
-    // Apply any persistent planet-specific deltas (e.g. evolutionary leaps, impacts, civilization growth)
     for (const planet of this.planetarySystem.planets) {
       this.applyPlanetCausalityAndDeltas(planet, this.planetarySystem.star, extraAgeGyr);
     }
@@ -3135,9 +3091,6 @@ class SimulationEngine {
   applyPlanetCausalityAndDeltas(planet, star, extraAgeGyr) {
     const pDelta = this.deltas[planet.id];
 
-    // Causal astrophysical feedback when star evolves (e.g. into a Red Giant or White Dwarf!)
-    const baseFlux = 1.0 / Math.max(0.001, planet.orbit.a * planet.orbit.a);
-    const currentFlux = star.luminositySolar * baseFlux;
     const newEqTempK = star.tempK * Math.sqrt((star.radiusSolar * 695700) / (2 * planet.orbit.a * 1.496e8)) * Math.pow(1 - planet.albedo, 0.25);
 
     if (Math.abs(extraAgeGyr) > 0.01) {
@@ -3146,16 +3099,14 @@ class SimulationEngine {
       planet.surfaceTempC = planet.surfaceTempK - 273.15;
       planet.inHabitableZone = planet.orbit.a >= star.hzInnerAU * 0.82 && planet.orbit.a <= star.hzOuterAU * 1.22;
 
-      // If star expanded into a Red Giant and overheated the planet:
       if (planet.surfaceTempK > 410 && planet.oceanCoverage > 0 && planet.archetype !== 'lava_world') {
         planet.oceanCoverage = Math.max(0, planet.oceanCoverage - 0.55);
         planet.iceCoverage = 0;
         if (planet.biosphere.active) {
           planet.biosphere.biomassGt = Math.round(planet.biosphere.biomassGt * 0.15);
-          planet.biosphere.stage = 'Biosfera Estremofila Residuale (Stress Termico Stellare)';
+          planet.biosphere.stage = 'Residual Extremophile Biosphere (Stellar Thermal Stress)';
         }
       } else if (planet.surfaceTempK < 180 && planet.oceanCoverage > 0) {
-        // Star cooled into a White Dwarf -> planet freezes over
         planet.iceCoverage = Math.min(0.98, planet.iceCoverage + 0.65);
       }
     }
@@ -3171,11 +3122,11 @@ class SimulationEngine {
     }
     if (pDelta.forceBiosphere && !planet.biosphere.active) {
       planet.biosphere.active = true;
-      planet.biosphere.stage = 'Ecosistema Complesso Neo-Evoluto';
+      planet.biosphere.stage = 'Newly Evolved Complex Ecosystem';
       planet.biosphere.complexityIndex = pDelta.bioComplexity || 0.78;
       planet.biosphere.biomassGt = pDelta.biomassGt || 420;
-      planet.biosphere.biochemistry = 'Carbonio-Acqua Chirale con Biopolimeri Adattivi';
-      planet.biosphere.energySource = 'Fotosintesi Multispettrale & Chemiosintesi';
+      planet.biosphere.biochemistry = 'Chiral Carbon-Water with Adaptive Biopolymers';
+      planet.biosphere.energySource = 'Multispectral Photosynthesis & Chemosynthesis';
       planet.biosphere.speciesCountEstimate = 1850000;
       planet.biosphere.foliageRGB = [0.16, 0.52, 0.31];
       planet.biosphere.clades = [
@@ -3183,12 +3134,12 @@ class SimulationEngine {
           id: 'clade-neo-0',
           index: 0,
           binomialName: 'Neophyta synthetica',
-          commonArchetype: 'Produttore Primario Globale',
+          commonArchetype: 'Global Primary Producer',
           trophicLevel: 1,
           icon: 'flora',
-          symmetry: 'Frattale Elicoidale',
-          locomotion: 'Sessile Fototropica',
-          sensoryMode: 'Fotoricezione a Spettro Esteso',
+          symmetry: 'Helical Fractal',
+          locomotion: 'Sessile Phototropic',
+          sensoryMode: 'Broad-Spectrum Photoreception',
           bioluminescence: true,
           biomassShare: 0.65,
           populationTrend: 0.06,
@@ -3196,18 +3147,18 @@ class SimulationEngine {
           bodySegments: 7,
           appendageCount: 8,
           hueDeg: 145,
-          traits: ['Fissazione rapida del carbonio atmosferico', 'Bioluminescenza notturna sincronizzata']
+          traits: ['Rapid atmospheric carbon fixation', 'Synchronized nocturnal bioluminescence']
         },
         {
           id: 'clade-neo-1',
           index: 1,
           binomialName: 'Aureozoon velox',
-          commonArchetype: 'Consumatore & Impollinatore',
+          commonArchetype: 'Primary Consumer & Pollinator',
           trophicLevel: 2,
           icon: 'herbivore',
-          symmetry: 'Bilaterale Esapode',
-          locomotion: 'Locomozione Articolata / Planata',
-          sensoryMode: 'Visione Multispettrale',
+          symmetry: 'Bilateral Hexapod',
+          locomotion: 'Articulated Gait / Gliding',
+          sensoryMode: 'Multispectral Vision',
           bioluminescence: true,
           biomassShare: 0.25,
           populationTrend: 0.04,
@@ -3215,18 +3166,18 @@ class SimulationEngine {
           bodySegments: 6,
           appendageCount: 6,
           hueDeg: 195,
-          traits: ['Simbiosi metabolica con la flora primaria', 'Navigazione magnetosferica']
+          traits: ['Metabolic symbiosis with primary flora', 'Magnetospheric navigation']
         },
         {
           id: 'clade-neo-2',
           index: 2,
           binomialName: 'Kronocaris regalis',
-          commonArchetype: 'Predatore Apicale',
+          commonArchetype: 'Apex Predator',
           trophicLevel: 3,
           icon: 'predator',
-          symmetry: 'Bilaterale Corazzata',
-          locomotion: 'Scatto Biomeccanico',
-          sensoryMode: 'Elettrorecezione & Termovisione',
+          symmetry: 'Armored Bilateral',
+          locomotion: 'Biomechanical Sprint',
+          sensoryMode: 'Electroreception & Thermal Imaging',
           bioluminescence: false,
           biomassShare: 0.10,
           populationTrend: 0.02,
@@ -3234,12 +3185,12 @@ class SimulationEngine {
           bodySegments: 9,
           appendageCount: 6,
           hueDeg: 25,
-          traits: ['Omeostasi avanzata', 'Coordinazione sociale di branco']
+          traits: ['Advanced homeostasis', 'Coordinated pack hunting']
         }
       ];
       planet.biosphere.trophicLinks = [
-        { from: 0, to: 1, efficiency: 0.15, label: 'Simbiosi Trofica' },
-        { from: 1, to: 2, efficiency: 0.12, label: 'Predazione Apicale' }
+        { from: 0, to: 1, efficiency: 0.15, label: 'Trophic Symbiosis' },
+        { from: 1, to: 2, efficiency: 0.12, label: 'Apex Predation' }
       ];
     }
     if (typeof pDelta.bioComplexity === 'number' && planet.biosphere.active) {
@@ -3254,13 +3205,13 @@ class SimulationEngine {
     if (pDelta.forceCivilization || (pDelta.kardashev && planet.civilization.active)) {
       const k = pDelta.kardashev || 1.15;
       planet.civilization.active = true;
-      planet.civilization.status = k >= 1.5 ? 'Civiltà Stellare (Sciame di Dyson)' : 'Civiltà Planetaria & Orbitale Attiva';
+      planet.civilization.status = k >= 1.5 ? 'Stellar Civilization (Dyson Swarm)' : 'Active Planetary & Orbital Civilization';
       planet.civilization.kardashev = k;
       planet.civilization.speciesName = planet.civilization.speciesName || `Sapiens ${planet.name.split(' ')[0]}`;
       planet.civilization.ethos = planet.civilization.ethos || {
-        name: 'Tecnocrazia Orbitale Armonica',
-        governance: 'Consiglio Scientifico Planetario & Rete Quantistica',
-        philosophy: 'Equilibrio tra espansione astrofisica e preservazione della biosfera nativa'
+        name: 'Harmonic Orbital Technocracy',
+        governance: 'Planetary Science Council & Quantum Mesh',
+        philosophy: 'Balancing astrophysical expansion with preservation of the native biosphere'
       };
       planet.civilization.populationBillions = Number((11.5 * k).toFixed(2));
       planet.civilization.energyPowerTW = Math.round(Math.pow(10, (k - 0.7) * 4.2) * 18);
@@ -3271,27 +3222,27 @@ class SimulationEngine {
       planet.civilization.megastructures = [
         {
           id: 'mega-ring',
-          name: 'Anello Orbitale Equatoriale & Ascensori Spaziali',
+          name: 'Equatorial Orbital Ring & Space Elevators',
           type: 'orbital_ring',
           completion: Math.min(1.0, (k - 0.5) * 1.2),
-          description: 'Infrastruttura di trasporto orbitale ed energia geostazionaria'
+          description: 'Non-rocket orbital transport infrastructure and geostationary energy array'
         }
       ];
       if (k >= 1.05) {
         planet.civilization.megastructures.push({
           id: 'mega-dyson',
-          name: 'Sciame Collettore di Dyson Eliocentrico',
+          name: 'Heliocentric Dyson Collector Swarm',
           type: 'dyson_swarm',
           completion: Math.min(1.0, (k - 0.9) * 0.9),
-          description: 'Rete di collettori solari quantistici attorno alla stella madre'
+          description: 'Network of quantum solar collectors orbiting the host star'
         });
       }
       if (!planet.civilization.techDomains) {
         planet.civilization.techDomains = [
-          { name: 'Produzione Energetica', level: 'Fusione He³ & Collettori Stellari', progress: Math.min(100, Math.round(k * 62)) },
-          { name: 'Propulsione Spaziale', level: 'Vele Relativistiche & Magneto-Plasma', progress: Math.min(100, Math.round(k * 58)) },
-          { name: 'Biotecnologia & Ecologia', level: 'Ingegneria Genomica & Omeostasi Climatica', progress: 92 },
-          { name: 'Computazione & IA', level: 'Reti Quantistiche Distribuite', progress: Math.min(100, Math.round(k * 65)) }
+          { name: 'Energy Production', level: 'He³ Fusion & Stellar Collectors', progress: Math.min(100, Math.round(k * 62)) },
+          { name: 'Space Propulsion', level: 'Relativistic Sails & Magneto-Plasma', progress: Math.min(100, Math.round(k * 58)) },
+          { name: 'Biotech & Ecology', level: 'Genomic Engineering & Climate Homeostasis', progress: 92 },
+          { name: 'Computation & AI', level: 'Distributed Quantum Networks', progress: Math.min(100, Math.round(k * 65)) }
         ];
       }
     }
@@ -3304,19 +3255,14 @@ class SimulationEngine {
     }
   }
 
-  /**
-   * Main simulation step called every animation frame (dt in seconds)
-   */
   step(dtSeconds) {
     const clampedDt = Math.min(0.1, Math.max(0.001, dtSeconds));
     const timeScale = TIME_SCALES[this.timeScaleIndex] || TIME_SCALES[4];
 
-    // Decay transient visual effects
     this.transientEffects.superflareIntensity = Math.max(0, this.transientEffects.superflareIntensity - clampedDt * 0.45);
     this.transientEffects.impactFlashIntensity = Math.max(0, this.transientEffects.impactFlashIntensity - clampedDt * 0.55);
     this.transientEffects.evolutionPulseIntensity = Math.max(0, this.transientEffects.evolutionPulseIntensity - clampedDt * 0.5);
 
-    // Smoothly interpolate spatial scale zoom
     const scaleDiff = this.targetLogScale - this.currentLogScale;
     if (Math.abs(scaleDiff) > 0.0001) {
       this.currentLogScale += scaleDiff * Math.min(1.0, clampedDt * 6.5);
@@ -3330,27 +3276,20 @@ class SimulationEngine {
       this.visualTime += clampedDt * timeScale.visualSpeed;
 
       const newGyr = Math.floor((this.elapsedYears / 1e9) * 20);
-      // If macro-time advanced significantly (> 50 Myr), recompute stellar evolution & planetary causal state!
       if (newGyr !== prevGyr) {
         this.refreshPlanetarySystem();
       }
 
-      // Autonomous background universe simulation ticker
       this._backgroundTickAccumulator += clampedDt * timeScale.visualSpeed;
       if (this._backgroundTickAccumulator > 14.0) {
         this._backgroundTickAccumulator = 0;
         this.simulateAutonomousBackgroundUniverse();
       }
     } else {
-      // Even when paused, allow subtle shader camera visual breathing
       this.visualTime += clampedDt * 0.08;
     }
   }
 
-  /**
-   * Autonomous background evolution: simulates events occurring across the universe
-   * even when the observer is looking elsewhere.
-   */
   simulateAutonomousBackgroundUniverse() {
     const prng = new PRNG(hashHierarchy(this.universeSeed, 'BG_EVENT', Math.floor(this.elapsedYears * 100 + this.globalEvents.length)));
     const sysList = this.stellarSector ? this.stellarSector.systems : [];
@@ -3360,33 +3299,32 @@ class SimulationEngine {
     const eventRoll = prng.next();
 
     if (eventRoll < 0.28 && randomSys.hasCivilization) {
-      // Civilization progression in sector
       this.logEvent(
         'civ',
-        `Espansione Infrastruttura Orbitale in ${randomSys.name}`,
-        `Segnali di telemetria indicano il completamento di nuovi nodi energetici nel sistema ${randomSys.catalogId}.`,
+        `Orbital Infrastructure Expansion in ${randomSys.name}`,
+        `Telemetry signals confirm completion of new orbital energy nodes in system ${randomSys.catalogId}.`,
         { systemIndex: randomSys.index }
       );
     } else if (eventRoll < 0.55 && randomSys.hasBiosphere) {
       this.logEvent(
         'bio',
-        `Fioritura Biosferica Stagionale in ${randomSys.name}`,
-        `Variazione dell'albedo spettroscopico a 700 nm (Red-Edge fotosintetico) rilevata nel sistema ${randomSys.catalogId}.`,
+        `Seasonal Biospheric Bloom in ${randomSys.name}`,
+        `Spectroscopic albedo shift at 700 nm (photosynthetic Red-Edge) detected in ${randomSys.catalogId}.`,
         { systemIndex: randomSys.index }
       );
     } else if (eventRoll < 0.80) {
       this.logEvent(
         'astro',
-        `Brillamento Magnetosferico su ${randomSys.name} (${randomSys.star.spectralClass})`,
-        `Emissione coronale registrata a ${randomSys.distancePc.toFixed(1)} pc; interazione con le magnetosfere planetarie.`,
+        `Magnetospheric Superflare on ${randomSys.name} (${randomSys.star.spectralClass})`,
+        `Coronal emission recorded at ${randomSys.distancePc.toFixed(1)} pc; interacting with planetary magnetospheres.`,
         { systemIndex: randomSys.index }
       );
     } else {
       const gal = prng.pick(this.galaxies);
       this.logEvent(
         'cosmos',
-        `Transiente Supernova Tipo II in ${gal.name}`,
-        `Picco di luminosità bolometrica rilevato nei bracci esterni di ${gal.catalogId}; arricchimento metallico del mezzo interstellare.`,
+        `Type II Supernova Transient in ${gal.name}`,
+        `Bolometric luminosity spike detected in outer spiral arms of ${gal.catalogId}; enriching ISM metallicity.`,
         { galaxyIndex: gal.index }
       );
     }
@@ -3394,9 +3332,6 @@ class SimulationEngine {
     this.emitChange('background_event');
   }
 
-  /**
-   * Trigger a physically modeled causal phenomenon on the active star or planet
-   */
   triggerPhenomenon(type) {
     const sysSummary = this.getActiveStarSystemSummary();
     const planet = this.getActivePlanet();
@@ -3406,7 +3341,6 @@ class SimulationEngine {
 
     switch (type) {
       case 'stellar_evolution_step': {
-        // Advance star's evolutionary age by 15% of its Main Sequence lifetime
         const stepGyr = Math.max(0.05, sysSummary.star.msLifetimeGyr * 0.18);
         const sysDelta = this.deltas[sysSummary.id] || {};
         sysDelta.extraAgeGyr = (sysDelta.extraAgeGyr || 0) + stepGyr;
@@ -3420,8 +3354,8 @@ class SimulationEngine {
         this.transientEffects.superflareIntensity = 1.0;
         this.logEvent(
           'astro',
-          `Evoluzione Stellare: ${sysSummary.name} (+${stepGyr.toFixed(2)} Gyr)`,
-          `Stadio: ${prevPhase} → ${newStar.phase} (${newStar.spectralClass}, ${Math.round(newStar.tempK)} K, ${newStar.luminositySolar.toFixed(2)} L☉). Temp. su ${updatedPlanet.name}: ${updatedPlanet.surfaceTempC.toFixed(1)} °C.`
+          `Stellar Evolution: ${sysSummary.name} (+${stepGyr.toFixed(2)} Gyr)`,
+          `Stage: ${prevPhase} → ${newStar.phase} (${newStar.spectralClass}, ${Math.round(newStar.tempK)} K, ${newStar.luminositySolar.toFixed(2)} L☉). ${updatedPlanet.name} surface temp: ${updatedPlanet.surfaceTempC.toFixed(1)} °C.`
         );
         break;
       }
@@ -3432,24 +3366,24 @@ class SimulationEngine {
         pDelta.volcanismBoost = (pDelta.volcanismBoost || 0) + 0.25;
         pDelta.extraHistory = pDelta.extraHistory || [];
 
-        let impactSummary = `Impatto di asteroide condritico (Ø 14 km) a 28 km/s; iniezione di silicati in stratosfera e attivazione vulcanica.`;
+        let impactSummary = `Chondritic asteroid impact (Ø 14 km at 28 km/s); stratospheric silicate injection and tectonic volcanism surge.`;
         if (planet.biosphere.active) {
           pDelta.extinctionEvents = (planet.biosphere.extinctionEvents || 0) + 1;
           pDelta.bioComplexity = Math.max(0.35, planet.biosphere.complexityIndex * 0.85);
           pDelta.biomassGt = Math.round(planet.biosphere.biomassGt * 0.62);
-          impactSummary += ` Estinzione selettiva seguita da rapida radiazione adattiva dei cladi superstiti.`;
+          impactSummary += ` Selective mass extinction followed by rapid adaptive radiation of surviving clades.`;
         }
         pDelta.extraHistory.push({
           epoch: epochLabel,
           category: 'geo',
-          title: 'Grande Impatto Meteoritico & Inverno da Polveri',
+          title: 'Major Bolide Impact & Impact Winter',
           detail: impactSummary
         });
 
         this.deltas[planet.id] = pDelta;
         this.transientEffects.impactFlashIntensity = 1.0;
         this.refreshPlanetarySystem();
-        this.logEvent('geo', `Impatto Bolide su ${planet.name}`, impactSummary);
+        this.logEvent('geo', `Bolide Impact on ${planet.name}`, impactSummary);
         break;
       }
 
@@ -3462,11 +3396,11 @@ class SimulationEngine {
         pDelta.extraHistory = pDelta.extraHistory || [];
 
         const title = planet.biosphere.active
-          ? 'Radiazione Evolutiva & Simbiogenesi Globale'
-          : 'Abiogenesi Catalitica & Emergenza della Biosfera';
+          ? 'Evolutionary Radiation & Global Symbiogenesis'
+          : 'Catalytic Abiogenesis & Biosphere Emergence';
         const detail = planet.biosphere.active
-          ? `Diversificazione filogenetica accelerata su ${planet.name}; indice di complessità salito a ${(pDelta.bioComplexity * 100).toFixed(0)}%.`
-          : `Sintesi di polimeri autoreplicanti presso sorgenti idrotermali; colonizzazione fotosintetica degli oceani di ${planet.name}.`;
+          ? `Accelerated phylogenetic diversification on ${planet.name}; complexity index rose to ${(pDelta.bioComplexity * 100).toFixed(0)}%.`
+          : `Synthesis of self-replicating polymers near hydrothermal vents; photosynthetic colonization of ${planet.name}'s oceans.`;
 
         pDelta.extraHistory.push({
           epoch: epochLabel,
@@ -3492,11 +3426,11 @@ class SimulationEngine {
         pDelta.extraHistory = pDelta.extraHistory || [];
 
         const title = planet.civilization.active
-          ? `Salto Tecnologico a Kardashev ${pDelta.kardashev.toFixed(2)}`
-          : `Emergenza di Civiltà Tecnologica Sapiente su ${planet.name}`;
+          ? `Technological Leap to Kardashev ${pDelta.kardashev.toFixed(2)}`
+          : `Sapient Technological Civilization Emerges on ${planet.name}`;
         const detail = pDelta.kardashev >= 1.15
-          ? `Espansione dello Sciame di Dyson e dell'Anello Orbitale; padronanza della fusione He³ e computazione quantistica.`
-          : `Unificazione planetaria, costruzione degli ascensori spaziali equatoriali e stabilizzazione climatica.`;
+          ? `Expansion of the Dyson Swarm and Orbital Ring; mastery of He³ fusion and planetary quantum computing.`
+          : `Global unification, construction of equatorial space elevators, and climate stabilization.`;
 
         pDelta.extraHistory.push({
           epoch: epochLabel,
@@ -3515,12 +3449,12 @@ class SimulationEngine {
       case 'superflare_cme': {
         this.transientEffects.superflareIntensity = 1.0;
         const shieldMsg = planet.magneticFieldGauss > 0.3
-          ? `La magnetosfera (${planet.magneticFieldGauss.toFixed(2)} G) deflette il plasma generando intense aurore polari.`
-          : `Bassa schermatura magnetica (${planet.magneticFieldGauss.toFixed(2)} G): erosione ionosferica temporanea.`;
+          ? `Magnetosphere (${planet.magneticFieldGauss.toFixed(2)} G) deflects plasma, igniting intense polar auroras.`
+          : `Weak magnetic shielding (${planet.magneticFieldGauss.toFixed(2)} G): temporary ionospheric erosion.`;
         this.logEvent(
           'astro',
-          `Eiezione di Massa Coronale (CME) verso ${planet.name}`,
-          `Onda d'urto di plasma solare da ${sysSummary.name}. ${shieldMsg}`
+          `Coronal Mass Ejection (CME) Striking ${planet.name}`,
+          `Solar plasma shockwave from ${sysSummary.name}. ${shieldMsg}`
         );
         break;
       }
@@ -3530,11 +3464,6 @@ class SimulationEngine {
     this.emitChange('phenomenon');
   }
 
-  /**
-   * Deep-Space Spectroscopic Biosignature & SETI Survey Scanner
-   * Scans the current galaxy/sector for habitable, life-bearing, or civilization-bearing worlds
-   * and flies the observer directly to the next discovered oasis!
-   */
   scanAndJumpToNextBiosignature() {
     if (!this.stellarSector) return null;
     const systems = this.stellarSector.systems;
@@ -3545,7 +3474,6 @@ class SimulationEngine {
       const cand = systems[candidateIdx];
       if (cand.hasCivilization || cand.hasBiosphere) {
         this.selectStarSystem(candidateIdx, false);
-        // Find the most habitable planet in that system
         let bestPlanetIdx = 0;
         let bestScore = -1;
         this.planetarySystem.planets.forEach((p, idx) => {
@@ -3556,12 +3484,12 @@ class SimulationEngine {
           }
         });
         this.activePlanetIndex = bestPlanetIdx;
-        this.flyToScale(4); // Fly directly to Planetary Orbit scale!
+        this.flyToScale(4);
         const targetPlanet = this.getActivePlanet();
         this.logEvent(
           'bio',
-          `Scanner Spettroscopico SETI: Lock su ${targetPlanet.name}`,
-          `Sistema ${cand.name} (${cand.catalogId}) — ${targetPlanet.civilization.active ? `Civiltà Kardashev ${targetPlanet.civilization.kardashev.toFixed(2)}` : `Biosfera Attiva (${targetPlanet.biosphere.biomassGt} Gt)`}.`
+          `SETI Spectroscopic Scanner: Locked onto ${targetPlanet.name}`,
+          `System ${cand.name} (${cand.catalogId}) — ${targetPlanet.civilization.active ? `Kardashev ${targetPlanet.civilization.kardashev.toFixed(2)} Civilization` : `Active Biosphere (${targetPlanet.biosphere.biomassGt} Gt C)`}.`
         );
         this.emitChange('scanner_lock');
         return targetPlanet;
@@ -3682,7 +3610,6 @@ class SimulationEngine {
   selectStarSystem(index, autoZoom = true) {
     this.activeSystemIndex = index;
     this.refreshPlanetarySystem();
-    // Default to a habitable planet if present, or planet index 2
     const habitableIdx = this.planetarySystem.planets.findIndex((p) => p.biosphere.active || p.inHabitableZone);
     this.activePlanetIndex = habitableIdx >= 0 ? habitableIdx : Math.min(2, this.planetarySystem.planets.length - 1);
     if (autoZoom) this.flyToScale(3);
@@ -3709,9 +3636,6 @@ class SimulationEngine {
     this.emitChange('select_clade');
   }
 
-  /**
-   * Compute live 3D heliocentric coordinates of all planets in the active system
-   */
   getLivePlanetaryPositions() {
     if (!this.planetarySystem) return [];
     return this.planetarySystem.planets.map((planet) => {
@@ -5198,7 +5122,7 @@ class UniverseRenderer {
         type: 'supercluster',
         index: idx,
         label: sc.name,
-        sublabel: `${sc.catalogId} (${sc.galaxyCount.toLocaleString()} galassie)`,
+        sublabel: `${sc.catalogId} (${sc.galaxyCount.toLocaleString()} galaxies)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 26
@@ -5259,16 +5183,16 @@ class UniverseRenderer {
       this.drawSelectionReticle(ctx, pSec.x, pSec.y, 18, '#38bdf8');
       ctx.fillStyle = '#38bdf8';
       ctx.font = '600 11px "Space Grotesk", sans-serif';
-      ctx.fillText(`SETTORE ATTIVO: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
+      ctx.fillText(`ACTIVE SECTOR: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
       ctx.fillStyle = 'rgba(226, 232, 240, 0.75)';
       ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Clicca per esplorare i ${this.engine.stellarSector.systems.length} sistemi stellari`, pSec.x + 22, pSec.y + 11);
+      ctx.fillText(`Click to explore ${this.engine.stellarSector.systems.length} star systems`, pSec.x + 22, pSec.y + 11);
 
       this.interactiveTargets.push({
         type: 'system',
         index: this.engine.activeSystemIndex,
         label: this.engine.stellarSector.name,
-        sublabel: 'Zoom nel Settore Stellare',
+        sublabel: 'Zoom into Star Sector',
         screenX: pSec.x,
         screenY: pSec.y,
         hitRadius: 30
@@ -5343,8 +5267,8 @@ class UniverseRenderer {
       ctx.fillText(sys.name, pStar.x + 12, pStar.y - 2);
 
       let tag = `${sys.star.spectralClass} • ${Math.round(sys.star.tempK)}K`;
-      if (sys.hasCivilization) tag += ' • [CIVILTÀ]';
-      else if (sys.hasBiosphere) tag += ' • [VITA]';
+      if (sys.hasCivilization) tag += ' • [CIVILIZATION]';
+      else if (sys.hasBiosphere) tag += ' • [LIFE]';
 
       ctx.fillStyle = sys.hasCivilization
         ? '#e5a93c'
@@ -5440,7 +5364,6 @@ class UniverseRenderer {
     // 4. Planets & Their 3D Keplerian Elliptical Orbits
     planets.forEach((planet, idx) => {
       const isSelected = idx === activePlanetIdx;
-      const rScaled = mapAU(planet.orbit.a);
 
       // Draw full 3D elliptical orbit path
       ctx.beginPath();
@@ -5530,7 +5453,7 @@ class UniverseRenderer {
 
       let sub = `${planet.orbit.a.toFixed(2)} AU • ${Math.round(planet.surfaceTempC)}°C`;
       if (planet.civilization.active) sub += ` • K-${planet.civilization.kardashev.toFixed(2)}`;
-      else if (planet.biosphere.active) sub += ' • BIOSFERA';
+      else if (planet.biosphere.active) sub += ' • BIOSPHERE';
 
       ctx.fillStyle = planet.civilization.active
         ? '#e5a93c'
@@ -5577,7 +5500,6 @@ class UniverseRenderer {
         const a = (i / 64) * Math.PI * 2;
         const p3 = [Math.cos(a) * ringR, Math.sin(a * 2) * 0.02, Math.sin(a) * ringR];
         const proj = this.project3D(p3, 3.35);
-        // Only draw front half of orbital ring or dashed back
         if (proj.visible) {
           if (i === 0) ctx.moveTo(proj.x, proj.y);
           else ctx.lineTo(proj.x, proj.y);
@@ -5600,7 +5522,6 @@ class UniverseRenderer {
         Math.sin(mAngle) * mOrbitR
       ];
       const pMoon = this.project3D(mPos, 3.35);
-      // Check if moon is behind planet sphere
       if (!pMoon.visible || (pMoon.depth > 3.35 && Math.hypot(mPos[0], mPos[1]) < planetR)) return;
 
       ctx.fillStyle = '#cbd5e1';
@@ -5610,15 +5531,15 @@ class UniverseRenderer {
 
       ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
       ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Luna ${moon.name} (${Math.round(moon.radiusKm)} km)`, pMoon.x + 8, pMoon.y + 3);
+      ctx.fillText(`Moon ${moon.name} (${Math.round(moon.radiusKm)} km)`, pMoon.x + 8, pMoon.y + 3);
     });
 
-    // 3. 3D Spherical Surface Landmarks (Continents, Volcanoes, Canyons, Biosphere, Cities)
+    // 3. 3D Spherical Surface Landmarks
     const cy = Math.cos(this.yaw);
     const sy = Math.sin(this.yaw);
     const cp = Math.cos(this.pitch);
     const sp = Math.sin(this.pitch);
-    const camDir = [sy * cp, sp, cy * cp]; // Vector from origin toward camera is -camDir
+    const camDir = [sy * cp, sp, cy * cp];
 
     planet.landmarks.forEach((lm, idx) => {
       const latRad = (lm.lat * Math.PI) / 180;
@@ -5628,9 +5549,8 @@ class UniverseRenderer {
       const ny = Math.sin(latRad);
       const nz = Math.cos(latRad) * Math.sin(lonRad);
 
-      // Check front-facing visibility against camera vector
       const facing = -(nx * camDir[0] + ny * camDir[1] + nz * camDir[2]);
-      if (facing < 0.18) return; // Hidden on far hemisphere of planet
+      if (facing < 0.18) return;
 
       const pos3D = [nx * planetR * 1.01, ny * planetR * 1.01, nz * planetR * 1.01];
       const proj = this.project3D(pos3D, 3.35);
@@ -5645,7 +5565,6 @@ class UniverseRenderer {
         ? '#f43f5e'
         : '#38bdf8';
 
-      // Draw crisp scientific target pin
       ctx.strokeStyle = pinColor;
       ctx.lineWidth = isSelected ? 1.8 : 1.2;
       ctx.beginPath();
@@ -5668,7 +5587,7 @@ class UniverseRenderer {
         type: 'landmark',
         index: idx,
         label: lm.name,
-        sublabel: `${lm.category} (Clicca per scendere in superficie)`,
+        sublabel: `${lm.category} (Click to descend to surface)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 22
@@ -5694,7 +5613,6 @@ class UniverseRenderer {
     const cx = this.width * 0.5;
     const cy = this.height * 0.5;
 
-    // 1. Scientific Horizon Altimeter & Compass Telemetry Overlay
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -5707,13 +5625,12 @@ class UniverseRenderer {
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `AZIMUT ${headingDeg.toString().padStart(3, '0')}°  •  LOCALITÀ: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  G=${planet.gravityG.toFixed(2)}g  •  P=${planet.pressureAtm.toFixed(2)} atm`,
+      `AZIMUTH ${headingDeg.toString().padStart(3, '0')}°  •  SITE: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  G=${planet.gravityG.toFixed(2)}g  •  P=${planet.pressureAtm.toFixed(2)} atm`,
       cx,
       74
     );
     ctx.textAlign = 'left';
 
-    // 2. Interactive Surface Markers for Biosphere Clades & Civilization Nodes
     if (planet.biosphere.active && planet.biosphere.clades.length > 0) {
       planet.biosphere.clades.forEach((clade, idx) => {
         const angle = (idx - 2) * 0.42 - (this.yaw % 0.6) * 0.3;
@@ -5721,7 +5638,6 @@ class UniverseRenderer {
         const sy = cy + 65 + (idx % 2) * 48;
         const isSelected = idx === this.engine.activeCladeIndex;
 
-        // Draw animated procedural organism silhouette node in the landscape
         this.drawProceduralOrganismSpecimen(
           ctx,
           sx,
@@ -5736,7 +5652,7 @@ class UniverseRenderer {
           type: 'clade',
           index: idx,
           label: clade.binomialName,
-          sublabel: `${clade.commonArchetype} (Clicca per analisi morfologica)`,
+          sublabel: `${clade.commonArchetype} (Click for morphological scan)`,
           screenX: sx,
           screenY: sy,
           hitRadius: 34
@@ -5744,7 +5660,6 @@ class UniverseRenderer {
       });
     }
 
-    // 3. When zoomed all the way to Scale 7 (logScale < 1.8), render the High-Precision Bio/Techno Holographic Specimen Frame
     const wMicro = 1.0 - this.smoothstep(1.1, 2.2, this.engine.currentLogScale);
     if (wMicro > 0.05) {
       ctx.save();
@@ -5833,7 +5748,7 @@ class UniverseRenderer {
     ctx.fillText(clade.binomialName, x + radius * 1.3, y - 2);
     ctx.fillStyle = color;
     ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillText(`${clade.commonArchetype} (Liv. Trofico ${clade.trophicLevel})`, x + radius * 1.3, y + 10);
+    ctx.fillText(`${clade.commonArchetype} (Trophic Lvl ${clade.trophicLevel})`, x + radius * 1.3, y + 10);
     ctx.restore();
   }
 
@@ -5844,7 +5759,6 @@ class UniverseRenderer {
     const clade = this.engine.getActiveClade();
     const r = 135;
 
-    // Outer technical instrument ring
     ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -5862,7 +5776,7 @@ class UniverseRenderer {
       ctx.fillStyle = '#34d399';
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`SCANSIONE BIO-MORFOLOGICA: ${clade.binomialName.toUpperCase()}`, cx, cy - r - 26);
+      ctx.fillText(`BIO-MORPHOLOGICAL SCAN: ${clade.binomialName.toUpperCase()}`, cx, cy - r - 26);
       ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.fillText(`${clade.symmetry} • ${clade.sensoryMode}`, cx, cy + r + 28);
@@ -5871,7 +5785,7 @@ class UniverseRenderer {
       ctx.fillStyle = '#e5a93c';
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`MATRICE TECNOSFERICA: ${planet.civilization.speciesName.toUpperCase()}`, cx, cy - r - 24);
+      ctx.fillText(`TECHNOSPHERE MATRIX: ${planet.civilization.speciesName.toUpperCase()}`, cx, cy - r - 24);
       ctx.textAlign = 'left';
     }
   }
@@ -6052,7 +5966,7 @@ class CosmicSoundscape {
  * - Hierarchical Cosmic Breadcrumb navigation
  * - Continuous Logarithmic Scale Slider & 7 Scale Level Presets
  * - Context-Sensitive Spatial Catalog (Superclusters, Galaxies, Stars, Planets, Landmarks, Clades)
- * - 4-Tab Scientific Dossier (Fisica/H-R Diagram, Atmosfera/Spettroscopia, Biosfera/Rete Trofica, Civiltà/Storia)
+ * - 4-Tab Scientific Dossier (Physics/H-R Diagram, Climate/Spectrometer, Life/Trophic Web, Civilization/History)
  * - Multi-Scale Temporal Control Dock & Causal Phenomenon Simulators
  */
 
@@ -6065,7 +5979,7 @@ class ObservatoryHUD {
     this.renderer = renderer;
     this.soundscape = soundscape;
 
-    this.activeTab = 'physics'; // 'physics' | 'climate' | 'life' | 'civ'
+    this.activeTab = 'physics';
     this.zenMode = false;
 
     this.cacheDOM();
@@ -6094,7 +6008,6 @@ class ObservatoryHUD {
     this.btnAudio = document.getElementById('btn-audio');
     this.btnZen = document.getElementById('btn-zen');
 
-    // Left Panel
     this.scaleMetricBig = document.getElementById('scale-metric-big');
     this.scaleExponentTag = document.getElementById('scale-exponent-tag');
     this.scaleSlider = document.getElementById('scale-slider');
@@ -6103,14 +6016,12 @@ class ObservatoryHUD {
     this.catalogCountBadge = document.getElementById('catalog-count-badge');
     this.catalogListContainer = document.getElementById('catalog-list-container');
 
-    // Right Dossier Panel
     this.entityOverline = document.getElementById('entity-category-overline');
     this.entityMainTitle = document.getElementById('entity-main-title');
     this.entityCatalogCode = document.getElementById('entity-catalog-code');
     this.dossierTabBtns = document.querySelectorAll('.dossier-tab-btn');
     this.dossierContent = document.getElementById('dossier-content-scroll');
 
-    // Bottom Temporal Dock
     this.epochTimeVal = document.getElementById('epoch-time-val');
     this.timePillsContainer = document.getElementById('time-speed-pills');
     this.liveTickerText = document.getElementById('live-ticker-text');
@@ -6140,7 +6051,7 @@ class ObservatoryHUD {
     this.btnBookmark.addEventListener('click', () => {
       const bm = this.engine.addBookmark();
       this.soundscape.playTelemetryPing(780, 0.12);
-      this.liveTickerText.textContent = `[SEGNALIBRO SALVATO] ${bm.title} (${bm.scaleLabel})`;
+      this.liveTickerText.textContent = `[BOOKMARK SAVED] ${bm.title} (${bm.scaleLabel})`;
     });
 
     this.btnAudio.addEventListener('click', () => {
@@ -6166,13 +6077,11 @@ class ObservatoryHUD {
       }
     });
 
-    // Continuous logarithmic scale slider (inverted so top/right = zoom in or standard)
     this.scaleSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       this.engine.setTargetLogScale(val);
     });
 
-    // Dossier Tabs
     this.dossierTabBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         this.activeTab = btn.dataset.tab;
@@ -6181,7 +6090,6 @@ class ObservatoryHUD {
       });
     });
 
-    // Causal Phenomenon Simulation Triggers
     this.btnPhenomStar.addEventListener('click', () => {
       this.engine.triggerPhenomenon('stellar_evolution_step');
     });
@@ -6235,9 +6143,6 @@ class ObservatoryHUD {
     });
   }
 
-  /**
-   * Lightweight per-frame telemetry update (scale slider readout & cosmic epoch clock)
-   */
   updateFrameTelemetry() {
     const logS = this.engine.currentLogScale;
     this.scaleMetricBig.textContent = formatLogScale(logS);
@@ -6249,7 +6154,6 @@ class ObservatoryHUD {
     const totalGyr = this.engine.baseCosmicEpochGyr + this.engine.elapsedYears / 1e9;
     this.epochTimeVal.textContent = `${totalGyr.toFixed(4)} Gyr (+${this.engine.formatElapsedCosmicTime()})`;
 
-    // Highlight active scale preset if scale crossed boundary
     const activeLvl = this.engine.getActiveScaleLevel();
     if (this._lastActiveLevelId !== activeLvl.id) {
       this._lastActiveLevelId = activeLvl.id;
@@ -6264,19 +6168,16 @@ class ObservatoryHUD {
     this.seedInput.value = this.engine.universeSeed;
     const activeLvl = this.engine.getActiveScaleLevel();
 
-    // Update scale preset active state
     this.scalePresetsContainer.querySelectorAll('.scale-preset-btn').forEach((btn) => {
       const idx = parseInt(btn.dataset.scaleIndex, 10);
       btn.classList.toggle('active', idx === activeLvl.index);
     });
 
-    // Update time pills active state
     this.timePillsContainer.querySelectorAll('.time-pill-btn').forEach((btn) => {
       const idx = parseInt(btn.dataset.timeIndex, 10);
       btn.classList.toggle('active', idx === this.engine.timeScaleIndex);
     });
 
-    // Update live event ticker
     if (this.engine.globalEvents.length > 0) {
       const latest = this.engine.globalEvents[0];
       this.liveTickerText.textContent = `[${latest.epoch}] ${latest.title} — ${latest.detail}`;
@@ -6296,12 +6197,12 @@ class ObservatoryHUD {
     const lm = this.engine.getActiveLandmark();
 
     const crumbs = [
-      { label: 'COSMO', level: 0, sub: sc.catalogId },
-      { label: gal.name.replace('Galassia ', ''), level: 1, sub: gal.morphology.code },
-      { label: 'SETTORE', level: 2, sub: `${this.engine.stellarSector.systems.length} stelle` },
+      { label: 'COSMOS', level: 0, sub: sc.catalogId },
+      { label: gal.name.replace(' Galaxy', ''), level: 1, sub: gal.morphology.code },
+      { label: 'SECTOR', level: 2, sub: `${this.engine.stellarSector.systems.length} stars` },
       { label: sys.name, level: 3, sub: sys.star.spectralClass },
-      { label: pl ? pl.name : 'Pianeta', level: 4, sub: pl ? `${pl.orbit.a.toFixed(2)} AU` : '' },
-      { label: lm ? lm.name.split(' ')[0] : 'Superficie', level: 5, sub: pl && pl.biosphere.active ? 'Biosfera' : 'Orizzonte' }
+      { label: pl ? pl.name : 'Planet', level: 4, sub: pl ? `${pl.orbit.a.toFixed(2)} AU` : '' },
+      { label: lm ? lm.name.split(' ')[0] : 'Surface', level: 5, sub: pl && pl.biosphere.active ? 'Biosphere' : 'Horizon' }
     ];
 
     this.breadcrumbContainer.innerHTML = '';
@@ -6327,10 +6228,9 @@ class ObservatoryHUD {
     this.catalogListContainer.innerHTML = '';
 
     if (activeLvl.index === 0) {
-      // List Superclusters
       const list = this.engine.cosmicWeb.superclusters;
-      this.catalogHeaderTitle.textContent = 'Superammassi Cosmici';
-      this.catalogCountBadge.textContent = `${list.length} nodi`;
+      this.catalogHeaderTitle.textContent = 'Cosmic Superclusters';
+      this.catalogCountBadge.textContent = `${list.length} nodes`;
 
       list.forEach((sc, idx) => {
         const item = this.createCatalogRow({
@@ -6347,10 +6247,9 @@ class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 1) {
-      // List Galaxies in Supercluster
       const list = this.engine.galaxies;
-      this.catalogHeaderTitle.textContent = 'Catalogo Galattico';
-      this.catalogCountBadge.textContent = `${list.length} galassie`;
+      this.catalogHeaderTitle.textContent = 'Galactic Catalog';
+      this.catalogCountBadge.textContent = `${list.length} galaxies`;
 
       list.forEach((gal, idx) => {
         const item = this.createCatalogRow({
@@ -6368,25 +6267,24 @@ class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 2) {
-      // List Star Systems in Sector
       const list = this.engine.stellarSector.systems;
-      this.catalogHeaderTitle.textContent = 'Sistemi Stellari nel Settore';
-      this.catalogCountBadge.textContent = `${list.length} sistemi`;
+      this.catalogHeaderTitle.textContent = 'Star Systems in Sector';
+      this.catalogCountBadge.textContent = `${list.length} systems`;
 
       list.forEach((sys, idx) => {
         let tagText = sys.star.spectralClass;
         let tagClass = 'neutral';
         if (sys.hasCivilization) {
-          tagText = 'CIVILTÀ';
+          tagText = 'CIV';
           tagClass = 'civ';
         } else if (sys.hasBiosphere) {
-          tagText = 'BIOSFERA';
+          tagText = 'LIFE';
           tagClass = 'bio';
         }
 
         const item = this.createCatalogRow({
           name: sys.name,
-          sub: `${sys.catalogId} • ${Math.round(sys.star.tempK)} K • ${sys.planetCount} pianeti`,
+          sub: `${sys.catalogId} • ${Math.round(sys.star.tempK)} K • ${sys.planetCount} planets`,
           tagText,
           tagClass,
           active: idx === this.engine.activeSystemIndex,
@@ -6398,11 +6296,10 @@ class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 3 || activeLvl.index === 4) {
-      // List Planets in Active Star System
       const pSys = this.engine.getActivePlanetarySystem();
       const list = pSys.planets;
-      this.catalogHeaderTitle.textContent = `Corpi Orbitali (${pSys.name})`;
-      this.catalogCountBadge.textContent = `${list.length} pianeti`;
+      this.catalogHeaderTitle.textContent = `Orbital Bodies (${pSys.name})`;
+      this.catalogCountBadge.textContent = `${list.length} planets`;
 
       list.forEach((pl, idx) => {
         let tagText = `${pl.orbit.a.toFixed(2)} AU`;
@@ -6411,13 +6308,13 @@ class ObservatoryHUD {
           tagText = `K-${pl.civilization.kardashev.toFixed(2)}`;
           tagClass = 'civ';
         } else if (pl.biosphere.active) {
-          tagText = 'VITA';
+          tagText = 'LIFE';
           tagClass = 'bio';
         }
 
         const item = this.createCatalogRow({
           name: pl.name,
-          sub: `${pl.typeLabel} • ${Math.round(pl.surfaceTempC)}°C • ${pl.moons.length} lune`,
+          sub: `${pl.typeLabel} • ${Math.round(pl.surfaceTempC)}°C • ${pl.moons.length} moons`,
           tagText,
           tagClass,
           active: idx === this.engine.activePlanetIndex,
@@ -6432,12 +6329,11 @@ class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else {
-      // Scale 5 & 6: List Surface Landmarks & Evolved Biosphere Clades on Active Planet
       const pl = this.engine.getActivePlanet();
       if (!pl) return;
-      this.catalogHeaderTitle.textContent = `Siti & Cladi su ${pl.name}`;
+      this.catalogHeaderTitle.textContent = `Sites & Clades on ${pl.name}`;
       const totalItems = pl.landmarks.length + (pl.biosphere.clades ? pl.biosphere.clades.length : 0);
-      this.catalogCountBadge.textContent = `${totalItems} elementi`;
+      this.catalogCountBadge.textContent = `${totalItems} entries`;
 
       pl.landmarks.forEach((lm, idx) => {
         const tagClass = lm.icon === 'city' ? 'civ' : lm.icon === 'biosphere' ? 'bio' : 'neutral';
@@ -6496,15 +6392,15 @@ class ObservatoryHUD {
     const pl = this.engine.getActivePlanet();
 
     if (activeLvl.index === 0) {
-      this.entityOverline.textContent = `STRUTTURA COSMOLOGICA • ${sc.dominantMorphology}`;
+      this.entityOverline.textContent = `COSMOLOGICAL STRUCTURE • ${sc.dominantMorphology}`;
       this.entityMainTitle.textContent = sc.name;
       this.entityCatalogCode.textContent = sc.catalogId;
     } else if (activeLvl.index === 1) {
-      this.entityOverline.textContent = `GALASSIA • ${gal.morphology.label}`;
+      this.entityOverline.textContent = `GALAXY • ${gal.morphology.label}`;
       this.entityMainTitle.textContent = gal.name;
       this.entityCatalogCode.textContent = `${gal.catalogId} (${gal.morphology.code})`;
     } else if (activeLvl.index === 2 || activeLvl.index === 3) {
-      this.entityOverline.textContent = `SISTEMA STELLARE • ${pSys.star.phase}`;
+      this.entityOverline.textContent = `STAR SYSTEM • ${pSys.star.phase}`;
       this.entityMainTitle.textContent = pSys.name;
       this.entityCatalogCode.textContent = `${pSys.catalogId} [${pSys.star.spectralClass}]`;
     } else if (pl) {
@@ -6532,9 +6428,6 @@ class ObservatoryHUD {
     }
   }
 
-  /**
-   * TAB 1: ASTROPHYSICS, GEOPHYSICS & DYNAMIC HERTZSPRUNG-RUSSELL DIAGRAM
-   */
   renderPhysicsTab(activeLvl, sc, gal, pSys, pl) {
     const star = pSys.star;
 
@@ -6543,27 +6436,27 @@ class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Massa Totale Viriale</div>
+            <div class="telemetry-label">Total Virial Mass</div>
             <div class="telemetry-val highlight-amber">10<sup>${sc.massLogSolar.toFixed(2)}</sup> M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Redshift Cosmologico</div>
+            <div class="telemetry-label">Cosmological Redshift</div>
             <div class="telemetry-val highlight-cyan">z = ${sc.redshift.toFixed(4)}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Galassie Censite</div>
+            <div class="telemetry-label">Cataloged Galaxies</div>
             <div class="telemetry-val">${sc.galaxyCount.toLocaleString()}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Frazione Materia Oscura</div>
+            <div class="telemetry-label">Dark Matter Fraction</div>
             <div class="telemetry-val">${(sc.darkMatterFraction * 100).toFixed(1)}%</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Estensione Lineare</div>
+            <div class="telemetry-label">Linear Span</div>
             <div class="telemetry-val">${sc.spanMpc.toFixed(1)} Mpc</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Temp. Gas ICM X-Ray</div>
+            <div class="telemetry-label">X-Ray ICM Gas Temp</div>
             <div class="telemetry-val">${(sc.icmTempKelvin / 1e6).toFixed(1)} MK</div>
           </div>
         </div>
@@ -6572,27 +6465,27 @@ class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Classificazione Hubble</div>
+            <div class="telemetry-label">Hubble Classification</div>
             <div class="telemetry-val highlight-amber">${gal.morphology.code}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Diametro Disco</div>
+            <div class="telemetry-label">Disk Diameter</div>
             <div class="telemetry-val highlight-cyan">${Math.round(gal.diameterLy).toLocaleString()} ly</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Popolazione Stellare</div>
-            <div class="telemetry-val">~${gal.starCountBillions.toFixed(0)} Miliardi</div>
+            <div class="telemetry-label">Stellar Population</div>
+            <div class="telemetry-val">~${gal.starCountBillions.toFixed(0)} Billion</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Buco Nero Centrale</div>
+            <div class="telemetry-label">Central SMBH</div>
             <div class="telemetry-val">${(gal.smbh.massSolar / 1e6).toFixed(2)}×10⁶ M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Età Media Galattica</div>
+            <div class="telemetry-label">Mean Galactic Age</div>
             <div class="telemetry-val">${gal.ageGyr.toFixed(2)} Gyr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Metallicità Media</div>
+            <div class="telemetry-label">Mean Metallicity</div>
             <div class="telemetry-val">[Fe/H] ${gal.metallicityFeH >= 0 ? '+' : ''}${gal.metallicityFeH.toFixed(2)}</div>
           </div>
         </div>
@@ -6601,35 +6494,35 @@ class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Stella Madre (${star.spectralClass})</div>
+            <div class="telemetry-label">Host Star (${star.spectralClass})</div>
             <div class="telemetry-val" style="color:${star.hexColor}">${Math.round(star.tempK)} K • ${star.currentMassSolar.toFixed(2)} M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Luminosità & Raggio</div>
+            <div class="telemetry-label">Luminosity & Radius</div>
             <div class="telemetry-val">${star.luminositySolar < 0.01 ? star.luminositySolar.toExponential(1) : star.luminositySolar.toFixed(2)} L☉ • ${star.radiusSolar < 0.05 ? star.radiusSolar.toFixed(4) : star.radiusSolar.toFixed(2)} R☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Età / Vita Seq. Princ.</div>
+            <div class="telemetry-label">Age / MS Lifetime</div>
             <div class="telemetry-val">${pSys.currentAgeGyr.toFixed(2)} / ${star.msLifetimeGyr.toFixed(2)} Gyr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Zona Abitabile (CHZ)</div>
+            <div class="telemetry-label">Habitable Zone (CHZ)</div>
             <div class="telemetry-val highlight-emerald">${star.hzInnerAU.toFixed(2)} – ${star.hzOuterAU.toFixed(2)} AU</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">${pl.name} (Massa/Raggio)</div>
+            <div class="telemetry-label">${pl.name} (Mass/Radius)</div>
             <div class="telemetry-val highlight-cyan">${pl.massEarths.toFixed(2)} M⊕ • ${Math.round(pl.radiusKm).toLocaleString()} km</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Gravità & Vel. Fuga</div>
+            <div class="telemetry-label">Gravity & Escape Vel.</div>
             <div class="telemetry-val">${pl.gravityG.toFixed(2)} g • ${pl.escapeVelocityKmS.toFixed(1)} km/s</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Semiasse & Periodo</div>
+            <div class="telemetry-label">Semi-Major & Period</div>
             <div class="telemetry-val">${pl.orbit.a.toFixed(3)} AU • ${pl.orbit.periodYears.toFixed(2)} yr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Campo Magnetico & Tettonica</div>
+            <div class="telemetry-label">Magnetic Field & Tectonics</div>
             <div class="telemetry-val">${pl.magneticFieldGauss.toFixed(2)} G • ${(pl.tectonics * 100).toFixed(0)}%</div>
           </div>
         </div>
@@ -6640,15 +6533,15 @@ class ObservatoryHUD {
       ${telemetryHTML}
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Diagramma Evolutivo Hertzsprung-Russell (H-R)</span>
+          <span class="instrument-title">Hertzsprung-Russell (H-R) Evolutionary Diagram</span>
           <span class="panel-badge">${star.spectralClass} (${(star.lifeFraction * 100).toFixed(0)}% MS)</span>
         </div>
         <canvas id="hr-diagram-canvas" class="instrument-canvas" width="330" height="150"></canvas>
       </div>
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Architettura Orbitale del Sistema (${pSys.planets.length} Pianeti)</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">Limite Neve: ${star.frostLineAU.toFixed(2)} AU</span>
+          <span class="instrument-title">Orbital System Architecture (${pSys.planets.length} Planets)</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">Frost Line: ${star.frostLineAU.toFixed(2)} AU</span>
         </div>
         <div class="comp-bar-list">
           ${pSys.planets
@@ -6692,7 +6585,6 @@ class ObservatoryHUD {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // Background grid
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
     ctx.lineWidth = 1;
     for (let x = 40; x < w; x += 55) {
@@ -6708,7 +6600,6 @@ class ObservatoryHUD {
       ctx.stroke();
     }
 
-    // Main Sequence diagonal band (Hot/Luminous top-left -> Cool/Dim bottom-right)
     const grad = ctx.createLinearGradient(40, 18, w - 25, h - 28);
     grad.addColorStop(0, 'rgba(96, 165, 250, 0.35)');
     grad.addColorStop(0.45, 'rgba(253, 224, 71, 0.35)');
@@ -6721,7 +6612,6 @@ class ObservatoryHUD {
     ctx.quadraticCurveTo(w * 0.5, h * 0.52, w - 30, h - 30);
     ctx.stroke();
 
-    // Red Giant Branch curve
     ctx.strokeStyle = 'rgba(251, 146, 60, 0.28)';
     ctx.lineWidth = 10;
     ctx.beginPath();
@@ -6729,7 +6619,6 @@ class ObservatoryHUD {
     ctx.quadraticCurveTo(w * 0.72, h * 0.25, w - 38, 28);
     ctx.stroke();
 
-    // White Dwarf cooling sequence (bottom-left)
     ctx.strokeStyle = 'rgba(147, 197, 253, 0.25)';
     ctx.lineWidth = 6;
     ctx.beginPath();
@@ -6737,7 +6626,6 @@ class ObservatoryHUD {
     ctx.lineTo(175, h - 26);
     ctx.stroke();
 
-    // Map active star (tempK: 40000 -> 2500 left-to-right; log10(L): -4 -> +6 bottom-to-top)
     const logT = Math.log10(Math.max(2500, Math.min(42000, star.tempK)));
     const minLogT = Math.log10(2500);
     const maxLogT = Math.log10(42000);
@@ -6746,7 +6634,6 @@ class ObservatoryHUD {
     const logL = Math.log10(Math.max(1e-4, Math.min(1e6, star.luminositySolar)));
     const sy = (h - 26) - ((logL + 4) / 10) * (h - 44);
 
-    // Crosshair on active star
     ctx.strokeStyle = 'rgba(229, 169, 60, 0.6)';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 3]);
@@ -6766,7 +6653,6 @@ class ObservatoryHUD {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Spectral Class Axis Labels
     ctx.fillStyle = '#94a3b8';
     ctx.font = '9px "JetBrains Mono", monospace';
     const classes = ['O', 'B', 'A', 'F', 'G', 'K', 'M'];
@@ -6776,50 +6662,47 @@ class ObservatoryHUD {
     ctx.fillText('L☉', 6, 20);
   }
 
-  /**
-   * TAB 2: ATMOSPHERIC SPECTROSCOPY, CLIMATE & HABITABILITY
-   */
   renderClimateTab(pSys, pl) {
     if (!pl) return;
     this.dossierContent.innerHTML = `
       <div class="telemetry-grid">
         <div class="telemetry-cell">
-          <div class="telemetry-label">Temperatura Superficiale</div>
+          <div class="telemetry-label">Surface Temperature</div>
           <div class="telemetry-val highlight-amber">${pl.surfaceTempC.toFixed(1)} °C (${Math.round(pl.surfaceTempK)} K)</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Temp. Equilibrio & Serra</div>
+          <div class="telemetry-label">Equilibrium & Greenhouse</div>
           <div class="telemetry-val">${Math.round(pl.eqTempK)} K (+${Math.round(pl.greenhouseDeltaK)} K)</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Pressione Atmosferica</div>
+          <div class="telemetry-label">Surface Pressure</div>
           <div class="telemetry-val highlight-cyan">${pl.pressureAtm < 0.01 ? pl.pressureAtm.toExponential(1) : pl.pressureAtm.toFixed(2)} atm</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Albedo Bond & Nubi</div>
-          <div class="telemetry-val">${pl.albedo.toFixed(2)} • ${(pl.cloudCoverage * 100).toFixed(0)}% nubi</div>
+          <div class="telemetry-label">Bond Albedo & Clouds</div>
+          <div class="telemetry-val">${pl.albedo.toFixed(2)} • ${(pl.cloudCoverage * 100).toFixed(0)}% clouds</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Idrosfera / Oceani</div>
-          <div class="telemetry-val">${(pl.oceanCoverage * 100).toFixed(0)}% copertura</div>
+          <div class="telemetry-label">Hydrosphere / Oceans</div>
+          <div class="telemetry-val">${(pl.oceanCoverage * 100).toFixed(0)}% coverage</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Indice Similarità ESI</div>
+          <div class="telemetry-label">Earth Similarity Index</div>
           <div class="telemetry-val highlight-emerald">${(pl.habitabilityScore * 100).toFixed(1)}%</div>
         </div>
       </div>
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Spettrogramma di Assorbimento Atmosferico (380–780 nm)</span>
-          <span class="panel-badge">${pl.biosphere.active ? 'BIOFIRMA O₂/CH₄' : 'ABIOTICO'}</span>
+          <span class="instrument-title">Atmospheric Absorption Spectrogram (380–780 nm)</span>
+          <span class="panel-badge">${pl.biosphere.active ? 'O₂/CH₄ BIOSIGNATURE' : 'ABIOTIC'}</span>
         </div>
         <canvas id="spectrum-canvas" class="instrument-canvas" width="330" height="64"></canvas>
       </div>
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Composizione Chimica dell'Atmosfera</span>
+          <span class="instrument-title">Atmospheric Chemical Composition</span>
         </div>
         <div class="comp-bar-list">
           ${pl.atmosphereComposition
@@ -6852,7 +6735,6 @@ class ObservatoryHUD {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // Continuous optical rainbow continuum (380nm violet -> 760nm deep red)
     const grad = ctx.createLinearGradient(0, 0, w, 0);
     grad.addColorStop(0.0, '#3b0764');
     grad.addColorStop(0.18, '#2563eb');
@@ -6864,7 +6746,6 @@ class ObservatoryHUD {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h - 16);
 
-    // Draw dark Fraunhofer & molecular absorption bands based on actual gas composition!
     const bands = [];
     for (const gas of pl.atmosphereComposition) {
       if (gas.formula.includes('O₂')) {
@@ -6898,9 +6779,6 @@ class ObservatoryHUD {
     });
   }
 
-  /**
-   * TAB 3: BIOSPHERE, EVOLUTIONARY CLADES & TROPHIC FOOD WEB
-   */
   renderLifeTab(pSys, pl) {
     if (!pl) return;
     const bio = pl.biosphere;
@@ -6908,13 +6786,13 @@ class ObservatoryHUD {
     if (!bio.active) {
       this.dossierContent.innerHTML = `
         <div class="instrument-box" style="text-align:center;padding:18px 12px">
-          <div class="entity-category-overline" style="color:var(--text-secondary)">STATO ASTROBIOLOGICO</div>
+          <div class="entity-category-overline" style="color:var(--text-secondary)">ASTROBIOLOGICAL STATUS</div>
           <div style="font-size:14px;font-weight:600;margin:6px 0">${bio.stage}</div>
           <p style="color:var(--text-secondary);font-size:11px;margin-bottom:12px">
-            Le condizioni termodinamiche attuali (${pl.surfaceTempC.toFixed(1)}°C, ${pl.pressureAtm.toFixed(2)} atm) non ospitano ancora una biosfera attiva, oppure attendono un evento catalitico di abiogenesi.
+            Current thermodynamic conditions (${pl.surfaceTempC.toFixed(1)}°C, ${pl.pressureAtm.toFixed(2)} atm) do not yet host an active biosphere, or await a catalytic abiogenesis event.
           </p>
           <button id="btn-trigger-abiogenesis-inline" class="action-btn accent-emerald">
-            + Catalizza Abiogenesi & Evoluzione Prebiotica
+            + Catalyze Abiogenesis & Prebiotic Evolution
           </button>
         </div>
       `;
@@ -6930,19 +6808,19 @@ class ObservatoryHUD {
     this.dossierContent.innerHTML = `
       <div class="telemetry-grid">
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biomassa Globale</div>
+          <div class="telemetry-label">Global Biomass</div>
           <div class="telemetry-val highlight-emerald">${bio.biomassGt.toLocaleString()} Gt C</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biodiversità Stimata</div>
-          <div class="telemetry-val">${bio.speciesCountEstimate.toLocaleString()} specie</div>
+          <div class="telemetry-label">Estimated Biodiversity</div>
+          <div class="telemetry-val">${bio.speciesCountEstimate.toLocaleString()} species</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biochimica & Solvente</div>
+          <div class="telemetry-label">Biochemistry & Solvent</div>
           <div class="telemetry-val" style="font-size:10px">${bio.biochemistry}</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Metabolismo Primario</div>
+          <div class="telemetry-label">Primary Metabolism</div>
           <div class="telemetry-val" style="font-size:10px">${bio.energySource}</div>
         </div>
       </div>
@@ -6952,15 +6830,15 @@ class ObservatoryHUD {
           ? `
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Esemplare Selezionato: ${activeClade.binomialName}</span>
+          <span class="instrument-title">Selected Specimen: ${activeClade.binomialName}</span>
           <span class="panel-badge">${activeClade.commonArchetype}</span>
         </div>
         <div style="font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:4px">
-          <div><strong style="color:var(--text-primary)">Simmetria & Morfologia:</strong> ${activeClade.symmetry} (${activeClade.bodySegments} metameri)</div>
-          <div><strong style="color:var(--text-primary)">Locomozione:</strong> ${activeClade.locomotion}</div>
-          <div><strong style="color:var(--text-primary)">Apparato Sensoriale:</strong> ${activeClade.sensoryMode}</div>
+          <div><strong style="color:var(--text-primary)">Symmetry & Morphology:</strong> ${activeClade.symmetry} (${activeClade.bodySegments} segments)</div>
+          <div><strong style="color:var(--text-primary)">Locomotion:</strong> ${activeClade.locomotion}</div>
+          <div><strong style="color:var(--text-primary)">Sensory Apparatus:</strong> ${activeClade.sensoryMode}</div>
           <div style="margin-top:4px;color:var(--accent-emerald);font-family:var(--font-mono);font-size:10px">
-            Adattamenti Evolutivi:
+            Evolutionary Adaptations:
             ${activeClade.traits.map((t) => `<div style="color:var(--text-secondary)">• ${t}</div>`).join('')}
           </div>
         </div>
@@ -6971,7 +6849,7 @@ class ObservatoryHUD {
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Rete Trofica & Piramide Filogenetica (Clicca per Ispezionare)</span>
+          <span class="instrument-title">Trophic Food Web & Phylogenetic Pyramid (Click to Inspect)</span>
         </div>
         <div class="comp-bar-list">
           ${bio.clades
@@ -6982,7 +6860,7 @@ class ObservatoryHUD {
             }" data-select-clade="${idx}">
               <div class="comp-row-label">
                 <span style="color:var(--text-primary);font-weight:600">${c.binomialName} <span style="color:var(--text-secondary);font-weight:400">(${c.commonArchetype})</span></span>
-                <span style="color:var(--accent-emerald)">${Math.round(c.biomassShare * 100)}% biomassa</span>
+                <span style="color:var(--accent-emerald)">${Math.round(c.biomassShare * 100)}% biomass</span>
               </div>
               <div class="comp-track">
                 <div class="comp-fill" style="width:${Math.max(6, c.biomassShare * 100)}%;background:hsl(${c.hueDeg}, 80%, 55%)"></div>
@@ -7003,9 +6881,6 @@ class ObservatoryHUD {
     });
   }
 
-  /**
-   * TAB 4: CIVILIZATION, KARDASHEV TECHNOSPHERE & HISTORICAL CHRONICLE
-   */
   renderCivTab(pSys, pl) {
     if (!pl) return;
     const civ = pl.civilization;
@@ -7014,13 +6889,13 @@ class ObservatoryHUD {
     if (!civ.active) {
       civSectionHTML = `
         <div class="instrument-box" style="text-align:center;padding:14px 10px">
-          <div class="entity-category-overline" style="color:var(--text-secondary)">SCANSIONE XENO-SOCIOLOGICA</div>
+          <div class="entity-category-overline" style="color:var(--text-secondary)">XENO-SOCIOLOGICAL SCAN</div>
           <div style="font-size:13px;font-weight:600;margin:4px 0">${civ.status}</div>
           <p style="color:var(--text-secondary);font-size:11px;margin-bottom:10px">
-            Nessuna emissione artificiale o megastruttura orbitale rilevata su ${pl.name}.
+            No artificial electromagnetic emissions or orbital megastructures detected around ${pl.name}.
           </p>
           <button id="btn-trigger-civ-inline" class="action-btn accent-amber">
-            + Catalizza Emergenza Cognitiva & Civiltà Kardashev
+            + Catalyze Cognitive Emergence & Kardashev Civilization
           </button>
         </div>
       `;
@@ -7028,37 +6903,37 @@ class ObservatoryHUD {
       civSectionHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Scala di Kardashev</div>
-            <div class="telemetry-val highlight-amber">Tipo ${civ.kardashev.toFixed(2)}</div>
+            <div class="telemetry-label">Kardashev Scale</div>
+            <div class="telemetry-val highlight-amber">Type ${civ.kardashev.toFixed(2)}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Specie & Popolazione</div>
-            <div class="telemetry-val">${civ.populationBillions} Mld</div>
+            <div class="telemetry-label">Species & Population</div>
+            <div class="telemetry-val">${civ.populationBillions} Billion</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Potenza Energetica</div>
+            <div class="telemetry-label">Installed Energy Output</div>
             <div class="telemetry-val highlight-cyan">${civ.energyPowerTW.toLocaleString()} TW</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Cooperazione / Conflitto</div>
+            <div class="telemetry-label">Cooperation / Conflict</div>
             <div class="telemetry-val highlight-emerald">${Math.round(civ.cooperationIndex * 100)}% / ${Math.round(civ.conflictRisk * 100)}%</div>
           </div>
         </div>
 
         <div class="instrument-box">
           <div class="instrument-header">
-            <span class="instrument-title">Modello Culturale: ${civ.ethos.name}</span>
+            <span class="instrument-title">Cultural Ethos: ${civ.ethos.name}</span>
           </div>
           <div style="font-size:11px;color:var(--text-secondary)">
-            <div><strong style="color:var(--text-primary)">Specie Dominante:</strong> ${civ.speciesName}</div>
+            <div><strong style="color:var(--text-primary)">Dominant Species:</strong> ${civ.speciesName}</div>
             <div><strong style="color:var(--text-primary)">Governance:</strong> ${civ.ethos.governance}</div>
-            <div><strong style="color:var(--text-primary)">Dottrina:</strong> ${civ.ethos.philosophy}</div>
+            <div><strong style="color:var(--text-primary)">Doctrine:</strong> ${civ.ethos.philosophy}</div>
           </div>
         </div>
 
         <div class="instrument-box">
           <div class="instrument-header">
-            <span class="instrument-title">Matrice Tecnologica & Megastrutture Orbitali</span>
+            <span class="instrument-title">Technology Matrix & Orbital Megastructures</span>
           </div>
           <div class="comp-bar-list">
             ${(civ.techDomains || [])
@@ -7088,7 +6963,7 @@ class ObservatoryHUD {
       ${civSectionHTML}
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Cronaca Storica & Registro Evolutivo di ${pl.name}</span>
+          <span class="instrument-title">Historical Chronicle & Evolutionary Log of ${pl.name}</span>
         </div>
         <div class="chronicle-timeline">
           ${historyList

@@ -4,13 +4,13 @@
  * - Hierarchical Cosmic Breadcrumb navigation
  * - Continuous Logarithmic Scale Slider & 7 Scale Level Presets
  * - Context-Sensitive Spatial Catalog (Superclusters, Galaxies, Stars, Planets, Landmarks, Clades)
- * - 4-Tab Scientific Dossier (Fisica/H-R Diagram, Atmosfera/Spettroscopia, Biosfera/Rete Trofica, Civiltà/Storia)
+ * - 4-Tab Scientific Dossier (Physics/H-R Diagram, Climate/Spectrometer, Life/Trophic Web, Civilization/History)
  * - Multi-Scale Temporal Control Dock & Causal Phenomenon Simulators
  */
 
 import { SCALE_LEVELS } from '../universe/generator.js';
 import { TIME_SCALES } from '../simulation/engine.js';
-import { formatLogScale, planckBlackbodyRGB, rgbToHex } from '../math/prng.js';
+import { formatLogScale } from '../math/prng.js';
 
 export class ObservatoryHUD {
   constructor(engine, renderer, soundscape) {
@@ -18,7 +18,7 @@ export class ObservatoryHUD {
     this.renderer = renderer;
     this.soundscape = soundscape;
 
-    this.activeTab = 'physics'; // 'physics' | 'climate' | 'life' | 'civ'
+    this.activeTab = 'physics';
     this.zenMode = false;
 
     this.cacheDOM();
@@ -47,7 +47,6 @@ export class ObservatoryHUD {
     this.btnAudio = document.getElementById('btn-audio');
     this.btnZen = document.getElementById('btn-zen');
 
-    // Left Panel
     this.scaleMetricBig = document.getElementById('scale-metric-big');
     this.scaleExponentTag = document.getElementById('scale-exponent-tag');
     this.scaleSlider = document.getElementById('scale-slider');
@@ -56,14 +55,12 @@ export class ObservatoryHUD {
     this.catalogCountBadge = document.getElementById('catalog-count-badge');
     this.catalogListContainer = document.getElementById('catalog-list-container');
 
-    // Right Dossier Panel
     this.entityOverline = document.getElementById('entity-category-overline');
     this.entityMainTitle = document.getElementById('entity-main-title');
     this.entityCatalogCode = document.getElementById('entity-catalog-code');
     this.dossierTabBtns = document.querySelectorAll('.dossier-tab-btn');
     this.dossierContent = document.getElementById('dossier-content-scroll');
 
-    // Bottom Temporal Dock
     this.epochTimeVal = document.getElementById('epoch-time-val');
     this.timePillsContainer = document.getElementById('time-speed-pills');
     this.liveTickerText = document.getElementById('live-ticker-text');
@@ -93,7 +90,7 @@ export class ObservatoryHUD {
     this.btnBookmark.addEventListener('click', () => {
       const bm = this.engine.addBookmark();
       this.soundscape.playTelemetryPing(780, 0.12);
-      this.liveTickerText.textContent = `[SEGNALIBRO SALVATO] ${bm.title} (${bm.scaleLabel})`;
+      this.liveTickerText.textContent = `[BOOKMARK SAVED] ${bm.title} (${bm.scaleLabel})`;
     });
 
     this.btnAudio.addEventListener('click', () => {
@@ -119,13 +116,11 @@ export class ObservatoryHUD {
       }
     });
 
-    // Continuous logarithmic scale slider (inverted so top/right = zoom in or standard)
     this.scaleSlider.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       this.engine.setTargetLogScale(val);
     });
 
-    // Dossier Tabs
     this.dossierTabBtns.forEach((btn) => {
       btn.addEventListener('click', () => {
         this.activeTab = btn.dataset.tab;
@@ -134,7 +129,6 @@ export class ObservatoryHUD {
       });
     });
 
-    // Causal Phenomenon Simulation Triggers
     this.btnPhenomStar.addEventListener('click', () => {
       this.engine.triggerPhenomenon('stellar_evolution_step');
     });
@@ -188,9 +182,6 @@ export class ObservatoryHUD {
     });
   }
 
-  /**
-   * Lightweight per-frame telemetry update (scale slider readout & cosmic epoch clock)
-   */
   updateFrameTelemetry() {
     const logS = this.engine.currentLogScale;
     this.scaleMetricBig.textContent = formatLogScale(logS);
@@ -202,7 +193,6 @@ export class ObservatoryHUD {
     const totalGyr = this.engine.baseCosmicEpochGyr + this.engine.elapsedYears / 1e9;
     this.epochTimeVal.textContent = `${totalGyr.toFixed(4)} Gyr (+${this.engine.formatElapsedCosmicTime()})`;
 
-    // Highlight active scale preset if scale crossed boundary
     const activeLvl = this.engine.getActiveScaleLevel();
     if (this._lastActiveLevelId !== activeLvl.id) {
       this._lastActiveLevelId = activeLvl.id;
@@ -217,19 +207,16 @@ export class ObservatoryHUD {
     this.seedInput.value = this.engine.universeSeed;
     const activeLvl = this.engine.getActiveScaleLevel();
 
-    // Update scale preset active state
     this.scalePresetsContainer.querySelectorAll('.scale-preset-btn').forEach((btn) => {
       const idx = parseInt(btn.dataset.scaleIndex, 10);
       btn.classList.toggle('active', idx === activeLvl.index);
     });
 
-    // Update time pills active state
     this.timePillsContainer.querySelectorAll('.time-pill-btn').forEach((btn) => {
       const idx = parseInt(btn.dataset.timeIndex, 10);
       btn.classList.toggle('active', idx === this.engine.timeScaleIndex);
     });
 
-    // Update live event ticker
     if (this.engine.globalEvents.length > 0) {
       const latest = this.engine.globalEvents[0];
       this.liveTickerText.textContent = `[${latest.epoch}] ${latest.title} — ${latest.detail}`;
@@ -249,12 +236,12 @@ export class ObservatoryHUD {
     const lm = this.engine.getActiveLandmark();
 
     const crumbs = [
-      { label: 'COSMO', level: 0, sub: sc.catalogId },
-      { label: gal.name.replace('Galassia ', ''), level: 1, sub: gal.morphology.code },
-      { label: 'SETTORE', level: 2, sub: `${this.engine.stellarSector.systems.length} stelle` },
+      { label: 'COSMOS', level: 0, sub: sc.catalogId },
+      { label: gal.name.replace(' Galaxy', ''), level: 1, sub: gal.morphology.code },
+      { label: 'SECTOR', level: 2, sub: `${this.engine.stellarSector.systems.length} stars` },
       { label: sys.name, level: 3, sub: sys.star.spectralClass },
-      { label: pl ? pl.name : 'Pianeta', level: 4, sub: pl ? `${pl.orbit.a.toFixed(2)} AU` : '' },
-      { label: lm ? lm.name.split(' ')[0] : 'Superficie', level: 5, sub: pl && pl.biosphere.active ? 'Biosfera' : 'Orizzonte' }
+      { label: pl ? pl.name : 'Planet', level: 4, sub: pl ? `${pl.orbit.a.toFixed(2)} AU` : '' },
+      { label: lm ? lm.name.split(' ')[0] : 'Surface', level: 5, sub: pl && pl.biosphere.active ? 'Biosphere' : 'Horizon' }
     ];
 
     this.breadcrumbContainer.innerHTML = '';
@@ -280,10 +267,9 @@ export class ObservatoryHUD {
     this.catalogListContainer.innerHTML = '';
 
     if (activeLvl.index === 0) {
-      // List Superclusters
       const list = this.engine.cosmicWeb.superclusters;
-      this.catalogHeaderTitle.textContent = 'Superammassi Cosmici';
-      this.catalogCountBadge.textContent = `${list.length} nodi`;
+      this.catalogHeaderTitle.textContent = 'Cosmic Superclusters';
+      this.catalogCountBadge.textContent = `${list.length} nodes`;
 
       list.forEach((sc, idx) => {
         const item = this.createCatalogRow({
@@ -300,10 +286,9 @@ export class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 1) {
-      // List Galaxies in Supercluster
       const list = this.engine.galaxies;
-      this.catalogHeaderTitle.textContent = 'Catalogo Galattico';
-      this.catalogCountBadge.textContent = `${list.length} galassie`;
+      this.catalogHeaderTitle.textContent = 'Galactic Catalog';
+      this.catalogCountBadge.textContent = `${list.length} galaxies`;
 
       list.forEach((gal, idx) => {
         const item = this.createCatalogRow({
@@ -321,25 +306,24 @@ export class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 2) {
-      // List Star Systems in Sector
       const list = this.engine.stellarSector.systems;
-      this.catalogHeaderTitle.textContent = 'Sistemi Stellari nel Settore';
-      this.catalogCountBadge.textContent = `${list.length} sistemi`;
+      this.catalogHeaderTitle.textContent = 'Star Systems in Sector';
+      this.catalogCountBadge.textContent = `${list.length} systems`;
 
       list.forEach((sys, idx) => {
         let tagText = sys.star.spectralClass;
         let tagClass = 'neutral';
         if (sys.hasCivilization) {
-          tagText = 'CIVILTÀ';
+          tagText = 'CIV';
           tagClass = 'civ';
         } else if (sys.hasBiosphere) {
-          tagText = 'BIOSFERA';
+          tagText = 'LIFE';
           tagClass = 'bio';
         }
 
         const item = this.createCatalogRow({
           name: sys.name,
-          sub: `${sys.catalogId} • ${Math.round(sys.star.tempK)} K • ${sys.planetCount} pianeti`,
+          sub: `${sys.catalogId} • ${Math.round(sys.star.tempK)} K • ${sys.planetCount} planets`,
           tagText,
           tagClass,
           active: idx === this.engine.activeSystemIndex,
@@ -351,11 +335,10 @@ export class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else if (activeLvl.index === 3 || activeLvl.index === 4) {
-      // List Planets in Active Star System
       const pSys = this.engine.getActivePlanetarySystem();
       const list = pSys.planets;
-      this.catalogHeaderTitle.textContent = `Corpi Orbitali (${pSys.name})`;
-      this.catalogCountBadge.textContent = `${list.length} pianeti`;
+      this.catalogHeaderTitle.textContent = `Orbital Bodies (${pSys.name})`;
+      this.catalogCountBadge.textContent = `${list.length} planets`;
 
       list.forEach((pl, idx) => {
         let tagText = `${pl.orbit.a.toFixed(2)} AU`;
@@ -364,13 +347,13 @@ export class ObservatoryHUD {
           tagText = `K-${pl.civilization.kardashev.toFixed(2)}`;
           tagClass = 'civ';
         } else if (pl.biosphere.active) {
-          tagText = 'VITA';
+          tagText = 'LIFE';
           tagClass = 'bio';
         }
 
         const item = this.createCatalogRow({
           name: pl.name,
-          sub: `${pl.typeLabel} • ${Math.round(pl.surfaceTempC)}°C • ${pl.moons.length} lune`,
+          sub: `${pl.typeLabel} • ${Math.round(pl.surfaceTempC)}°C • ${pl.moons.length} moons`,
           tagText,
           tagClass,
           active: idx === this.engine.activePlanetIndex,
@@ -385,12 +368,11 @@ export class ObservatoryHUD {
         this.catalogListContainer.appendChild(item);
       });
     } else {
-      // Scale 5 & 6: List Surface Landmarks & Evolved Biosphere Clades on Active Planet
       const pl = this.engine.getActivePlanet();
       if (!pl) return;
-      this.catalogHeaderTitle.textContent = `Siti & Cladi su ${pl.name}`;
+      this.catalogHeaderTitle.textContent = `Sites & Clades on ${pl.name}`;
       const totalItems = pl.landmarks.length + (pl.biosphere.clades ? pl.biosphere.clades.length : 0);
-      this.catalogCountBadge.textContent = `${totalItems} elementi`;
+      this.catalogCountBadge.textContent = `${totalItems} entries`;
 
       pl.landmarks.forEach((lm, idx) => {
         const tagClass = lm.icon === 'city' ? 'civ' : lm.icon === 'biosphere' ? 'bio' : 'neutral';
@@ -449,15 +431,15 @@ export class ObservatoryHUD {
     const pl = this.engine.getActivePlanet();
 
     if (activeLvl.index === 0) {
-      this.entityOverline.textContent = `STRUTTURA COSMOLOGICA • ${sc.dominantMorphology}`;
+      this.entityOverline.textContent = `COSMOLOGICAL STRUCTURE • ${sc.dominantMorphology}`;
       this.entityMainTitle.textContent = sc.name;
       this.entityCatalogCode.textContent = sc.catalogId;
     } else if (activeLvl.index === 1) {
-      this.entityOverline.textContent = `GALASSIA • ${gal.morphology.label}`;
+      this.entityOverline.textContent = `GALAXY • ${gal.morphology.label}`;
       this.entityMainTitle.textContent = gal.name;
       this.entityCatalogCode.textContent = `${gal.catalogId} (${gal.morphology.code})`;
     } else if (activeLvl.index === 2 || activeLvl.index === 3) {
-      this.entityOverline.textContent = `SISTEMA STELLARE • ${pSys.star.phase}`;
+      this.entityOverline.textContent = `STAR SYSTEM • ${pSys.star.phase}`;
       this.entityMainTitle.textContent = pSys.name;
       this.entityCatalogCode.textContent = `${pSys.catalogId} [${pSys.star.spectralClass}]`;
     } else if (pl) {
@@ -485,9 +467,6 @@ export class ObservatoryHUD {
     }
   }
 
-  /**
-   * TAB 1: ASTROPHYSICS, GEOPHYSICS & DYNAMIC HERTZSPRUNG-RUSSELL DIAGRAM
-   */
   renderPhysicsTab(activeLvl, sc, gal, pSys, pl) {
     const star = pSys.star;
 
@@ -496,27 +475,27 @@ export class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Massa Totale Viriale</div>
+            <div class="telemetry-label">Total Virial Mass</div>
             <div class="telemetry-val highlight-amber">10<sup>${sc.massLogSolar.toFixed(2)}</sup> M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Redshift Cosmologico</div>
+            <div class="telemetry-label">Cosmological Redshift</div>
             <div class="telemetry-val highlight-cyan">z = ${sc.redshift.toFixed(4)}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Galassie Censite</div>
+            <div class="telemetry-label">Cataloged Galaxies</div>
             <div class="telemetry-val">${sc.galaxyCount.toLocaleString()}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Frazione Materia Oscura</div>
+            <div class="telemetry-label">Dark Matter Fraction</div>
             <div class="telemetry-val">${(sc.darkMatterFraction * 100).toFixed(1)}%</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Estensione Lineare</div>
+            <div class="telemetry-label">Linear Span</div>
             <div class="telemetry-val">${sc.spanMpc.toFixed(1)} Mpc</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Temp. Gas ICM X-Ray</div>
+            <div class="telemetry-label">X-Ray ICM Gas Temp</div>
             <div class="telemetry-val">${(sc.icmTempKelvin / 1e6).toFixed(1)} MK</div>
           </div>
         </div>
@@ -525,27 +504,27 @@ export class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Classificazione Hubble</div>
+            <div class="telemetry-label">Hubble Classification</div>
             <div class="telemetry-val highlight-amber">${gal.morphology.code}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Diametro Disco</div>
+            <div class="telemetry-label">Disk Diameter</div>
             <div class="telemetry-val highlight-cyan">${Math.round(gal.diameterLy).toLocaleString()} ly</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Popolazione Stellare</div>
-            <div class="telemetry-val">~${gal.starCountBillions.toFixed(0)} Miliardi</div>
+            <div class="telemetry-label">Stellar Population</div>
+            <div class="telemetry-val">~${gal.starCountBillions.toFixed(0)} Billion</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Buco Nero Centrale</div>
+            <div class="telemetry-label">Central SMBH</div>
             <div class="telemetry-val">${(gal.smbh.massSolar / 1e6).toFixed(2)}×10⁶ M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Età Media Galattica</div>
+            <div class="telemetry-label">Mean Galactic Age</div>
             <div class="telemetry-val">${gal.ageGyr.toFixed(2)} Gyr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Metallicità Media</div>
+            <div class="telemetry-label">Mean Metallicity</div>
             <div class="telemetry-val">[Fe/H] ${gal.metallicityFeH >= 0 ? '+' : ''}${gal.metallicityFeH.toFixed(2)}</div>
           </div>
         </div>
@@ -554,35 +533,35 @@ export class ObservatoryHUD {
       telemetryHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Stella Madre (${star.spectralClass})</div>
+            <div class="telemetry-label">Host Star (${star.spectralClass})</div>
             <div class="telemetry-val" style="color:${star.hexColor}">${Math.round(star.tempK)} K • ${star.currentMassSolar.toFixed(2)} M☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Luminosità & Raggio</div>
+            <div class="telemetry-label">Luminosity & Radius</div>
             <div class="telemetry-val">${star.luminositySolar < 0.01 ? star.luminositySolar.toExponential(1) : star.luminositySolar.toFixed(2)} L☉ • ${star.radiusSolar < 0.05 ? star.radiusSolar.toFixed(4) : star.radiusSolar.toFixed(2)} R☉</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Età / Vita Seq. Princ.</div>
+            <div class="telemetry-label">Age / MS Lifetime</div>
             <div class="telemetry-val">${pSys.currentAgeGyr.toFixed(2)} / ${star.msLifetimeGyr.toFixed(2)} Gyr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Zona Abitabile (CHZ)</div>
+            <div class="telemetry-label">Habitable Zone (CHZ)</div>
             <div class="telemetry-val highlight-emerald">${star.hzInnerAU.toFixed(2)} – ${star.hzOuterAU.toFixed(2)} AU</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">${pl.name} (Massa/Raggio)</div>
+            <div class="telemetry-label">${pl.name} (Mass/Radius)</div>
             <div class="telemetry-val highlight-cyan">${pl.massEarths.toFixed(2)} M⊕ • ${Math.round(pl.radiusKm).toLocaleString()} km</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Gravità & Vel. Fuga</div>
+            <div class="telemetry-label">Gravity & Escape Vel.</div>
             <div class="telemetry-val">${pl.gravityG.toFixed(2)} g • ${pl.escapeVelocityKmS.toFixed(1)} km/s</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Semiasse & Periodo</div>
+            <div class="telemetry-label">Semi-Major & Period</div>
             <div class="telemetry-val">${pl.orbit.a.toFixed(3)} AU • ${pl.orbit.periodYears.toFixed(2)} yr</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Campo Magnetico & Tettonica</div>
+            <div class="telemetry-label">Magnetic Field & Tectonics</div>
             <div class="telemetry-val">${pl.magneticFieldGauss.toFixed(2)} G • ${(pl.tectonics * 100).toFixed(0)}%</div>
           </div>
         </div>
@@ -593,15 +572,15 @@ export class ObservatoryHUD {
       ${telemetryHTML}
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Diagramma Evolutivo Hertzsprung-Russell (H-R)</span>
+          <span class="instrument-title">Hertzsprung-Russell (H-R) Evolutionary Diagram</span>
           <span class="panel-badge">${star.spectralClass} (${(star.lifeFraction * 100).toFixed(0)}% MS)</span>
         </div>
         <canvas id="hr-diagram-canvas" class="instrument-canvas" width="330" height="150"></canvas>
       </div>
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Architettura Orbitale del Sistema (${pSys.planets.length} Pianeti)</span>
-          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">Limite Neve: ${star.frostLineAU.toFixed(2)} AU</span>
+          <span class="instrument-title">Orbital System Architecture (${pSys.planets.length} Planets)</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary)">Frost Line: ${star.frostLineAU.toFixed(2)} AU</span>
         </div>
         <div class="comp-bar-list">
           ${pSys.planets
@@ -645,7 +624,6 @@ export class ObservatoryHUD {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // Background grid
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
     ctx.lineWidth = 1;
     for (let x = 40; x < w; x += 55) {
@@ -661,7 +639,6 @@ export class ObservatoryHUD {
       ctx.stroke();
     }
 
-    // Main Sequence diagonal band (Hot/Luminous top-left -> Cool/Dim bottom-right)
     const grad = ctx.createLinearGradient(40, 18, w - 25, h - 28);
     grad.addColorStop(0, 'rgba(96, 165, 250, 0.35)');
     grad.addColorStop(0.45, 'rgba(253, 224, 71, 0.35)');
@@ -674,7 +651,6 @@ export class ObservatoryHUD {
     ctx.quadraticCurveTo(w * 0.5, h * 0.52, w - 30, h - 30);
     ctx.stroke();
 
-    // Red Giant Branch curve
     ctx.strokeStyle = 'rgba(251, 146, 60, 0.28)';
     ctx.lineWidth = 10;
     ctx.beginPath();
@@ -682,7 +658,6 @@ export class ObservatoryHUD {
     ctx.quadraticCurveTo(w * 0.72, h * 0.25, w - 38, 28);
     ctx.stroke();
 
-    // White Dwarf cooling sequence (bottom-left)
     ctx.strokeStyle = 'rgba(147, 197, 253, 0.25)';
     ctx.lineWidth = 6;
     ctx.beginPath();
@@ -690,7 +665,6 @@ export class ObservatoryHUD {
     ctx.lineTo(175, h - 26);
     ctx.stroke();
 
-    // Map active star (tempK: 40000 -> 2500 left-to-right; log10(L): -4 -> +6 bottom-to-top)
     const logT = Math.log10(Math.max(2500, Math.min(42000, star.tempK)));
     const minLogT = Math.log10(2500);
     const maxLogT = Math.log10(42000);
@@ -699,7 +673,6 @@ export class ObservatoryHUD {
     const logL = Math.log10(Math.max(1e-4, Math.min(1e6, star.luminositySolar)));
     const sy = (h - 26) - ((logL + 4) / 10) * (h - 44);
 
-    // Crosshair on active star
     ctx.strokeStyle = 'rgba(229, 169, 60, 0.6)';
     ctx.lineWidth = 1;
     ctx.setLineDash([2, 3]);
@@ -719,7 +692,6 @@ export class ObservatoryHUD {
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // Spectral Class Axis Labels
     ctx.fillStyle = '#94a3b8';
     ctx.font = '9px "JetBrains Mono", monospace';
     const classes = ['O', 'B', 'A', 'F', 'G', 'K', 'M'];
@@ -729,50 +701,47 @@ export class ObservatoryHUD {
     ctx.fillText('L☉', 6, 20);
   }
 
-  /**
-   * TAB 2: ATMOSPHERIC SPECTROSCOPY, CLIMATE & HABITABILITY
-   */
   renderClimateTab(pSys, pl) {
     if (!pl) return;
     this.dossierContent.innerHTML = `
       <div class="telemetry-grid">
         <div class="telemetry-cell">
-          <div class="telemetry-label">Temperatura Superficiale</div>
+          <div class="telemetry-label">Surface Temperature</div>
           <div class="telemetry-val highlight-amber">${pl.surfaceTempC.toFixed(1)} °C (${Math.round(pl.surfaceTempK)} K)</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Temp. Equilibrio & Serra</div>
+          <div class="telemetry-label">Equilibrium & Greenhouse</div>
           <div class="telemetry-val">${Math.round(pl.eqTempK)} K (+${Math.round(pl.greenhouseDeltaK)} K)</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Pressione Atmosferica</div>
+          <div class="telemetry-label">Surface Pressure</div>
           <div class="telemetry-val highlight-cyan">${pl.pressureAtm < 0.01 ? pl.pressureAtm.toExponential(1) : pl.pressureAtm.toFixed(2)} atm</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Albedo Bond & Nubi</div>
-          <div class="telemetry-val">${pl.albedo.toFixed(2)} • ${(pl.cloudCoverage * 100).toFixed(0)}% nubi</div>
+          <div class="telemetry-label">Bond Albedo & Clouds</div>
+          <div class="telemetry-val">${pl.albedo.toFixed(2)} • ${(pl.cloudCoverage * 100).toFixed(0)}% clouds</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Idrosfera / Oceani</div>
-          <div class="telemetry-val">${(pl.oceanCoverage * 100).toFixed(0)}% copertura</div>
+          <div class="telemetry-label">Hydrosphere / Oceans</div>
+          <div class="telemetry-val">${(pl.oceanCoverage * 100).toFixed(0)}% coverage</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Indice Similarità ESI</div>
+          <div class="telemetry-label">Earth Similarity Index</div>
           <div class="telemetry-val highlight-emerald">${(pl.habitabilityScore * 100).toFixed(1)}%</div>
         </div>
       </div>
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Spettrogramma di Assorbimento Atmosferico (380–780 nm)</span>
-          <span class="panel-badge">${pl.biosphere.active ? 'BIOFIRMA O₂/CH₄' : 'ABIOTICO'}</span>
+          <span class="instrument-title">Atmospheric Absorption Spectrogram (380–780 nm)</span>
+          <span class="panel-badge">${pl.biosphere.active ? 'O₂/CH₄ BIOSIGNATURE' : 'ABIOTIC'}</span>
         </div>
         <canvas id="spectrum-canvas" class="instrument-canvas" width="330" height="64"></canvas>
       </div>
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Composizione Chimica dell'Atmosfera</span>
+          <span class="instrument-title">Atmospheric Chemical Composition</span>
         </div>
         <div class="comp-bar-list">
           ${pl.atmosphereComposition
@@ -805,7 +774,6 @@ export class ObservatoryHUD {
     const h = canvas.height;
     ctx.clearRect(0, 0, w, h);
 
-    // Continuous optical rainbow continuum (380nm violet -> 760nm deep red)
     const grad = ctx.createLinearGradient(0, 0, w, 0);
     grad.addColorStop(0.0, '#3b0764');
     grad.addColorStop(0.18, '#2563eb');
@@ -817,7 +785,6 @@ export class ObservatoryHUD {
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h - 16);
 
-    // Draw dark Fraunhofer & molecular absorption bands based on actual gas composition!
     const bands = [];
     for (const gas of pl.atmosphereComposition) {
       if (gas.formula.includes('O₂')) {
@@ -851,9 +818,6 @@ export class ObservatoryHUD {
     });
   }
 
-  /**
-   * TAB 3: BIOSPHERE, EVOLUTIONARY CLADES & TROPHIC FOOD WEB
-   */
   renderLifeTab(pSys, pl) {
     if (!pl) return;
     const bio = pl.biosphere;
@@ -861,13 +825,13 @@ export class ObservatoryHUD {
     if (!bio.active) {
       this.dossierContent.innerHTML = `
         <div class="instrument-box" style="text-align:center;padding:18px 12px">
-          <div class="entity-category-overline" style="color:var(--text-secondary)">STATO ASTROBIOLOGICO</div>
+          <div class="entity-category-overline" style="color:var(--text-secondary)">ASTROBIOLOGICAL STATUS</div>
           <div style="font-size:14px;font-weight:600;margin:6px 0">${bio.stage}</div>
           <p style="color:var(--text-secondary);font-size:11px;margin-bottom:12px">
-            Le condizioni termodinamiche attuali (${pl.surfaceTempC.toFixed(1)}°C, ${pl.pressureAtm.toFixed(2)} atm) non ospitano ancora una biosfera attiva, oppure attendono un evento catalitico di abiogenesi.
+            Current thermodynamic conditions (${pl.surfaceTempC.toFixed(1)}°C, ${pl.pressureAtm.toFixed(2)} atm) do not yet host an active biosphere, or await a catalytic abiogenesis event.
           </p>
           <button id="btn-trigger-abiogenesis-inline" class="action-btn accent-emerald">
-            + Catalizza Abiogenesi & Evoluzione Prebiotica
+            + Catalyze Abiogenesis & Prebiotic Evolution
           </button>
         </div>
       `;
@@ -883,19 +847,19 @@ export class ObservatoryHUD {
     this.dossierContent.innerHTML = `
       <div class="telemetry-grid">
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biomassa Globale</div>
+          <div class="telemetry-label">Global Biomass</div>
           <div class="telemetry-val highlight-emerald">${bio.biomassGt.toLocaleString()} Gt C</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biodiversità Stimata</div>
-          <div class="telemetry-val">${bio.speciesCountEstimate.toLocaleString()} specie</div>
+          <div class="telemetry-label">Estimated Biodiversity</div>
+          <div class="telemetry-val">${bio.speciesCountEstimate.toLocaleString()} species</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Biochimica & Solvente</div>
+          <div class="telemetry-label">Biochemistry & Solvent</div>
           <div class="telemetry-val" style="font-size:10px">${bio.biochemistry}</div>
         </div>
         <div class="telemetry-cell">
-          <div class="telemetry-label">Metabolismo Primario</div>
+          <div class="telemetry-label">Primary Metabolism</div>
           <div class="telemetry-val" style="font-size:10px">${bio.energySource}</div>
         </div>
       </div>
@@ -905,15 +869,15 @@ export class ObservatoryHUD {
           ? `
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Esemplare Selezionato: ${activeClade.binomialName}</span>
+          <span class="instrument-title">Selected Specimen: ${activeClade.binomialName}</span>
           <span class="panel-badge">${activeClade.commonArchetype}</span>
         </div>
         <div style="font-size:11px;color:var(--text-secondary);display:flex;flex-direction:column;gap:4px">
-          <div><strong style="color:var(--text-primary)">Simmetria & Morfologia:</strong> ${activeClade.symmetry} (${activeClade.bodySegments} metameri)</div>
-          <div><strong style="color:var(--text-primary)">Locomozione:</strong> ${activeClade.locomotion}</div>
-          <div><strong style="color:var(--text-primary)">Apparato Sensoriale:</strong> ${activeClade.sensoryMode}</div>
+          <div><strong style="color:var(--text-primary)">Symmetry & Morphology:</strong> ${activeClade.symmetry} (${activeClade.bodySegments} segments)</div>
+          <div><strong style="color:var(--text-primary)">Locomotion:</strong> ${activeClade.locomotion}</div>
+          <div><strong style="color:var(--text-primary)">Sensory Apparatus:</strong> ${activeClade.sensoryMode}</div>
           <div style="margin-top:4px;color:var(--accent-emerald);font-family:var(--font-mono);font-size:10px">
-            Adattamenti Evolutivi:
+            Evolutionary Adaptations:
             ${activeClade.traits.map((t) => `<div style="color:var(--text-secondary)">• ${t}</div>`).join('')}
           </div>
         </div>
@@ -924,7 +888,7 @@ export class ObservatoryHUD {
 
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Rete Trofica & Piramide Filogenetica (Clicca per Ispezionare)</span>
+          <span class="instrument-title">Trophic Food Web & Phylogenetic Pyramid (Click to Inspect)</span>
         </div>
         <div class="comp-bar-list">
           ${bio.clades
@@ -935,7 +899,7 @@ export class ObservatoryHUD {
             }" data-select-clade="${idx}">
               <div class="comp-row-label">
                 <span style="color:var(--text-primary);font-weight:600">${c.binomialName} <span style="color:var(--text-secondary);font-weight:400">(${c.commonArchetype})</span></span>
-                <span style="color:var(--accent-emerald)">${Math.round(c.biomassShare * 100)}% biomassa</span>
+                <span style="color:var(--accent-emerald)">${Math.round(c.biomassShare * 100)}% biomass</span>
               </div>
               <div class="comp-track">
                 <div class="comp-fill" style="width:${Math.max(6, c.biomassShare * 100)}%;background:hsl(${c.hueDeg}, 80%, 55%)"></div>
@@ -956,9 +920,6 @@ export class ObservatoryHUD {
     });
   }
 
-  /**
-   * TAB 4: CIVILIZATION, KARDASHEV TECHNOSPHERE & HISTORICAL CHRONICLE
-   */
   renderCivTab(pSys, pl) {
     if (!pl) return;
     const civ = pl.civilization;
@@ -967,13 +928,13 @@ export class ObservatoryHUD {
     if (!civ.active) {
       civSectionHTML = `
         <div class="instrument-box" style="text-align:center;padding:14px 10px">
-          <div class="entity-category-overline" style="color:var(--text-secondary)">SCANSIONE XENO-SOCIOLOGICA</div>
+          <div class="entity-category-overline" style="color:var(--text-secondary)">XENO-SOCIOLOGICAL SCAN</div>
           <div style="font-size:13px;font-weight:600;margin:4px 0">${civ.status}</div>
           <p style="color:var(--text-secondary);font-size:11px;margin-bottom:10px">
-            Nessuna emissione artificiale o megastruttura orbitale rilevata su ${pl.name}.
+            No artificial electromagnetic emissions or orbital megastructures detected around ${pl.name}.
           </p>
           <button id="btn-trigger-civ-inline" class="action-btn accent-amber">
-            + Catalizza Emergenza Cognitiva & Civiltà Kardashev
+            + Catalyze Cognitive Emergence & Kardashev Civilization
           </button>
         </div>
       `;
@@ -981,37 +942,37 @@ export class ObservatoryHUD {
       civSectionHTML = `
         <div class="telemetry-grid">
           <div class="telemetry-cell">
-            <div class="telemetry-label">Scala di Kardashev</div>
-            <div class="telemetry-val highlight-amber">Tipo ${civ.kardashev.toFixed(2)}</div>
+            <div class="telemetry-label">Kardashev Scale</div>
+            <div class="telemetry-val highlight-amber">Type ${civ.kardashev.toFixed(2)}</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Specie & Popolazione</div>
-            <div class="telemetry-val">${civ.populationBillions} Mld</div>
+            <div class="telemetry-label">Species & Population</div>
+            <div class="telemetry-val">${civ.populationBillions} Billion</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Potenza Energetica</div>
+            <div class="telemetry-label">Installed Energy Output</div>
             <div class="telemetry-val highlight-cyan">${civ.energyPowerTW.toLocaleString()} TW</div>
           </div>
           <div class="telemetry-cell">
-            <div class="telemetry-label">Cooperazione / Conflitto</div>
+            <div class="telemetry-label">Cooperation / Conflict</div>
             <div class="telemetry-val highlight-emerald">${Math.round(civ.cooperationIndex * 100)}% / ${Math.round(civ.conflictRisk * 100)}%</div>
           </div>
         </div>
 
         <div class="instrument-box">
           <div class="instrument-header">
-            <span class="instrument-title">Modello Culturale: ${civ.ethos.name}</span>
+            <span class="instrument-title">Cultural Ethos: ${civ.ethos.name}</span>
           </div>
           <div style="font-size:11px;color:var(--text-secondary)">
-            <div><strong style="color:var(--text-primary)">Specie Dominante:</strong> ${civ.speciesName}</div>
+            <div><strong style="color:var(--text-primary)">Dominant Species:</strong> ${civ.speciesName}</div>
             <div><strong style="color:var(--text-primary)">Governance:</strong> ${civ.ethos.governance}</div>
-            <div><strong style="color:var(--text-primary)">Dottrina:</strong> ${civ.ethos.philosophy}</div>
+            <div><strong style="color:var(--text-primary)">Doctrine:</strong> ${civ.ethos.philosophy}</div>
           </div>
         </div>
 
         <div class="instrument-box">
           <div class="instrument-header">
-            <span class="instrument-title">Matrice Tecnologica & Megastrutture Orbitali</span>
+            <span class="instrument-title">Technology Matrix & Orbital Megastructures</span>
           </div>
           <div class="comp-bar-list">
             ${(civ.techDomains || [])
@@ -1041,7 +1002,7 @@ export class ObservatoryHUD {
       ${civSectionHTML}
       <div class="instrument-box">
         <div class="instrument-header">
-          <span class="instrument-title">Cronaca Storica & Registro Evolutivo di ${pl.name}</span>
+          <span class="instrument-title">Historical Chronicle & Evolutionary Log of ${pl.name}</span>
         </div>
         <div class="chronicle-timeline">
           ${historyList

@@ -530,7 +530,7 @@ export class UniverseRenderer {
         type: 'supercluster',
         index: idx,
         label: sc.name,
-        sublabel: `${sc.catalogId} (${sc.galaxyCount.toLocaleString()} galassie)`,
+        sublabel: `${sc.catalogId} (${sc.galaxyCount.toLocaleString()} galaxies)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 26
@@ -591,16 +591,16 @@ export class UniverseRenderer {
       this.drawSelectionReticle(ctx, pSec.x, pSec.y, 18, '#38bdf8');
       ctx.fillStyle = '#38bdf8';
       ctx.font = '600 11px "Space Grotesk", sans-serif';
-      ctx.fillText(`SETTORE ATTIVO: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
+      ctx.fillText(`ACTIVE SECTOR: ${this.engine.stellarSector.name}`, pSec.x + 22, pSec.y - 2);
       ctx.fillStyle = 'rgba(226, 232, 240, 0.75)';
       ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Clicca per esplorare i ${this.engine.stellarSector.systems.length} sistemi stellari`, pSec.x + 22, pSec.y + 11);
+      ctx.fillText(`Click to explore ${this.engine.stellarSector.systems.length} star systems`, pSec.x + 22, pSec.y + 11);
 
       this.interactiveTargets.push({
         type: 'system',
         index: this.engine.activeSystemIndex,
         label: this.engine.stellarSector.name,
-        sublabel: 'Zoom nel Settore Stellare',
+        sublabel: 'Zoom into Star Sector',
         screenX: pSec.x,
         screenY: pSec.y,
         hitRadius: 30
@@ -675,8 +675,8 @@ export class UniverseRenderer {
       ctx.fillText(sys.name, pStar.x + 12, pStar.y - 2);
 
       let tag = `${sys.star.spectralClass} • ${Math.round(sys.star.tempK)}K`;
-      if (sys.hasCivilization) tag += ' • [CIVILTÀ]';
-      else if (sys.hasBiosphere) tag += ' • [VITA]';
+      if (sys.hasCivilization) tag += ' • [CIVILIZATION]';
+      else if (sys.hasBiosphere) tag += ' • [LIFE]';
 
       ctx.fillStyle = sys.hasCivilization
         ? '#e5a93c'
@@ -772,7 +772,6 @@ export class UniverseRenderer {
     // 4. Planets & Their 3D Keplerian Elliptical Orbits
     planets.forEach((planet, idx) => {
       const isSelected = idx === activePlanetIdx;
-      const rScaled = mapAU(planet.orbit.a);
 
       // Draw full 3D elliptical orbit path
       ctx.beginPath();
@@ -862,7 +861,7 @@ export class UniverseRenderer {
 
       let sub = `${planet.orbit.a.toFixed(2)} AU • ${Math.round(planet.surfaceTempC)}°C`;
       if (planet.civilization.active) sub += ` • K-${planet.civilization.kardashev.toFixed(2)}`;
-      else if (planet.biosphere.active) sub += ' • BIOSFERA';
+      else if (planet.biosphere.active) sub += ' • BIOSPHERE';
 
       ctx.fillStyle = planet.civilization.active
         ? '#e5a93c'
@@ -909,7 +908,6 @@ export class UniverseRenderer {
         const a = (i / 64) * Math.PI * 2;
         const p3 = [Math.cos(a) * ringR, Math.sin(a * 2) * 0.02, Math.sin(a) * ringR];
         const proj = this.project3D(p3, 3.35);
-        // Only draw front half of orbital ring or dashed back
         if (proj.visible) {
           if (i === 0) ctx.moveTo(proj.x, proj.y);
           else ctx.lineTo(proj.x, proj.y);
@@ -932,7 +930,6 @@ export class UniverseRenderer {
         Math.sin(mAngle) * mOrbitR
       ];
       const pMoon = this.project3D(mPos, 3.35);
-      // Check if moon is behind planet sphere
       if (!pMoon.visible || (pMoon.depth > 3.35 && Math.hypot(mPos[0], mPos[1]) < planetR)) return;
 
       ctx.fillStyle = '#cbd5e1';
@@ -942,15 +939,15 @@ export class UniverseRenderer {
 
       ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
       ctx.font = '10px "JetBrains Mono", monospace';
-      ctx.fillText(`Luna ${moon.name} (${Math.round(moon.radiusKm)} km)`, pMoon.x + 8, pMoon.y + 3);
+      ctx.fillText(`Moon ${moon.name} (${Math.round(moon.radiusKm)} km)`, pMoon.x + 8, pMoon.y + 3);
     });
 
-    // 3. 3D Spherical Surface Landmarks (Continents, Volcanoes, Canyons, Biosphere, Cities)
+    // 3. 3D Spherical Surface Landmarks
     const cy = Math.cos(this.yaw);
     const sy = Math.sin(this.yaw);
     const cp = Math.cos(this.pitch);
     const sp = Math.sin(this.pitch);
-    const camDir = [sy * cp, sp, cy * cp]; // Vector from origin toward camera is -camDir
+    const camDir = [sy * cp, sp, cy * cp];
 
     planet.landmarks.forEach((lm, idx) => {
       const latRad = (lm.lat * Math.PI) / 180;
@@ -960,9 +957,8 @@ export class UniverseRenderer {
       const ny = Math.sin(latRad);
       const nz = Math.cos(latRad) * Math.sin(lonRad);
 
-      // Check front-facing visibility against camera vector
       const facing = -(nx * camDir[0] + ny * camDir[1] + nz * camDir[2]);
-      if (facing < 0.18) return; // Hidden on far hemisphere of planet
+      if (facing < 0.18) return;
 
       const pos3D = [nx * planetR * 1.01, ny * planetR * 1.01, nz * planetR * 1.01];
       const proj = this.project3D(pos3D, 3.35);
@@ -977,7 +973,6 @@ export class UniverseRenderer {
         ? '#f43f5e'
         : '#38bdf8';
 
-      // Draw crisp scientific target pin
       ctx.strokeStyle = pinColor;
       ctx.lineWidth = isSelected ? 1.8 : 1.2;
       ctx.beginPath();
@@ -1000,7 +995,7 @@ export class UniverseRenderer {
         type: 'landmark',
         index: idx,
         label: lm.name,
-        sublabel: `${lm.category} (Clicca per scendere in superficie)`,
+        sublabel: `${lm.category} (Click to descend to surface)`,
         screenX: proj.x,
         screenY: proj.y,
         hitRadius: 22
@@ -1026,7 +1021,6 @@ export class UniverseRenderer {
     const cx = this.width * 0.5;
     const cy = this.height * 0.5;
 
-    // 1. Scientific Horizon Altimeter & Compass Telemetry Overlay
     ctx.strokeStyle = 'rgba(148, 163, 184, 0.22)';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -1039,13 +1033,12 @@ export class UniverseRenderer {
     ctx.font = '10px "JetBrains Mono", monospace';
     ctx.textAlign = 'center';
     ctx.fillText(
-      `AZIMUT ${headingDeg.toString().padStart(3, '0')}°  •  LOCALITÀ: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  G=${planet.gravityG.toFixed(2)}g  •  P=${planet.pressureAtm.toFixed(2)} atm`,
+      `AZIMUTH ${headingDeg.toString().padStart(3, '0')}°  •  SITE: ${lm ? lm.name.toUpperCase() : planet.name.toUpperCase()}  •  G=${planet.gravityG.toFixed(2)}g  •  P=${planet.pressureAtm.toFixed(2)} atm`,
       cx,
       74
     );
     ctx.textAlign = 'left';
 
-    // 2. Interactive Surface Markers for Biosphere Clades & Civilization Nodes
     if (planet.biosphere.active && planet.biosphere.clades.length > 0) {
       planet.biosphere.clades.forEach((clade, idx) => {
         const angle = (idx - 2) * 0.42 - (this.yaw % 0.6) * 0.3;
@@ -1053,7 +1046,6 @@ export class UniverseRenderer {
         const sy = cy + 65 + (idx % 2) * 48;
         const isSelected = idx === this.engine.activeCladeIndex;
 
-        // Draw animated procedural organism silhouette node in the landscape
         this.drawProceduralOrganismSpecimen(
           ctx,
           sx,
@@ -1068,7 +1060,7 @@ export class UniverseRenderer {
           type: 'clade',
           index: idx,
           label: clade.binomialName,
-          sublabel: `${clade.commonArchetype} (Clicca per analisi morfologica)`,
+          sublabel: `${clade.commonArchetype} (Click for morphological scan)`,
           screenX: sx,
           screenY: sy,
           hitRadius: 34
@@ -1076,7 +1068,6 @@ export class UniverseRenderer {
       });
     }
 
-    // 3. When zoomed all the way to Scale 7 (logScale < 1.8), render the High-Precision Bio/Techno Holographic Specimen Frame
     const wMicro = 1.0 - this.smoothstep(1.1, 2.2, this.engine.currentLogScale);
     if (wMicro > 0.05) {
       ctx.save();
@@ -1165,7 +1156,7 @@ export class UniverseRenderer {
     ctx.fillText(clade.binomialName, x + radius * 1.3, y - 2);
     ctx.fillStyle = color;
     ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.fillText(`${clade.commonArchetype} (Liv. Trofico ${clade.trophicLevel})`, x + radius * 1.3, y + 10);
+    ctx.fillText(`${clade.commonArchetype} (Trophic Lvl ${clade.trophicLevel})`, x + radius * 1.3, y + 10);
     ctx.restore();
   }
 
@@ -1176,7 +1167,6 @@ export class UniverseRenderer {
     const clade = this.engine.getActiveClade();
     const r = 135;
 
-    // Outer technical instrument ring
     ctx.strokeStyle = 'rgba(52, 211, 153, 0.35)';
     ctx.lineWidth = 1.2;
     ctx.beginPath();
@@ -1194,7 +1184,7 @@ export class UniverseRenderer {
       ctx.fillStyle = '#34d399';
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`SCANSIONE BIO-MORFOLOGICA: ${clade.binomialName.toUpperCase()}`, cx, cy - r - 26);
+      ctx.fillText(`BIO-MORPHOLOGICAL SCAN: ${clade.binomialName.toUpperCase()}`, cx, cy - r - 26);
       ctx.fillStyle = 'rgba(226, 232, 240, 0.8)';
       ctx.font = '10px "JetBrains Mono", monospace';
       ctx.fillText(`${clade.symmetry} • ${clade.sensoryMode}`, cx, cy + r + 28);
@@ -1203,7 +1193,7 @@ export class UniverseRenderer {
       ctx.fillStyle = '#e5a93c';
       ctx.font = '600 11px "JetBrains Mono", monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(`MATRICE TECNOSFERICA: ${planet.civilization.speciesName.toUpperCase()}`, cx, cy - r - 24);
+      ctx.fillText(`TECHNOSPHERE MATRIX: ${planet.civilization.speciesName.toUpperCase()}`, cx, cy - r - 24);
       ctx.textAlign = 'left';
     }
   }
