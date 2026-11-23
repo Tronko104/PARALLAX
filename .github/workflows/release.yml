@@ -176,8 +176,8 @@ jobs:
 
           | Platform | Package | Instructions |
           | :--- | :--- | :--- |
-          | **Windows (x64)** | \`PARALLAX-${VERSION}-Windows-nsis.exe\` | Run the installer for Desktop & Start Menu shortcuts |
-          | **Windows Portable** | \`PARALLAX-${VERSION}-Windows-portable.exe\` | Double-click to run directly — no installation required |
+          | **Windows (x64)** | \`PARALLAX-${VERSION}-Windows-Setup.exe\` | Run the installer for Desktop & Start Menu shortcuts |
+          | **Windows Portable** | \`PARALLAX-${VERSION}-Windows-Portable.exe\` | Double-click to run directly — no installation required |
           | **Linux (Universal)** | \`PARALLAX-${VERSION}-Linux-x86_64.AppImage\` | \`chmod +x *.AppImage && ./PARALLAX-${VERSION}-Linux-x86_64.AppImage\` |
           | **Linux (Debian/Ubuntu)** | \`PARALLAX-${VERSION}-Linux-amd64.deb\` | \`sudo apt install ./PARALLAX-${VERSION}-Linux-amd64.deb\` |
           | **Android (7.0+)** | \`PARALLAX-${VERSION}-Android.apk\` | Download & install directly on your Android phone or tablet |

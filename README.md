@@ -20,8 +20,8 @@ Download pre-built, ready-to-install packages directly from **[GitHub Releases](
 
 | Platform | Package | How to Run |
 | :--- | :--- | :--- |
-| **Windows (x64)** | `PARALLAX-*-Windows-nsis.exe` | Run the installer for Desktop & Start Menu shortcuts |
-| **Windows Portable** | `PARALLAX-*-Windows-portable.exe` | Double-click to launch directly without installing |
+| **Windows (x64)** | `PARALLAX-*-Windows-Setup.exe` | Run the installer for Desktop & Start Menu shortcuts |
+| **Windows Portable** | `PARALLAX-*-Windows-Portable.exe` | Double-click to launch directly without installing |
 | **Linux (Universal)** | `PARALLAX-*-Linux-x86_64.AppImage` | `chmod +x PARALLAX-*.AppImage && ./PARALLAX-*.AppImage` |
 | **Linux (Debian/Ubuntu)** | `PARALLAX-*-Linux-amd64.deb` | `sudo apt install ./PARALLAX-*.deb` |
 | **Android (7.0+)** | `PARALLAX-*-Android.apk` | Download and install directly on your Android phone or tablet |

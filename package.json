@@ -2,7 +2,10 @@
   "name": "parallax-universe-simulator",
   "version": "2.0.0",
   "description": "PARALLAX — A Universe Beyond Observation. Procedural, infinite, persistent multi-scale universe simulator with WebGL2 raymarching (Vibe-Coded).",
-  "author": "Tronko104",
+  "author": {
+    "name": "Tronko104",
+    "email": "tronko104@users.noreply.github.com"
+  },
   "license": "MIT",
   "type": "module",
   "main": "electron/main.cjs",
@@ -15,8 +18,8 @@
     "dev": "python3 -m http.server 4173",
     "start": "npm run bundle && electron .",
     "bundle": "node scripts/bundle_artifact.js",
-    "dist:win": "npm run bundle && electron-builder --win --x64",
-    "dist:linux": "npm run bundle && electron-builder --linux --x64"
+    "dist:win": "npm run bundle && electron-builder --win --x64 --publish never",
+    "dist:linux": "npm run bundle && electron-builder --linux --x64 --publish never"
   },
   "devDependencies": {
     "electron": "^33.2.0",
@@ -47,19 +50,23 @@
           "target": "portable",
           "arch": ["x64"]
         }
-      ],
-      "artifactName": "PARALLAX-${version}-Windows-${target}.${ext}"
+      ]
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "PARALLAX"
+      "shortcutName": "PARALLAX",
+      "artifactName": "PARALLAX-${version}-Windows-Setup.${ext}"
+    },
+    "portable": {
+      "artifactName": "PARALLAX-${version}-Windows-Portable.${ext}"
     },
     "linux": {
       "icon": "assets/icon.png",
       "category": "Science",
+      "maintainer": "Tronko104 <tronko104@users.noreply.github.com>",
       "synopsis": "Procedural multi-scale universe simulator",
       "target": [
         {

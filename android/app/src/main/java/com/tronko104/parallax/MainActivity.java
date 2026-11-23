@@ -1,6 +1,7 @@
 package com.tronko104.parallax;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,15 +14,11 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AppCompatActivity;
-
 /**
  * PARALLAX — Native Android Fullscreen WebGL2 Observatory Activity
- * Hosts the offline bundled WebGL2 multi-scale universe simulator with hardware acceleration,
- * edge-to-edge immersion, persistent storage, and hardware back-button cosmic scale zoom-out.
+ * Zero-bloat hardware-accelerated WebView hosting the offline procedural universe simulator.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private WebView webView;
 
@@ -55,24 +52,23 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(webView);
         webView.loadUrl("file:///android_asset/www/index.html");
+    }
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (webView != null) {
-                    webView.evaluateJavascript(
-                        "(function(){ return window.PARALLAX && window.PARALLAX.handleAndroidBack ? window.PARALLAX.handleAndroidBack() : false; })()",
-                        result -> {
-                            if (!"true".equals(result)) {
-                                finish();
-                            }
-                        }
-                    );
-                } else {
-                    finish();
+    @Override
+    @SuppressWarnings("deprecation")
+    public void onBackPressed() {
+        if (webView != null) {
+            webView.evaluateJavascript(
+                "(function(){ return window.PARALLAX && window.PARALLAX.handleAndroidBack ? window.PARALLAX.handleAndroidBack() : false; })()",
+                result -> {
+                    if (!"true".equals(result)) {
+                        MainActivity.super.onBackPressed();
+                    }
                 }
-            }
-        });
+            );
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

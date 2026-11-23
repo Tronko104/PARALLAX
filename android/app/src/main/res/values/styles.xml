@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Parallax" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="Theme.Parallax" parent="@android:style/Theme.Black.NoTitleBar.Fullscreen">
         <item name="android:windowBackground">@color/parallax_void</item>
         <item name="android:statusBarColor">@color/parallax_void</item>
         <item name="android:navigationBarColor">@color/parallax_void</item>
-        <item name="android:windowFullscreen">true</item>
     </style>
     <color name="parallax_void">#05070B</color>
 </resources>

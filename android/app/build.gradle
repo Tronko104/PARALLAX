@@ -45,5 +45,5 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.7.0'
+    // Pure native Android SDK Activity + Hardware WebView (zero Kotlin/AppCompat bloat or collisions)
 }
