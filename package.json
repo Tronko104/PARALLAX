@@ -1,0 +1,22 @@
+{
+  "name": "parallax-universe-simulator",
+  "version": "1.0.0",
+  "description": "PARALLAX — A Universe Beyond Observation. Procedural, infinite, persistent multi-scale universe simulator with WebGL2 raymarching.",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "start": "python3 -m http.server 4173",
+    "bundle": "node scripts/bundle_artifact.js"
+  },
+  "keywords": [
+    "astrophysics",
+    "procedural-universe",
+    "webgl2",
+    "raymarching",
+    "cosmology",
+    "exoplanets",
+    "astrobiology",
+    "simulation"
+  ],
+  "license": "MIT"
+}

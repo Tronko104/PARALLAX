@@ -1,0 +1,861 @@
+/**
+ * PARALLAX — Scientific Observatory Design System (Vanilla CSS)
+ * Aesthetic: ESA Gaia / NASA JPL / Event Horizon Telescope Telemetry Workstation
+ */
+
+:root {
+  --bg-void: #05070b;
+  --surface-glass: rgba(9, 13, 21, 0.78);
+  --surface-glass-elevated: rgba(15, 21, 33, 0.86);
+  --surface-card: rgba(20, 28, 44, 0.52);
+  --surface-card-hover: rgba(30, 41, 63, 0.68);
+
+  --border-hairline: rgba(203, 213, 225, 0.13);
+  --border-active: rgba(229, 169, 60, 0.55);
+
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --accent-amber: #e5a93c;
+  --accent-amber-soft: rgba(229, 169, 60, 0.16);
+  --accent-cyan: #38bdf8;
+  --accent-cyan-soft: rgba(56, 189, 248, 0.15);
+  --accent-emerald: #34d399;
+  --accent-emerald-soft: rgba(52, 211, 153, 0.15);
+  --accent-crimson: #f43f5e;
+
+  --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --transition-fast: 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* Fullscreen Viewport Canvases */
+#viewport-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-void);
+}
+
+#webgl-canvas,
+#overlay-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#overlay-canvas {
+  z-index: 2;
+}
+
+/* HUD Layer Container */
+#hud-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 12px 14px;
+  gap: 12px;
+  transition: opacity 280ms ease;
+}
+
+#hud-layer.zen-mode .hud-panel:not(#top-telemetry-bar) {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+}
+
+.hud-panel {
+  pointer-events: auto;
+  background: var(--surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-md);
+  transition: opacity 240ms ease, transform 240ms ease, border-color var(--transition-fast);
+}
+
+/* 1. Top Telemetry & Cosmic Breadcrumb Bar */
+#top-telemetry-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brand-cluster {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-reticle {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--accent-amber);
+  border-radius: 50%;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-reticle::after {
+  content: '';
+  width: 5px;
+  height: 5px;
+  background: var(--accent-amber);
+  border-radius: 50%;
+}
+
+.brand-title {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--text-primary);
+}
+
+.brand-subtitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-left: 10px;
+  border-left: 1px solid var(--border-hairline);
+}
+
+/* Hierarchical Cosmic Breadcrumb */
+.cosmic-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.crumb-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.crumb-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-card-hover);
+  border-color: var(--border-hairline);
+}
+
+.crumb-btn.active {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border-color: rgba(229, 169, 60, 0.35);
+  font-weight: 600;
+}
+
+.crumb-sep {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+/* Top Right Controls & Seed Input */
+.top-controls-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.seed-input-group {
+  display: flex;
+  align-items: center;
+  background: rgba(5, 7, 11, 0.65);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+.seed-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+
+#seed-input {
+  background: transparent;
+  border: none;
+  color: var(--accent-cyan);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  width: 145px;
+  outline: none;
+}
+
+.icon-btn,
+.action-btn {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn:hover,
+.action-btn:hover {
+  background: var(--surface-card-hover);
+  border-color: rgba(203, 213, 225, 0.32);
+}
+
+.action-btn.accent-emerald {
+  color: var(--accent-emerald);
+  border-color: rgba(52, 211, 153, 0.35);
+  background: var(--accent-emerald-soft);
+}
+
+.action-btn.accent-emerald:hover {
+  background: rgba(52, 211, 153, 0.25);
+}
+
+.action-btn.accent-amber {
+  color: var(--accent-amber);
+  border-color: rgba(229, 169, 60, 0.38);
+  background: var(--accent-amber-soft);
+}
+
+/* Middle Workspace Grid: Left Navigator + Center Viewport + Right Scientific Dossier */
+#middle-workspace {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 12px;
+  min-height: 0;
+  pointer-events: none;
+}
+
+/* 2. Left Panel: Continuous Scale Ladder & Spatial Object Catalog */
+#left-navigator-panel {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.panel-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-hairline);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.panel-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-cyan);
+  background: var(--accent-cyan-soft);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* Scale Ladder Controls */
+.scale-ladder-section {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.scale-readout-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.scale-metric-big {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent-amber);
+  font-variant-numeric: tabular-nums;
+}
+
+.scale-exponent-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+#scale-slider {
+  width: 100%;
+  accent-color: var(--accent-amber);
+  cursor: pointer;
+  height: 4px;
+  margin: 6px 0 10px;
+}
+
+.scale-presets-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.scale-preset-btn {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 7px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.scale-preset-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-card-hover);
+}
+
+.scale-preset-btn.active {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border-color: var(--border-active);
+  font-weight: 600;
+}
+
+/* Catalog Object List */
+.catalog-list-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.catalog-item {
+  background: var(--surface-card);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.catalog-item:hover {
+  background: var(--surface-card-hover);
+  border-color: var(--border-hairline);
+}
+
+.catalog-item.active {
+  background: rgba(229, 169, 60, 0.13);
+  border-color: var(--border-active);
+}
+
+.catalog-item-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.catalog-item-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.catalog-item-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.catalog-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.catalog-tag.bio {
+  color: var(--accent-emerald);
+  background: var(--accent-emerald-soft);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+}
+
+.catalog-tag.civ {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border: 1px solid rgba(229, 169, 60, 0.35);
+}
+
+.catalog-tag.neutral {
+  color: var(--text-secondary);
+  background: rgba(148, 163, 184, 0.12);
+}
+
+/* 3. Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector */
+#right-dossier-panel {
+  width: 375px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.dossier-entity-hero {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-hairline);
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.entity-category-overline {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.entity-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.entity-main-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.entity-catalog-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Dossier Navigation Tabs */
+.dossier-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid var(--border-hairline);
+  background: rgba(5, 7, 11, 0.45);
+}
+
+.dossier-tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all var(--transition-fast);
+}
+
+.dossier-tab-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dossier-tab-btn.active {
+  color: var(--accent-amber);
+  border-bottom-color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+}
+
+.dossier-content-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Telemetry Key-Value Grid */
+.telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.telemetry-cell {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+}
+
+.telemetry-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.telemetry-val {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.telemetry-val.highlight-amber {
+  color: var(--accent-amber);
+}
+
+.telemetry-val.highlight-emerald {
+  color: var(--accent-emerald);
+}
+
+.telemetry-val.highlight-cyan {
+  color: var(--accent-cyan);
+}
+
+/* Scientific Canvas Widgets (H-R Diagram, Absorption Spectrum) */
+.instrument-box {
+  background: rgba(5, 7, 11, 0.72);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+
+.instrument-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.instrument-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.instrument-canvas {
+  width: 100%;
+  display: block;
+  border-radius: 3px;
+}
+
+/* Progress / Composition Bars */
+.comp-bar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.comp-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.comp-row-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.comp-track {
+  width: 100%;
+  height: 5px;
+  background: rgba(148, 163, 184, 0.14);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.comp-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+/* Chronicle & Global Event Timeline */
+.chronicle-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 1px solid rgba(203, 213, 225, 0.2);
+  padding-left: 10px;
+  margin-left: 4px;
+}
+
+.chronicle-entry {
+  position: relative;
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+}
+
+.chronicle-entry::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 10px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-amber);
+}
+
+.chronicle-epoch {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+}
+
+.chronicle-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 1px 0 2px;
+}
+
+.chronicle-detail {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+/* 4. Bottom Temporal Simulation & Causal Phenomena Dock */
+#bottom-temporal-dock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.time-controls-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.epoch-clock-box {
+  display: flex;
+  flex-direction: column;
+  padding-right: 12px;
+  border-right: 1px solid var(--border-hairline);
+  min-width: 155px;
+}
+
+.epoch-overline {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.epoch-time-val {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-amber);
+  font-variant-numeric: tabular-nums;
+}
+
+.time-speed-pills {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.time-pill-btn {
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.time-pill-btn:hover {
+  color: var(--text-primary);
+  background: var(--surface-card-hover);
+}
+
+.time-pill-btn.active {
+  color: var(--accent-amber);
+  background: var(--accent-amber-soft);
+  border-color: var(--border-active);
+  font-weight: 600;
+}
+
+/* Live Global Universe Ticker in Bottom Bar */
+.live-event-ticker {
+  flex: 1;
+  min-width: 220px;
+  background: rgba(5, 7, 11, 0.65);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.ticker-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  flex-shrink: 0;
+}
+
+.ticker-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phenomena-actions-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+@media (max-width: 1100px) {
+  #left-navigator-panel {
+    width: 250px;
+  }
+  #right-dossier-panel {
+    width: 310px;
+  }
+}
+
+@media (max-width: 820px) {
+  #middle-workspace {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+  #left-navigator-panel,
+  #right-dossier-panel {
+    width: 100%;
+    max-height: 36vh;
+  }
+}

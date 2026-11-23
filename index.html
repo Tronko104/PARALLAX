@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PARALLAX — A Universe Beyond Observation | Simulatore Cosmologico Multi-Scala</title>
+  <meta
+    name="description"
+    content="PARALLAX è un simulatore di universo procedurale, infinito e persistente con raymarching WebGL2, dai filamenti cosmici fino alla biosfera e alle civiltà planetarie."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="./src/styles/index.css" />
+</head>
+<body>
+  <!-- Fullscreen WebGL2 Volumetric Raymarching & 3D Astrographic Projection Viewport -->
+  <main id="viewport-container" aria-label="Simulazione 3D dell'Universo">
+    <canvas id="webgl-canvas"></canvas>
+    <canvas id="overlay-canvas"></canvas>
+  </main>
+
+  <!-- Scientific Observatory Telemetry HUD -->
+  <div id="hud-layer">
+    <!-- 1. Top Telemetry & Cosmic Breadcrumb Header -->
+    <header id="top-telemetry-bar" class="hud-panel">
+      <div class="brand-cluster">
+        <div class="brand-mark">
+          <span class="brand-reticle" aria-hidden="true"></span>
+          <h1 class="brand-title">PARALLAX</h1>
+        </div>
+        <span class="brand-subtitle">A Universe Beyond Observation</span>
+      </div>
+
+      <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Gerarchia Cosmica"></nav>
+
+      <div class="top-controls-cluster">
+        <div class="seed-input-group" title="Seed Deterministico dell'Universo">
+          <label for="seed-input" class="seed-label">SEED</label>
+          <input id="seed-input" type="text" value="PARALLAX-2026-OMEGA" spellcheck="false" />
+        </div>
+        <button id="btn-apply-seed" class="icon-btn" title="Rigenera o sintonizza coordinate seed">
+          SINTONIZZA
+        </button>
+        <button
+          id="btn-seti-scanner"
+          class="action-btn accent-emerald"
+          title="Scansiona il settore e salta al prossimo esopianeta con Biosfera o Civiltà attiva"
+        >
+          ◉ SCANNER BIO / SETI
+        </button>
+        <button id="btn-bookmark" class="icon-btn" title="Salva coordinate attuali nei segnalibri persistenti">
+          ★ SALVA
+        </button>
+        <button id="btn-audio" class="icon-btn" title="Attiva/Disattiva sintesi acustica WebAudio Deep Space">
+          AUDIO: OFF
+        </button>
+        <button id="btn-zen" class="icon-btn" title="Modalità Osservazione Pura (Tasto H)">
+          HUD: FULL
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Middle Workspace: Left Scale Ladder & Catalog + Right Scientific Dossier -->
+    <div id="middle-workspace">
+      <!-- Left Panel: Continuous Logarithmic Scale & Spatial Object Catalog -->
+      <aside id="left-navigator-panel" class="hud-panel" aria-label="Scala Spaziale e Catalogo">
+        <div class="panel-header">
+          <span class="panel-title">Scala Spaziale Continua</span>
+          <span id="scale-exponent-tag" class="scale-exponent-tag">10^24.60 m</span>
+        </div>
+
+        <div class="scale-ladder-section">
+          <div class="scale-readout-row">
+            <span style="font-size:11px;color:var(--text-secondary)">Campo Visivo (FOV)</span>
+            <span id="scale-metric-big" class="scale-metric-big">1.29 Gpc</span>
+          </div>
+          <input
+            id="scale-slider"
+            type="range"
+            min="0.0"
+            max="25.5"
+            step="0.05"
+            value="24.6"
+            aria-label="Cursore logaritmico di scala spaziale"
+          />
+          <div id="scale-presets-grid" class="scale-presets-grid"></div>
+        </div>
+
+        <div class="panel-header">
+          <span id="catalog-header-title" class="panel-title">Superammassi Cosmici</span>
+          <span id="catalog-count-badge" class="panel-badge">14 nodi</span>
+        </div>
+
+        <div id="catalog-list-container" class="catalog-list-container"></div>
+      </aside>
+
+      <!-- Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector -->
+      <aside id="right-dossier-panel" class="hud-panel" aria-label="Dossier Scientifico e Spettrometria">
+        <div class="dossier-entity-hero">
+          <div id="entity-category-overline" class="entity-category-overline">STRUTTURA COSMOLOGICA</div>
+          <div class="entity-title-row">
+            <h2 id="entity-main-title" class="entity-main-title">Superammasso Laniakea-Prime</h2>
+            <span id="entity-catalog-code" class="entity-catalog-code">PCL-N0000</span>
+          </div>
+        </div>
+
+        <div class="dossier-tabs" role="tablist">
+          <button class="dossier-tab-btn active" data-tab="physics" role="tab">1. Fisica</button>
+          <button class="dossier-tab-btn" data-tab="climate" role="tab">2. Clima</button>
+          <button class="dossier-tab-btn" data-tab="life" role="tab">3. Vita</button>
+          <button class="dossier-tab-btn" data-tab="civ" role="tab">4. Civiltà</button>
+        </div>
+
+        <div id="dossier-content-scroll" class="dossier-content-scroll"></div>
+      </aside>
+    </div>
+
+    <!-- 3. Bottom Temporal Simulation & Causal Phenomena Dock -->
+    <footer id="bottom-temporal-dock" class="hud-panel" aria-label="Controllo Temporale ed Eventi Cosmici">
+      <div class="time-controls-cluster">
+        <div class="epoch-clock-box">
+          <span class="epoch-overline">Epoca Cosmica Universale</span>
+          <span id="epoch-time-val" class="epoch-time-val">13.8000 Gyr (+0.0 h)</span>
+        </div>
+        <div id="time-speed-pills" class="time-speed-pills" role="group" aria-label="Moltiplicatore Temporale"></div>
+      </div>
+
+      <div class="live-event-ticker" title="Registro autonomo degli eventi cosmici in tempo reale">
+        <span class="ticker-pulse-dot" aria-hidden="true"></span>
+        <span id="live-ticker-text" class="ticker-text">Sintonizzazione telemetria PARALLAX...</span>
+      </div>
+
+      <div class="phenomena-actions-cluster">
+        <button
+          id="btn-phenom-star"
+          class="action-btn"
+          title="Avanza l'evoluzione astrofisica della stella madre lungo il diagramma H-R (+Gyr)"
+        >
+          ✦ Evoluzione Stellare
+        </button>
+        <button
+          id="btn-phenom-impact"
+          class="action-btn"
+          title="Simula l'impatto di un asteroide sul pianeta attivo con effetti climatici ed evolutivi"
+        >
+          ☄ Impatto Bolide
+        </button>
+        <button
+          id="btn-phenom-bio"
+          class="action-btn accent-emerald"
+          title="Catalizza abiogenesi o accelera la radiazione evolutiva della biosfera"
+        >
+          ❋ Impulso Evolutivo
+        </button>
+        <button
+          id="btn-phenom-civ"
+          class="action-btn accent-amber"
+          title="Innesca un salto tecnologico sulla scala di Kardashev e costruisci megastrutture orbitali"
+        >
+          ⬡ Salto Kardashev
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
