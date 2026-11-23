@@ -14,18 +14,22 @@ export class UniverseRenderer {
     this.ctx = overlayCanvas.getContext('2d');
     this.engine = engine;
 
-    // 3D Orbital Camera State
+    // 3D Orbital Camera & Surface Flight State
     this.yaw = 0.45;
-    this.pitch = 0.34;
+    this.pitch = 0.28;
     this.targetYaw = 0.45;
-    this.targetPitch = 0.34;
+    this.targetPitch = 0.28;
     this.cameraZoom = 1.0;
+    this.surfaceOffset = { x: 0, z: 0 };
+    this.keysPressed = new Set();
 
-    // Pointer & 3D spatial picking state
+    // Pointer, Multi-Touch Pinch & 3D spatial picking state
     this.isDragging = false;
     this.dragMoved = false;
     this.lastPointer = { x: 0, y: 0 };
     this.hoverPointer = { x: -1000, y: -1000 };
+    this.activePointers = new Map();
+    this.lastPinchDist = null;
     this.interactiveTargets = [];
     this.hoveredTarget = null;
 
@@ -75,7 +79,6 @@ export class UniverseRenderer {
     this.program = prog;
     gl.useProgram(prog);
 
-    // Fullscreen quad VAO
     const vao = gl.createVertexArray();
     gl.bindVertexArray(vao);
     const vbo = gl.createBuffer();
@@ -89,16 +92,16 @@ export class UniverseRenderer {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     this.vao = vao;
 
-    // Cache uniform locations
     const uniformNames = [
-      'u_resolution', 'u_time', 'u_logScale', 'u_cameraAngles', 'u_cameraZoom', 'u_seed',
+      'u_resolution', 'u_time', 'u_logScale', 'u_cameraAngles', 'u_surfaceOffset',
+      'u_cameraZoom', 'u_warpFactor', 'u_seed',
       'u_starColor', 'u_starTempK', 'u_starRadiusNorm', 'u_remnantType', 'u_hasNebulaHalo',
       'u_isBinary', 'u_companionColor',
-      'u_galaxyFamily', 'u_galaxyArms', 'u_galaxyTwist', 'u_galaxyBar', 'u_nebulaColor',
+      'u_galaxyFamily', 'u_galaxyArms', 'u_galaxyTwist', 'u_galaxyBar', 'u_agnActive', 'u_nebulaColor',
       'u_planetArchetype', 'u_colDeepOcean', 'u_colShallowOcean', 'u_colLowland',
       'u_colHighland', 'u_colPeak', 'u_colAtmo', 'u_colFoliage',
       'u_oceanCoverage', 'u_iceCoverage', 'u_cloudCoverage', 'u_terrainRoughness',
-      'u_volcanism', 'u_pressureAtm', 'u_bioComplexity', 'u_cityLights',
+      'u_volcanism', 'u_pressureAtm', 'u_bioComplexity', 'u_cityLights', 'u_isTidallyLocked',
       'u_hasRings', 'u_ringInner', 'u_ringOuter', 'u_planetSeed',
       'u_superflare', 'u_impactFlash', 'u_evoPulse'
     ];
@@ -139,16 +142,41 @@ export class UniverseRenderer {
 
   bindInteractionEvents() {
     const el = this.overlayCanvas;
+    el.style.touchAction = 'none';
 
     el.addEventListener('pointerdown', (e) => {
-      this.isDragging = true;
-      this.dragMoved = false;
-      this.lastPointer = { x: e.clientX, y: e.clientY };
+      this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (this.activePointers.size === 1) {
+        this.isDragging = true;
+        this.dragMoved = false;
+        this.lastPointer = { x: e.clientX, y: e.clientY };
+      } else if (this.activePointers.size === 2) {
+        this.isDragging = false;
+        this.dragMoved = true;
+        const pts = Array.from(this.activePointers.values());
+        this.lastPinchDist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      }
       el.setPointerCapture(e.pointerId);
     });
 
     el.addEventListener('pointermove', (e) => {
       this.hoverPointer = { x: e.clientX, y: e.clientY };
+      if (this.activePointers.has(e.pointerId)) {
+        this.activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      }
+
+      // Two-finger pinch-to-zoom for Android & touchscreens
+      if (this.activePointers.size === 2) {
+        const pts = Array.from(this.activePointers.values());
+        const dist = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+        if (this.lastPinchDist !== null) {
+          const delta = (this.lastPinchDist - dist) * 0.025;
+          this.engine.setTargetLogScale(this.engine.targetLogScale + delta);
+        }
+        this.lastPinchDist = dist;
+        return;
+      }
+
       if (!this.isDragging) return;
       const dx = e.clientX - this.lastPointer.x;
       const dy = e.clientY - this.lastPointer.y;
@@ -159,12 +187,22 @@ export class UniverseRenderer {
       this.lastPointer = { x: e.clientX, y: e.clientY };
     });
 
-    el.addEventListener('pointerup', (e) => {
-      if (this.isDragging && !this.dragMoved) {
+    const releasePointer = (e) => {
+      const wasSingleClick = this.activePointers.size === 1 && this.isDragging && !this.dragMoved;
+      this.activePointers.delete(e.pointerId);
+      if (this.activePointers.size < 2) {
+        this.lastPinchDist = null;
+      }
+      if (wasSingleClick) {
         this.handleSpatialClick(e.clientX, e.clientY);
       }
-      this.isDragging = false;
-    });
+      if (this.activePointers.size === 0) {
+        this.isDragging = false;
+      }
+    };
+
+    el.addEventListener('pointerup', releasePointer);
+    el.addEventListener('pointercancel', releasePointer);
 
     // Continuous logarithmic scale zoom via mouse wheel
     el.addEventListener(
@@ -176,6 +214,15 @@ export class UniverseRenderer {
       },
       { passive: false }
     );
+
+    // Keyboard camera & surface flight controls (WASD / Arrows / Q & E)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      this.keysPressed.add(e.key.toLowerCase());
+    });
+    window.addEventListener('keyup', (e) => {
+      this.keysPressed.delete(e.key.toLowerCase());
+    });
   }
 
   handleSpatialClick(clientX, clientY) {
@@ -278,13 +325,40 @@ export class UniverseRenderer {
       this._fpsTimer = now;
     }
 
+    // Apply WASD / Arrow / Q-E flight controls
+    if (this.keysPressed.size > 0) {
+      const k = this.keysPressed;
+      const isSurface = this.engine.currentLogScale < 4.5;
+      const speed = dtSeconds * (isSurface ? 2.4 : 1.2);
+      if (k.has('a') || k.has('arrowleft')) this.targetYaw -= speed;
+      if (k.has('d') || k.has('arrowright')) this.targetYaw += speed;
+      if (k.has('w') || k.has('arrowup')) {
+        if (isSurface) {
+          this.surfaceOffset.x += Math.sin(this.yaw * 0.72) * speed * 1.4;
+          this.surfaceOffset.z += Math.cos(this.yaw * 0.72) * speed * 1.4;
+        } else {
+          this.targetPitch = Math.min(1.38, this.targetPitch + speed * 0.75);
+        }
+      }
+      if (k.has('s') || k.has('arrowdown')) {
+        if (isSurface) {
+          this.surfaceOffset.x -= Math.sin(this.yaw * 0.72) * speed * 1.4;
+          this.surfaceOffset.z -= Math.cos(this.yaw * 0.72) * speed * 1.4;
+        } else {
+          this.targetPitch = Math.max(-1.38, this.targetPitch - speed * 0.75);
+        }
+      }
+      if (k.has('q')) this.engine.setTargetLogScale(this.engine.targetLogScale + dtSeconds * 3.8);
+      if (k.has('e')) this.engine.setTargetLogScale(this.engine.targetLogScale - dtSeconds * 3.8);
+    }
+
     // Smooth orbital camera interpolation
     this.yaw += (this.targetYaw - this.yaw) * Math.min(1.0, dtSeconds * 10.0);
     this.pitch += (this.targetPitch - this.pitch) * Math.min(1.0, dtSeconds * 10.0);
 
     // Subtle slow orbital drift when not dragging
     if (!this.isDragging) {
-      this.targetYaw += dtSeconds * 0.025;
+      this.targetYaw += dtSeconds * (this.engine.autopilotActive ? 0.14 : 0.028);
     }
 
     this.renderWebGLPass();
@@ -309,7 +383,9 @@ export class UniverseRenderer {
     gl.uniform1f(this.uniforms.u_time, eng.visualTime);
     gl.uniform1f(this.uniforms.u_logScale, eng.currentLogScale);
     gl.uniform2f(this.uniforms.u_cameraAngles, this.yaw, this.pitch);
+    gl.uniform2f(this.uniforms.u_surfaceOffset, this.surfaceOffset.x, this.surfaceOffset.z);
     gl.uniform1f(this.uniforms.u_cameraZoom, this.cameraZoom);
+    gl.uniform1f(this.uniforms.u_warpFactor, eng.warpFactor || 0.0);
     gl.uniform1f(this.uniforms.u_seed, (sys.seed % 10000) * 0.1);
 
     // Star uniforms
@@ -338,6 +414,7 @@ export class UniverseRenderer {
     gl.uniform1f(this.uniforms.u_galaxyArms, gal.morphology.arms || 2.0);
     gl.uniform1f(this.uniforms.u_galaxyTwist, gal.armTwist || 3.4);
     gl.uniform1f(this.uniforms.u_galaxyBar, gal.morphology.bar || 0.1);
+    gl.uniform1f(this.uniforms.u_agnActive, gal.smbh && gal.smbh.agnActive ? 1.0 : 0.0);
     const nebCol = gal.nebulae && gal.nebulae.length ? gal.nebulae[0].color : [0.95, 0.28, 0.48];
     gl.uniform3fv(this.uniforms.u_nebulaColor, nebCol);
 
@@ -382,6 +459,7 @@ export class UniverseRenderer {
         this.uniforms.u_cityLights,
         planet.civilization.active ? planet.civilization.cityLightIntensity : 0.0
       );
+      gl.uniform1f(this.uniforms.u_isTidallyLocked, planet.isTidallyLocked ? 1.0 : 0.0);
       gl.uniform1f(this.uniforms.u_hasRings, planet.rings ? 1.0 : 0.0);
       gl.uniform1f(this.uniforms.u_ringInner, planet.rings ? planet.rings.innerRadiusRatio : 1.4);
       gl.uniform1f(this.uniforms.u_ringOuter, planet.rings ? planet.rings.outerRadiusRatio : 2.3);

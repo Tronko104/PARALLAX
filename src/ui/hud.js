@@ -9,7 +9,7 @@
  */
 
 import { SCALE_LEVELS } from '../universe/generator.js';
-import { TIME_SCALES } from '../simulation/engine.js';
+import { TIME_SCALES, COSMIC_WONDERS } from '../simulation/engine.js';
 import { formatLogScale } from '../math/prng.js';
 
 export class ObservatoryHUD {
@@ -21,14 +21,20 @@ export class ObservatoryHUD {
     this.activeTab = 'physics';
     this.zenMode = false;
 
+    const isMobile = window.innerWidth <= 860;
+    this.leftDrawerCollapsed = isMobile;
+    this.rightDrawerCollapsed = isMobile;
+
     this.cacheDOM();
     this.bindEvents();
     this.renderScalePresets();
     this.renderTimeControls();
+    this.renderWondersGrid();
+    this.syncDrawerStates();
     this.refreshAll();
 
     this.engine.onChange((_eng, reason) => {
-      if (reason === 'select_planet' || reason === 'scanner_lock') {
+      if (reason === 'select_planet' || reason === 'scanner_lock' || reason === 'wonder_jump') {
         this.soundscape.playTelemetryPing(660, 0.14);
       } else if (reason === 'phenomenon') {
         this.soundscape.playTelemetryPing(440, 0.22);
@@ -38,10 +44,31 @@ export class ObservatoryHUD {
   }
 
   cacheDOM() {
+    this.introOverlay = document.getElementById('intro-overlay');
+    this.btnIntroEnter = document.getElementById('btn-intro-enter');
+    this.btnIntroTour = document.getElementById('btn-intro-tour');
+
+    this.wondersModal = document.getElementById('wonders-modal');
+    this.wondersGrid = document.getElementById('wonders-grid');
+    this.btnOpenWonders = document.getElementById('btn-open-wonders');
+    this.btnCloseWonders = document.getElementById('btn-close-wonders');
+    this.sectorCoordsBadge = document.getElementById('sector-coords-badge');
+    this.btnSectorPrev = document.getElementById('btn-sector-prev');
+    this.btnSectorNext = document.getElementById('btn-sector-next');
+    this.btnSectorRandom = document.getElementById('btn-sector-random');
+    this.btnExportSnapshot = document.getElementById('btn-export-snapshot');
+    this.inputImportSnapshot = document.getElementById('input-import-snapshot');
+
     this.hudLayer = document.getElementById('hud-layer');
+    this.leftPanel = document.getElementById('left-navigator-panel');
+    this.rightPanel = document.getElementById('right-dossier-panel');
+    this.btnToggleLeft = document.getElementById('btn-toggle-left');
+    this.btnToggleRight = document.getElementById('btn-toggle-right');
+
     this.breadcrumbContainer = document.getElementById('cosmic-breadcrumb');
     this.seedInput = document.getElementById('seed-input');
     this.btnApplySeed = document.getElementById('btn-apply-seed');
+    this.btnAutopilot = document.getElementById('btn-autopilot');
     this.btnSetiScanner = document.getElementById('btn-seti-scanner');
     this.btnBookmark = document.getElementById('btn-bookmark');
     this.btnAudio = document.getElementById('btn-audio');
@@ -70,7 +97,122 @@ export class ObservatoryHUD {
     this.btnPhenomCiv = document.getElementById('btn-phenom-civ');
   }
 
+  syncDrawerStates() {
+    if (this.leftPanel) this.leftPanel.classList.toggle('collapsed', this.leftDrawerCollapsed);
+    if (this.rightPanel) this.rightPanel.classList.toggle('collapsed', this.rightDrawerCollapsed);
+  }
+
   bindEvents() {
+    if (this.btnIntroEnter) {
+      this.btnIntroEnter.addEventListener('click', () => {
+        this.introOverlay.classList.add('dismissed');
+      });
+    }
+
+    if (this.btnIntroTour) {
+      this.btnIntroTour.addEventListener('click', () => {
+        this.introOverlay.classList.add('dismissed');
+        if (!this.soundscape.enabled) {
+          this.soundscape.toggle();
+          this.btnAudio.textContent = 'AUDIO: ON';
+          this.btnAudio.classList.add('accent-emerald');
+        }
+        this.leftDrawerCollapsed = true;
+        this.rightDrawerCollapsed = true;
+        this.syncDrawerStates();
+        this.engine.toggleAutopilot(true);
+      });
+    }
+
+    if (this.btnToggleLeft) {
+      this.btnToggleLeft.addEventListener('click', () => {
+        this.leftDrawerCollapsed = !this.leftDrawerCollapsed;
+        if (window.innerWidth <= 820 && !this.leftDrawerCollapsed) {
+          this.rightDrawerCollapsed = true;
+        }
+        this.syncDrawerStates();
+      });
+    }
+
+    if (this.btnToggleRight) {
+      this.btnToggleRight.addEventListener('click', () => {
+        this.rightDrawerCollapsed = !this.rightDrawerCollapsed;
+        if (window.innerWidth <= 820 && !this.rightDrawerCollapsed) {
+          this.leftDrawerCollapsed = true;
+        }
+        this.syncDrawerStates();
+      });
+    }
+
+    if (this.btnOpenWonders) {
+      this.btnOpenWonders.addEventListener('click', () => {
+        this.wondersModal.classList.remove('hidden');
+      });
+    }
+    if (this.btnCloseWonders) {
+      this.btnCloseWonders.addEventListener('click', () => {
+        this.wondersModal.classList.add('hidden');
+      });
+    }
+    if (this.wondersModal) {
+      this.wondersModal.addEventListener('click', (e) => {
+        if (e.target === this.wondersModal) this.wondersModal.classList.add('hidden');
+      });
+    }
+
+    if (this.btnSectorPrev) {
+      this.btnSectorPrev.addEventListener('click', () => {
+        this.engine.travelCosmicSector(-1, 0, 0);
+        this.wondersModal.classList.add('hidden');
+      });
+    }
+    if (this.btnSectorNext) {
+      this.btnSectorNext.addEventListener('click', () => {
+        this.engine.travelCosmicSector(1, 0, 0);
+        this.wondersModal.classList.add('hidden');
+      });
+    }
+    if (this.btnSectorRandom) {
+      this.btnSectorRandom.addEventListener('click', () => {
+        const dx = Math.floor(Math.random() * 19) - 9 || 3;
+        const dy = Math.floor(Math.random() * 9) - 4;
+        const dz = Math.floor(Math.random() * 19) - 9 || -2;
+        this.engine.travelCosmicSector(dx, dy, dz);
+        this.wondersModal.classList.add('hidden');
+      });
+    }
+
+    if (this.btnExportSnapshot) {
+      this.btnExportSnapshot.addEventListener('click', () => {
+        const json = this.engine.exportUniverseSnapshot();
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `PARALLAX-${this.engine.universeSeed}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+
+    if (this.inputImportSnapshot) {
+      this.inputImportSnapshot.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            this.engine.importUniverseSnapshot(String(reader.result));
+            this.wondersModal.classList.add('hidden');
+            this.liveTickerText.textContent = `[IMPORTED] Universe seed ${this.engine.universeSeed} restored.`;
+          } catch (err) {
+            this.liveTickerText.textContent = `[ERROR] Invalid universe snapshot file.`;
+          }
+        };
+        reader.readAsText(file);
+      });
+    }
+
     this.btnApplySeed.addEventListener('click', () => {
       const val = this.seedInput.value.trim() || `PARALLAX-${Math.floor(Math.random() * 9000 + 1000)}`;
       this.seedInput.value = val;
@@ -83,7 +225,14 @@ export class ObservatoryHUD {
       }
     });
 
+    if (this.btnAutopilot) {
+      this.btnAutopilot.addEventListener('click', () => {
+        this.engine.toggleAutopilot();
+      });
+    }
+
     this.btnSetiScanner.addEventListener('click', () => {
+      this.engine.toggleAutopilot(false);
       this.engine.scanAndJumpToNextBiosignature();
     });
 
@@ -108,15 +257,23 @@ export class ObservatoryHUD {
       if (e.target.tagName === 'INPUT') return;
       if (e.key === 'h' || e.key === 'H') {
         this.toggleZenMode();
+      } else if (e.key === 't' || e.key === 'T') {
+        this.engine.toggleAutopilot();
+      } else if (e.key === 'm' || e.key === 'M') {
+        this.btnAudio.click();
+      } else if (e.key === 'Escape' && this.wondersModal) {
+        this.wondersModal.classList.add('hidden');
       } else if (e.key === ' ') {
         e.preventDefault();
         this.engine.setTimeScale(this.engine.timeScaleIndex === 0 ? 4 : 0);
       } else if (e.key >= '1' && e.key <= '7') {
+        this.engine.toggleAutopilot(false);
         this.engine.flyToScale(parseInt(e.key, 10) - 1);
       }
     });
 
     this.scaleSlider.addEventListener('input', (e) => {
+      this.engine.toggleAutopilot(false);
       const val = parseFloat(e.target.value);
       this.engine.setTargetLogScale(val);
     });
@@ -143,10 +300,31 @@ export class ObservatoryHUD {
     });
   }
 
+  renderWondersGrid() {
+    if (!this.wondersGrid) return;
+    this.wondersGrid.innerHTML = '';
+    COSMIC_WONDERS.forEach((wonder) => {
+      const card = document.createElement('button');
+      card.className = 'wonder-card';
+      card.innerHTML = `
+        <span class="wonder-cat">${wonder.category}</span>
+        <span class="wonder-name">${wonder.title}</span>
+        <span class="wonder-desc">${wonder.desc}</span>
+      `;
+      card.addEventListener('click', () => {
+        this.engine.toggleAutopilot(false);
+        this.engine.jumpToWonder(wonder);
+        this.wondersModal.classList.add('hidden');
+      });
+      this.wondersGrid.appendChild(card);
+    });
+  }
+
   toggleZenMode() {
     this.zenMode = !this.zenMode;
     this.hudLayer.classList.toggle('zen-mode', this.zenMode);
-    this.btnZen.textContent = this.zenMode ? 'HUD: ZEN' : 'HUD: FULL';
+    this.btnZen.textContent = this.zenMode ? 'EXIT ZEN' : 'ZEN';
+    this.btnZen.classList.toggle('accent-amber', this.zenMode);
   }
 
   renderScalePresets() {
@@ -200,12 +378,26 @@ export class ObservatoryHUD {
     }
 
     const star = this.engine.getActivePlanetarySystem()?.star;
-    this.soundscape.updateScaleTone(logS, star ? star.tempK : 5778);
+    const pl = this.engine.getActivePlanet();
+    this.soundscape.updateScaleTone(
+      logS,
+      star ? star.tempK : 5778,
+      this.engine.warpFactor || 0,
+      pl ? pl.pressureAtm : 1.0
+    );
   }
 
   refreshAll() {
     this.seedInput.value = this.engine.universeSeed;
     const activeLvl = this.engine.getActiveScaleLevel();
+
+    if (this.btnAutopilot) {
+      this.btnAutopilot.textContent = this.engine.autopilotActive ? 'TOUR: ON' : 'TOUR: OFF';
+      this.btnAutopilot.classList.toggle('accent-amber', this.engine.autopilotActive);
+    }
+    if (this.sectorCoordsBadge) {
+      this.sectorCoordsBadge.textContent = `[${this.engine.sectorCoords.join(', ')}]`;
+    }
 
     this.scalePresetsContainer.querySelectorAll('.scale-preset-btn').forEach((btn) => {
       const idx = parseInt(btn.dataset.scaleIndex, 10);
@@ -728,6 +920,23 @@ export class ObservatoryHUD {
         <div class="telemetry-cell">
           <div class="telemetry-label">Earth Similarity Index</div>
           <div class="telemetry-val highlight-emerald">${(pl.habitabilityScore * 100).toFixed(1)}%</div>
+        </div>
+        <div class="telemetry-cell">
+          <div class="telemetry-label">Scale Height & Wind</div>
+          <div class="telemetry-val">${(pl.scaleHeightKm || 8.5).toFixed(1)} km • ${pl.surfaceWindKmH || 0} km/h</div>
+        </div>
+        <div class="telemetry-cell">
+          <div class="telemetry-label">Rotation / Tidal State</div>
+          <div class="telemetry-val">${pl.isTidallyLocked ? 'Tidally Locked (1:1)' : `${pl.rotationPeriodHours.toFixed(1)} h day`}</div>
+        </div>
+      </div>
+
+      <div class="instrument-box">
+        <div class="instrument-header">
+          <span class="instrument-title">Tectonic & Geophysical Regime</span>
+        </div>
+        <div style="font-size:11px;color:var(--text-primary);font-family:var(--font-mono)">
+          ${pl.tectonicRegime || 'Active Mobile-Lid Plate Tectonics'}
         </div>
       </div>
 

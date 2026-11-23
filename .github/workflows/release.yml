@@ -1,0 +1,200 @@
+name: Build & Publish Multi-Platform Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v2.0.0)'
+        required: true
+        default: 'v2.0.0'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Windows Installer & Portable (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install desktop packaging dependencies
+        run: npm install
+
+      - name: Build Windows NSIS installer and portable executable
+        run: npm run dist:win
+
+      - name: Upload Windows release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: |
+            release/*.exe
+
+  build-linux:
+    name: Linux AppImage & Debian Package (.AppImage / .deb)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install desktop packaging dependencies
+        run: npm install
+
+      - name: Build Linux AppImage and .deb package
+        run: npm run dist:linux
+
+      - name: Upload Linux release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: |
+            release/*.AppImage
+            release/*.deb
+
+  build-android:
+    name: Android Installable APK (.apk)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Bundle web observatory into Android assets
+        run: npm run bundle
+
+      - name: Generate Android release signing keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore android/app/parallax-release.jks \
+            -storepass parallax2026 \
+            -keypass parallax2026 \
+            -alias parallax \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=PARALLAX Observatory, OU=Open Source, O=Tronko104, L=Universe, S=Cosmos, C=US"
+
+      - name: Build signed Android Release APK
+        run: |
+          gradle -p android assembleRelease --no-daemon
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p release
+          cp android/app/build/outputs/apk/release/app-release.apk "release/PARALLAX-${VERSION}-Android.apk"
+          ls -lh release/
+
+      - name: Upload Android APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifacts
+          path: release/*.apk
+
+  build-web:
+    name: Standalone Offline Web Package (.html)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build single-file standalone web package
+        run: |
+          npm run bundle
+          VERSION=$(node -p "require('./package.json').version")
+          mkdir -p release
+          cp dist/index.html "release/PARALLAX-${VERSION}-Web-Standalone.html"
+
+      - name: Upload Web standalone artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-artifacts
+          path: release/*.html
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-windows, build-linux, build-android, build-web]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all platform artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Verify release asset list
+        run: ls -lh release-assets/
+
+      - name: Create & Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          VERSION=$(node -p "require('./package.json').version")
+
+          cat <<EOF > release_notes.md
+          # PARALLAX ${TAG} — A Universe Beyond Observation
+
+          > **Note:** PARALLAX is a **vibe-coded** experimental multi-scale procedural universe simulator powered by WebGL2 volumetric raymarching.
+
+          ## Downloads (Ready to Install / Run)
+
+          | Platform | Package | Instructions |
+          | :--- | :--- | :--- |
+          | **Windows (x64)** | \`PARALLAX-${VERSION}-Windows-nsis.exe\` | Run the installer for Desktop & Start Menu shortcuts |
+          | **Windows Portable** | \`PARALLAX-${VERSION}-Windows-portable.exe\` | Double-click to run directly — no installation required |
+          | **Linux (Universal)** | \`PARALLAX-${VERSION}-Linux-x86_64.AppImage\` | \`chmod +x *.AppImage && ./PARALLAX-${VERSION}-Linux-x86_64.AppImage\` |
+          | **Linux (Debian/Ubuntu)** | \`PARALLAX-${VERSION}-Linux-amd64.deb\` | \`sudo apt install ./PARALLAX-${VERSION}-Linux-amd64.deb\` |
+          | **Android (7.0+)** | \`PARALLAX-${VERSION}-Android.apk\` | Download & install directly on your Android phone or tablet |
+          | **Offline Web** | \`PARALLAX-${VERSION}-Web-Standalone.html\` | Open directly in any WebGL2 browser offline |
+
+          ## Highlights in ${TAG}
+          - **Cinematic WebGL2 Raymarching Pipeline:** Ray-deflected gravitational lensing black holes with double-imaged Doppler-beamed accretion disks, pulsar polar jets, active galactic nucleus quasar jets, relativistic warp star streaks, cratered rocky worlds, tidally locked eyeball worlds, volumetric clouds with cast shadows, and Rayleigh/Mie atmospheric scattering.
+          - **Deep Living Simulation:** Tidal locking physics, tectonic regimes, atmospheric scale height, habitable zone migration during stellar evolution, Lotka-Volterra trophic biospheres, and Kardashev civilizations with persistent historical chronicles.
+          - **Discovery Guide & Infinite Cosmic Sectors:** Jump directly to 9 curated Cosmic Wonders, explore infinite 3D cosmic sectors \`[sx, sy, sz]\`, launch Cinematic Autopilot Tour, and export/import universe JSON snapshots.
+          - **Native Touch & Desktop Ergonomics:** Two-finger pinch-to-zoom across 26 orders of magnitude, collapsible drawers, hardware back-button navigation on Android, and WASD surface flight on Desktop.
+          EOF
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" release-assets/* --clobber
+            gh release edit "$TAG" --notes-file release_notes.md
+          else
+            gh release create "$TAG" release-assets/* \
+              --title "PARALLAX ${TAG} — Multi-Platform Release (Windows, Linux, Android)" \
+              --notes-file release_notes.md
+          fi

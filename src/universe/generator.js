@@ -63,7 +63,8 @@ export function generateCosmicWeb(universeSeed, sectorCoords = [0, 0, 0]) {
     const distMpc = Math.hypot(x + sx * 4, y + sy * 4, z + sz * 4) * 140;
     const redshift = Math.max(0.001, (distMpc * 67.4) / 299792.458);
 
-    const name = i === 0
+    const isOriginSector = sx === 0 && sy === 0 && sz === 0;
+    const name = i === 0 && isOriginSector
       ? 'Laniakea-Prime Supercluster'
       : `${generateAstronomicalName(scPrng)} Supercluster`;
 
@@ -402,23 +403,38 @@ export function generateStellarSector(galaxy, sectorIndex = 0) {
     let isBinary = sysPrng.chance(0.28);
 
     if (i === 0) {
+      // Solar-type G-star with inhabited temperate Gaia homeworld
       initialMassSolar = 1.04;
       ageGyr = 4.62;
       isBinary = false;
     } else if (i === 1) {
+      // K-type orange dwarf with lush pelagic ocean world
       initialMassSolar = 0.82;
       ageGyr = 6.1;
     } else if (i === 2) {
+      // Evolved Red Giant expanding into its inner system
       initialMassSolar = 1.45;
       ageGyr = 4.25;
     } else if (i === 3) {
+      // Massive Blue O/B Binary Supergiant
       initialMassSolar = 14.2;
       ageGyr = 0.008;
       isBinary = true;
     } else if (i === 4) {
+      // Stellar-Mass Black Hole with relativistic accretion disk & gravitational lensing
       initialMassSolar = 26.0;
       ageGyr = 0.04;
     } else if (i === 5) {
+      // Magnetar / Neutron Star Pulsar with relativistic polar jets
+      initialMassSolar = 15.5;
+      ageGyr = 0.025;
+    } else if (i === 6) {
+      // Cool M-Dwarf hosting a Tidally Locked Eyeball World in close HZ!
+      initialMassSolar = 0.32;
+      ageGyr = 7.4;
+      isBinary = false;
+    } else if (i === 7) {
+      // White Dwarf with Ionized Planetary Nebula shell
       initialMassSolar = 2.2;
       ageGyr = 1.61;
     } else {
@@ -451,8 +467,17 @@ export function generateStellarSector(galaxy, sectorIndex = 0) {
       };
     }
 
-    const designation = i === 0 && galaxy.index === 0
-      ? { properName: 'Helios-Vega Prime', catalogId: `${galaxy.catalogId}-S001` }
+    const anchorNames = [
+      'Helios-Vega Prime',
+      'Thalassa-K8',
+      'Hyperion Giant',
+      'Cygnus-OB Binary',
+      'Gargantua-Vex BH',
+      'Vela-PSR Magnetar',
+      'Terminus-M4 Dwarf'
+    ];
+    const designation = galaxy.index === 0 && i < anchorNames.length
+      ? { properName: anchorNames[i], catalogId: `${galaxy.catalogId}-S${String(i + 1).padStart(3, '0')}` }
       : generateStarDesignation(sysPrng, galaxy.catalogId, i);
 
     const pos = i === 0
@@ -1012,8 +1037,35 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     });
   }
 
+  // Tidal Locking Physics: tau_lock scales roughly with a^6 / M_star^2
+  const tidalLockRadiusAU = 0.42 * Math.pow(star.currentMassSolar, 0.35) * Math.pow(Math.max(0.5, currentAgeGyr) / 4.5, 0.16);
+  const isTidallyLocked = (starSystem.index === 6 && pIndex === 2) || (semiMajorAxisAU < tidalLockRadiusAU && archetype !== 'gas_giant');
+
+  // Tectonic Regime & Atmospheric Scale Height (H = R*T / (M*g))
+  const tectonicRegime = archetype === 'gas_giant' || archetype === 'ice_giant'
+    ? 'Superionic Convective Fluid Mantle'
+    : archetype === 'cryo_glacial'
+    ? 'Cryo-Tectonic Ice Shell Convection'
+    : tectonics > 0.65
+    ? 'Active Mobile-Lid Plate Tectonics'
+    : tectonics > 0.32
+    ? 'Episodic Mantle Overturn'
+    : 'Stagnant-Lid Thermal Conduction';
+
+  const meanMolarMass = archetype === 'gas_giant' || archetype === 'ice_giant' ? 0.0023 : 0.029;
+  const scaleHeightKm = (8.314 * surfaceTempK) / Math.max(0.01, meanMolarMass * gravityG * 9.81) / 1000;
+  const surfaceWindKmH = pressureAtm < 0.005
+    ? 0
+    : archetype === 'gas_giant' || archetype === 'ice_giant'
+    ? Math.round(prng.range(380, 1450))
+    : isTidallyLocked
+    ? Math.round(prng.range(65, 160)) // Strong substellar-to-nightside thermal circulation
+    : Math.round(prng.range(14, 72));
+
   const properName = isAnchorHomeworld
     ? (starSystem.index === 1 ? 'Thalassa Prime' : 'Aurelia IV (Gaia-Nova)')
+    : (starSystem.index === 6 && pIndex === 2)
+    ? 'Terminus III (Eyeball World)'
     : `${starSystem.name.split(' ')[1] || starSystem.name} ${roman}`;
 
   const biosphere = generateBiosphere({
@@ -1025,7 +1077,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     gravityG,
     star,
     currentAgeGyr,
-    forceBiosphere: isAnchorHomeworld || isSecondaryHabitable
+    forceBiosphere: isAnchorHomeworld || isSecondaryHabitable || (starSystem.index === 6 && pIndex === 2)
   });
 
   const civilization = generateCivilization({
@@ -1046,7 +1098,7 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     name: properName,
     roman,
     archetype,
-    typeLabel,
+    typeLabel: isTidallyLocked && biosphere.active ? 'Tidally Locked Eyeball World' : typeLabel,
     massEarths,
     radiusEarths,
     radiusKm: radiusEarths * 6371,
@@ -1064,12 +1116,16 @@ function generateSinglePlanet({ pSeed, pIndex, starSystem, star, semiMajorAxisAU
     cloudCoverage,
     terrainRoughness,
     tectonics,
+    tectonicRegime,
     volcanism,
     magneticFieldGauss,
     habitabilityScore,
     inHabitableZone,
-    axialTiltDeg: prng.range(2.5, 34.0),
-    rotationPeriodHours: prng.range(9.5, 42.0),
+    isTidallyLocked,
+    scaleHeightKm,
+    surfaceWindKmH,
+    axialTiltDeg: isTidallyLocked ? 0.4 : prng.range(2.5, 34.0),
+    rotationPeriodHours: isTidallyLocked ? periodYears * 8766 : prng.range(9.5, 42.0),
     atmosphereComposition,
     palette,
     orbit,

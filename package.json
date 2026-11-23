@@ -1,12 +1,78 @@
 {
   "name": "parallax-universe-simulator",
-  "version": "1.0.0",
-  "description": "PARALLAX — A Universe Beyond Observation. Procedural, infinite, persistent multi-scale universe simulator with WebGL2 raymarching.",
+  "version": "2.0.0",
+  "description": "PARALLAX — A Universe Beyond Observation. Procedural, infinite, persistent multi-scale universe simulator with WebGL2 raymarching (Vibe-Coded).",
+  "author": "Tronko104",
+  "license": "MIT",
   "type": "module",
+  "main": "electron/main.cjs",
+  "homepage": "https://github.com/Tronko104/PARALLAX",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tronko104/PARALLAX.git"
+  },
   "scripts": {
     "dev": "python3 -m http.server 4173",
-    "start": "python3 -m http.server 4173",
-    "bundle": "node scripts/bundle_artifact.js"
+    "start": "npm run bundle && electron .",
+    "bundle": "node scripts/bundle_artifact.js",
+    "dist:win": "npm run bundle && electron-builder --win --x64",
+    "dist:linux": "npm run bundle && electron-builder --linux --x64"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.tronko104.parallax",
+    "productName": "PARALLAX",
+    "copyright": "Copyright © 2026 Tronko104",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/index.html",
+      "assets/icon.png",
+      "assets/icon.ico",
+      "package.json"
+    ],
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "PARALLAX-${version}-Windows-${target}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PARALLAX"
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "category": "Science",
+      "synopsis": "Procedural multi-scale universe simulator",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "deb",
+          "arch": ["x64"]
+        }
+      ],
+      "artifactName": "PARALLAX-${version}-Linux-${arch}.${ext}"
+    }
   },
   "keywords": [
     "astrophysics",
@@ -16,7 +82,6 @@
     "cosmology",
     "exoplanets",
     "astrobiology",
-    "simulation"
-  ],
-  "license": "MIT"
+    "vibe-coded"
+  ]
 }

@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PARALLAX — A Universe Beyond Observation | Multi-Scale Cosmological Simulator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>PARALLAX — A Universe Beyond Observation</title>
   <meta
     name="description"
     content="PARALLAX is a procedural, infinite, persistent multi-scale universe simulator with WebGL2 volumetric raymarching — from cosmic web filaments down to planetary biospheres and civilizations."
   />
+  <meta name="theme-color" content="#05070b" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -23,60 +24,118 @@
     <canvas id="overlay-canvas"></canvas>
   </main>
 
+  <!-- Cinematic Welcome Curtain (Live Universe Renders Behind) -->
+  <section id="intro-overlay" class="intro-overlay" aria-label="PARALLAX Welcome">
+    <div class="intro-card">
+      <div class="intro-eyebrow">PROCEDURAL COSMOLOGICAL OBSERVATORY • v2.0</div>
+      <div class="intro-logo-row">
+        <span class="intro-reticle" aria-hidden="true"></span>
+        <span class="intro-title">PARALLAX</span>
+      </div>
+      <p class="intro-tagline">A Universe Beyond Observation</p>
+      <p class="intro-desc">
+        Traverse 26 continuous orders of magnitude — from dark-matter cosmic filaments and active galactic nuclei to black hole event horizons, exoplanet climates, evolving biospheres, and Kardashev civilizations.
+      </p>
+      <div class="intro-actions">
+        <button id="btn-intro-enter" class="intro-btn-primary">Enter Universe</button>
+        <button id="btn-intro-tour" class="intro-btn-secondary">✦ Start Cinematic Tour</button>
+      </div>
+      <div class="intro-hints">
+        <span>Drag: Orbit / Look</span>
+        <span>•</span>
+        <span>Scroll / Pinch: Zoom 26 Orders</span>
+        <span>•</span>
+        <span>WASD: Fly</span>
+        <span>•</span>
+        <span>H: Pure View</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Discovery Guide & Cosmic Wonders Modal -->
+  <div id="wonders-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Cosmic Wonders & Sector Travel">
+    <div class="modal-sheet hud-panel">
+      <div class="modal-header">
+        <div>
+          <div class="entity-category-overline">OBSERVATORY DISCOVERY GUIDE</div>
+          <h2 class="modal-title">Cosmic Wonders & Infinite Sector Jump</h2>
+        </div>
+        <button id="btn-close-wonders" class="icon-btn" aria-label="Close Discovery Guide">✕</button>
+      </div>
+
+      <div id="wonders-grid" class="wonders-grid"></div>
+
+      <div class="modal-footer-tools">
+        <div class="sector-jump-bar">
+          <span class="panel-title">Cosmic Web Sector:</span>
+          <span id="sector-coords-badge" class="panel-badge">[0, 0, 0]</span>
+          <button id="btn-sector-prev" class="icon-btn" title="Jump to neighboring cosmic sector (-X)">◀ Prev Sector</button>
+          <button id="btn-sector-next" class="icon-btn" title="Jump to neighboring cosmic sector (+X)">Next Sector ▶</button>
+          <button id="btn-sector-random" class="icon-btn" title="Jump to deep uncharted cosmic coordinates">⟐ Deep Space Jump</button>
+        </div>
+        <div class="snapshot-bar">
+          <button id="btn-export-snapshot" class="icon-btn">↓ Export Universe JSON</button>
+          <label class="icon-btn" style="cursor:pointer">
+            ↑ Import JSON
+            <input id="input-import-snapshot" type="file" accept=".json,application/json" style="display:none" />
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scientific Observatory Telemetry HUD -->
   <div id="hud-layer">
     <!-- 1. Top Telemetry & Cosmic Breadcrumb Header -->
     <header id="top-telemetry-bar" class="hud-panel">
       <div class="brand-cluster">
+        <button id="btn-toggle-left" class="icon-btn drawer-toggle-btn" title="Toggle Scale & Catalog Drawer">☰</button>
         <div class="brand-mark">
           <span class="brand-reticle" aria-hidden="true"></span>
           <h1 class="brand-title">PARALLAX</h1>
         </div>
-        <span class="brand-subtitle">A Universe Beyond Observation</span>
+        <span class="brand-subtitle">Beyond Observation</span>
       </div>
 
       <nav id="cosmic-breadcrumb" class="cosmic-breadcrumb" aria-label="Cosmic Hierarchy"></nav>
 
       <div class="top-controls-cluster">
-        <div class="seed-input-group" title="Deterministic Universe Seed">
-          <label for="seed-input" class="seed-label">SEED</label>
-          <input id="seed-input" type="text" value="PARALLAX-2026-OMEGA" spellcheck="false" />
-        </div>
-        <button id="btn-apply-seed" class="icon-btn" title="Regenerate or tune universe seed coordinates">
-          TUNE SEED
+        <button id="btn-open-wonders" class="action-btn accent-amber" title="Open Cosmic Wonders & Infinite Sector Guide">
+          ✦ WONDERS
+        </button>
+        <button id="btn-autopilot" class="icon-btn" title="Toggle Cinematic Autopilot Tour (Key T)">
+          TOUR: OFF
         </button>
         <button
           id="btn-seti-scanner"
           class="action-btn accent-emerald"
           title="Scan sector and jump to the next exoplanet with an active Biosphere or Civilization"
         >
-          ◉ BIO / SETI SCAN
+          ◉ BIO / SETI
         </button>
-        <button id="btn-bookmark" class="icon-btn" title="Save current coordinates to persistent bookmarks">
-          ★ BOOKMARK
-        </button>
-        <button id="btn-audio" class="icon-btn" title="Toggle WebAudio Deep Space acoustic synthesis">
+        <button id="btn-audio" class="icon-btn" title="Toggle WebAudio Deep Space Soundscape (Key M)">
           AUDIO: OFF
         </button>
         <button id="btn-zen" class="icon-btn" title="Pure Observation Mode (Key H)">
-          HUD: FULL
+          ZEN
         </button>
+        <button id="btn-toggle-right" class="icon-btn drawer-toggle-btn" title="Toggle Scientific Dossier Drawer">☷</button>
       </div>
     </header>
 
-    <!-- 2. Middle Workspace: Left Scale Ladder & Catalog + Right Scientific Dossier -->
+    <!-- 2. Middle Workspace: Collapsible Left Scale/Catalog + Open 3D Cosmos + Collapsible Right Scientific Dossier -->
     <div id="middle-workspace">
       <!-- Left Panel: Continuous Logarithmic Scale & Spatial Object Catalog -->
-      <aside id="left-navigator-panel" class="hud-panel" aria-label="Spatial Scale and Catalog">
+      <aside id="left-navigator-panel" class="hud-panel side-drawer left-drawer" aria-label="Spatial Scale and Catalog">
         <div class="panel-header">
           <span class="panel-title">Continuous Spatial Scale</span>
-          <span id="scale-exponent-tag" class="scale-exponent-tag">10^24.60 m</span>
+          <span id="scale-exponent-tag" class="scale-exponent-tag">10^7.40 m</span>
         </div>
 
         <div class="scale-ladder-section">
           <div class="scale-readout-row">
-            <span style="font-size:11px;color:var(--text-secondary)">Field of View (FOV)</span>
-            <span id="scale-metric-big" class="scale-metric-big">1.29 Gpc</span>
+            <span style="font-size:11px;color:var(--text-secondary)">Field of View</span>
+            <span id="scale-metric-big" class="scale-metric-big">25.1 Mm</span>
           </div>
           <input
             id="scale-slider"
@@ -84,27 +143,36 @@
             min="0.0"
             max="25.5"
             step="0.05"
-            value="24.6"
+            value="7.4"
             aria-label="Logarithmic spatial scale slider"
           />
           <div id="scale-presets-grid" class="scale-presets-grid"></div>
         </div>
 
+        <div class="seed-drawer-row">
+          <div class="seed-input-group" title="Deterministic Universe Seed">
+            <label for="seed-input" class="seed-label">SEED</label>
+            <input id="seed-input" type="text" value="PARALLAX-2026-OMEGA" spellcheck="false" />
+          </div>
+          <button id="btn-apply-seed" class="icon-btn" title="Tune universe seed">TUNE</button>
+          <button id="btn-bookmark" class="icon-btn" title="Save bookmark">★</button>
+        </div>
+
         <div class="panel-header">
-          <span id="catalog-header-title" class="panel-title">Cosmic Superclusters</span>
-          <span id="catalog-count-badge" class="panel-badge">14 nodes</span>
+          <span id="catalog-header-title" class="panel-title">Orbital Bodies</span>
+          <span id="catalog-count-badge" class="panel-badge">7 planets</span>
         </div>
 
         <div id="catalog-list-container" class="catalog-list-container"></div>
       </aside>
 
       <!-- Right Panel: Multi-Tab Scientific Dossier & Telemetry Inspector -->
-      <aside id="right-dossier-panel" class="hud-panel" aria-label="Scientific Dossier and Spectrometry">
+      <aside id="right-dossier-panel" class="hud-panel side-drawer right-drawer" aria-label="Scientific Dossier and Spectrometry">
         <div class="dossier-entity-hero">
-          <div id="entity-category-overline" class="entity-category-overline">COSMOLOGICAL STRUCTURE</div>
+          <div id="entity-category-overline" class="entity-category-overline">TEMPERATE TERRESTRIAL WORLD</div>
           <div class="entity-title-row">
-            <h2 id="entity-main-title" class="entity-main-title">Laniakea-Prime Supercluster</h2>
-            <span id="entity-catalog-code" class="entity-catalog-code">PCL-N0000</span>
+            <h2 id="entity-main-title" class="entity-main-title">Aurelia IV (Gaia-Nova)</h2>
+            <span id="entity-catalog-code" class="entity-catalog-code">1.15 AU</span>
           </div>
         </div>
 
@@ -140,28 +208,28 @@
           class="action-btn"
           title="Advance host star astrophysical evolution along the H-R diagram (+Gyr)"
         >
-          ✦ Stellar Evolution
+          ✦ Star Evo
         </button>
         <button
           id="btn-phenom-impact"
           class="action-btn"
-          title="Simulate an asteroid bolide impact on the active planet with climatic and evolutionary effects"
+          title="Simulate an asteroid bolide impact on the active planet"
         >
-          ☄ Bolide Impact
+          ☄ Impact
         </button>
         <button
           id="btn-phenom-bio"
           class="action-btn accent-emerald"
-          title="Catalyze abiogenesis or accelerate evolutionary radiation of the biosphere"
+          title="Catalyze abiogenesis or accelerate evolutionary radiation"
         >
-          ❋ Evolution Surge
+          ❋ Bio Surge
         </button>
         <button
           id="btn-phenom-civ"
           class="action-btn accent-amber"
-          title="Trigger a Kardashev technological breakthrough and construct orbital megastructures"
+          title="Trigger a Kardashev technological breakthrough"
         >
-          ⬡ Kardashev Leap
+          ⬡ Kardashev
         </button>
       </div>
     </footer>

@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.tronko104.parallax'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.tronko104.parallax"
+        minSdk 24
+        targetSdk 34
+        versionCode 200
+        versionName "2.0.0"
+    }
+
+    signingConfigs {
+        release {
+            def ksFile = file("parallax-release.jks")
+            if (ksFile.exists()) {
+                storeFile ksFile
+                storePassword System.getenv("ANDROID_KEYSTORE_PASS") ?: "parallax2026"
+                keyAlias System.getenv("ANDROID_KEY_ALIAS") ?: "parallax"
+                keyPassword System.getenv("ANDROID_KEY_PASS") ?: "parallax2026"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (file("parallax-release.jks").exists()) {
+                signingConfig signingConfigs.release
+            } else {
+                signingConfig signingConfigs.debug
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+}

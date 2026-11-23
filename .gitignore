@@ -1,3 +1,10 @@
 node_modules/
+release/
+release-assets/
+android/.gradle/
+android/build/
+android/app/build/
+android/app/*.jks
+android/local.properties
 .DS_Store
 *.log

@@ -1,6 +1,6 @@
 /**
- * PARALLAX — A Universe Beyond Observation
- * Main Application Bootstrapper & Frame Scheduler
+ * PARALLAX v2.0 — A Universe Beyond Observation
+ * Main Application Bootstrapper, Frame Scheduler & Native Mobile/Desktop Bridge
  */
 
 import { SimulationEngine } from './simulation/engine.js';
@@ -17,12 +17,25 @@ function bootstrapParallax() {
   const soundscape = new CosmicSoundscape();
   const hud = new ObservatoryHUD(engine, renderer, soundscape);
 
-  // Expose for telemetry inspection
+  // Expose telemetry & Android/Desktop native bridge
   window.PARALLAX = {
     engine,
     renderer,
     soundscape,
-    hud
+    hud,
+    handleAndroidBack() {
+      const wondersModal = document.getElementById('wonders-modal');
+      if (wondersModal && !wondersModal.classList.contains('hidden')) {
+        wondersModal.classList.add('hidden');
+        return true;
+      }
+      const lvl = engine.getActiveScaleLevel();
+      if (lvl.index > 0) {
+        engine.flyToScale(lvl.index - 1);
+        return true;
+      }
+      return false;
+    }
   };
 
   let lastFrameTime = performance.now();

@@ -29,20 +29,91 @@ export const TIME_SCALES = [
   { id: 'gigayears', label: 'Cosmic & Stellar Scale', short: '200 Myr/s', yearsPerSec: 2e8, visualSpeed: 5.5, desc: 'H-R stellar evolution, red giants, supernovae & white dwarfs' }
 ];
 
-const STORAGE_KEY = 'parallax_universe_persistence_v1';
+export const COSMIC_WONDERS = [
+  {
+    id: 'wonder-web',
+    title: 'Laniakea-Prime Cosmic Web',
+    category: 'Cosmology • 10²⁵ m',
+    desc: 'Dark-matter filaments and supercluster attractors spanning hundreds of megaparsecs.',
+    scIdx: 0, galIdx: 0, sysIdx: 0, plIdx: 2, scaleIdx: 0
+  },
+  {
+    id: 'wonder-galaxy',
+    title: 'Aethelgard Grand-Design Spiral',
+    category: 'Galaxy • 10²¹ m',
+    desc: 'Rotating spiral density waves, HII emission nebulae, dust lanes, and central SMBH.',
+    scIdx: 0, galIdx: 0, sysIdx: 0, plIdx: 2, scaleIdx: 1
+  },
+  {
+    id: 'wonder-gaia',
+    title: 'Aurelia IV (Gaia-Nova)',
+    category: 'Civilization • Type 1.2',
+    desc: 'Temperate living world with nocturnal city grids, equatorial orbital ring & active biosphere.',
+    scIdx: 0, galIdx: 0, sysIdx: 0, plIdx: 2, scaleIdx: 4
+  },
+  {
+    id: 'wonder-surface',
+    title: 'Aurelia IV Surface Horizon',
+    category: 'Planetary Surface • 10³ m',
+    desc: 'Descend through the Rayleigh atmosphere to inspect alien landscapes, oceans & flora.',
+    scIdx: 0, galIdx: 0, sysIdx: 0, plIdx: 2, scaleIdx: 5
+  },
+  {
+    id: 'wonder-bh',
+    title: 'Gargantua-Vex Black Hole',
+    category: 'Relativity • Event Horizon',
+    desc: 'Stellar-mass black hole with ray-deflected gravitational lensing & Doppler-beamed accretion disk.',
+    scIdx: 0, galIdx: 0, sysIdx: 4, plIdx: 0, scaleIdx: 3
+  },
+  {
+    id: 'wonder-pulsar',
+    title: 'Vela-PSR Magnetar Pulsar',
+    category: 'Exotic Remnant • Neutron Star',
+    desc: 'Rapidly spinning magnetized neutron star sweeping relativistic lighthouse polar jets.',
+    scIdx: 0, galIdx: 0, sysIdx: 5, plIdx: 0, scaleIdx: 3
+  },
+  {
+    id: 'wonder-eyeball',
+    title: 'Terminus III (Eyeball World)',
+    category: 'Astrobiology • Tidally Locked',
+    desc: 'M-dwarf exoplanet with a permanent sunlit ocean, twilight biosphere belt & frozen nightside.',
+    scIdx: 0, galIdx: 0, sysIdx: 6, plIdx: 2, scaleIdx: 4
+  },
+  {
+    id: 'wonder-redgiant',
+    title: 'Hyperion Red Giant System',
+    category: 'Stellar Evolution • RGB III',
+    desc: 'Dying star swelling off the Main Sequence, superheating inner worlds & thawing outer moons.',
+    scIdx: 0, galIdx: 0, sysIdx: 2, plIdx: 2, scaleIdx: 3
+  },
+  {
+    id: 'wonder-ocean',
+    title: 'Thalassa Prime Ocean World',
+    category: 'Pelagic Exoplanet • 10⁷ m',
+    desc: 'Global deep-ocean biosphere with bioluminescent reefs and pelagic trophic web.',
+    scIdx: 0, galIdx: 0, sysIdx: 1, plIdx: 2, scaleIdx: 4
+  }
+];
+
+const STORAGE_KEY = 'parallax_universe_persistence_v2';
 
 export class SimulationEngine {
   constructor() {
     this.universeSeed = 'PARALLAX-2026-OMEGA';
     this.sectorCoords = [0, 0, 0];
 
-    this.currentLogScale = 24.6;
-    this.targetLogScale = 24.6;
+    this.currentLogScale = 7.4; // Start on the breathtaking orbital view of Aurelia IV!
+    this.targetLogScale = 7.4;
+    this.warpFactor = 0.0;
 
-    this.timeScaleIndex = 4;
+    this.timeScaleIndex = 2; // Gentle planetary rotation on launch
     this.elapsedYears = 0.0;
     this.baseCosmicEpochGyr = 13.800;
     this.visualTime = 0.0;
+
+    this.autopilotActive = false;
+    this._autopilotTimer = 0;
+    this._autopilotWonderIndex = 0;
 
     this.deltas = {};
     this.bookmarks = [];
@@ -357,10 +428,23 @@ export class SimulationEngine {
     this.transientEffects.evolutionPulseIntensity = Math.max(0, this.transientEffects.evolutionPulseIntensity - clampedDt * 0.5);
 
     const scaleDiff = this.targetLogScale - this.currentLogScale;
-    if (Math.abs(scaleDiff) > 0.0001) {
-      this.currentLogScale += scaleDiff * Math.min(1.0, clampedDt * 6.5);
-    } else {
-      this.currentLogScale = this.targetLogScale;
+    const scaleStep = Math.abs(scaleDiff) > 0.0001
+      ? scaleDiff * Math.min(1.0, clampedDt * 5.2)
+      : scaleDiff;
+    this.currentLogScale += scaleStep;
+
+    // Smooth relativistic warp streak factor proportional to logarithmic transit speed
+    const targetWarp = Math.min(1.0, Math.abs(scaleDiff) * 0.28);
+    this.warpFactor += (targetWarp - this.warpFactor) * Math.min(1.0, clampedDt * 7.5);
+
+    // Cinematic Autopilot Tour cycles smoothly through Cosmic Wonders
+    if (this.autopilotActive) {
+      this._autopilotTimer += clampedDt;
+      if (this._autopilotTimer >= 11.5) {
+        this._autopilotTimer = 0;
+        this._autopilotWonderIndex = (this._autopilotWonderIndex + 1) % COSMIC_WONDERS.length;
+        this.jumpToWonder(COSMIC_WONDERS[this._autopilotWonderIndex]);
+      }
     }
 
     if (timeScale.yearsPerSec > 0) {
@@ -778,5 +862,85 @@ export class SimulationEngine {
     this.activeLandmarkIndex = bm.landmarkIndex || 0;
     this.setTargetLogScale(bm.logScale);
     this.emitChange('jump_bookmark');
+  }
+
+  /**
+   * Travel freely across infinite 3D cosmic sectors [sx, sy, sz]
+   */
+  travelCosmicSector(dx, dy, dz) {
+    this.sectorCoords = [
+      this.sectorCoords[0] + dx,
+      this.sectorCoords[1] + dy,
+      this.sectorCoords[2] + dz
+    ];
+    this.activeSuperclusterIndex = 0;
+    this.activeGalaxyIndex = 0;
+    this.activeSystemIndex = 0;
+    this.activePlanetIndex = 2;
+    this.rebuildHierarchy();
+    this.flyToScale(0);
+    this.logEvent(
+      'cosmos',
+      `Entered Cosmic Sector [${this.sectorCoords.join(', ')}]`,
+      `Mapped ${this.cosmicWeb.superclusters.length} supercluster attractors and ${this.cosmicWeb.voids.length} cosmic voids.`
+    );
+    this.savePersistence();
+    this.emitChange('sector_travel');
+  }
+
+  jumpToWonder(wonder) {
+    if (!wonder) return;
+    this.sectorCoords = [0, 0, 0];
+    this.cosmicWeb = generateCosmicWeb(this.universeSeed, this.sectorCoords);
+    this.selectSupercluster(wonder.scIdx, false);
+    this.selectGalaxy(wonder.galIdx, false);
+    this.selectStarSystem(wonder.sysIdx, false);
+    this.selectPlanet(wonder.plIdx, false);
+    this.flyToScale(wonder.scaleIdx);
+    this.logEvent('cosmos', `Discovery Lock: ${wonder.title}`, wonder.desc);
+    this.emitChange('wonder_jump');
+  }
+
+  toggleAutopilot(forceState = null) {
+    this.autopilotActive = forceState !== null ? Boolean(forceState) : !this.autopilotActive;
+    this._autopilotTimer = 0;
+    if (this.autopilotActive) {
+      this._autopilotWonderIndex = 0;
+      this.jumpToWonder(COSMIC_WONDERS[0]);
+    }
+    this.emitChange('autopilot');
+    return this.autopilotActive;
+  }
+
+  exportUniverseSnapshot() {
+    return JSON.stringify(
+      {
+        version: '2.0.0',
+        universeSeed: this.universeSeed,
+        sectorCoords: this.sectorCoords,
+        elapsedYears: this.elapsedYears,
+        deltas: this.deltas,
+        bookmarks: this.bookmarks,
+        globalEvents: this.globalEvents.slice(0, 30)
+      },
+      null,
+      2
+    );
+  }
+
+  importUniverseSnapshot(jsonString) {
+    const parsed = JSON.parse(jsonString);
+    if (!parsed || !parsed.universeSeed) {
+      throw new Error('Invalid PARALLAX universe snapshot');
+    }
+    this.universeSeed = String(parsed.universeSeed);
+    this.sectorCoords = Array.isArray(parsed.sectorCoords) ? parsed.sectorCoords : [0, 0, 0];
+    this.elapsedYears = typeof parsed.elapsedYears === 'number' ? parsed.elapsedYears : 0;
+    this.deltas = parsed.deltas && typeof parsed.deltas === 'object' ? parsed.deltas : {};
+    this.bookmarks = Array.isArray(parsed.bookmarks) ? parsed.bookmarks : [];
+    this.globalEvents = Array.isArray(parsed.globalEvents) ? parsed.globalEvents : [];
+    this.rebuildHierarchy();
+    this.savePersistence();
+    this.emitChange('import');
   }
 }
